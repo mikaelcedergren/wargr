@@ -1,13 +1,37 @@
-@import url('//fonts.googleapis.com/css?family=Vollkorn:400,400i,700,700i,900,900i&display=swap');
+@import url('http://fonts.googleapis.com/css?family=Vollkorn:400,400i,700,700i,900,900i&display=swap');
 
 html, body {
     font-family: Vollkorn, serif;
+    font-size: 18px;
+}
+
+body {
+    max-width: 900px;
+    padding: 3rem;
 }
 
 nav {
+    position: fixed;
     width: 250px;
+    top: 3rem;
+    left: 3rem;
+    height: 100%;
+    z-index: 1;
+    overflow-x: hidden;
+    font-size: 0.8rem;
 }
 
 nav a {
     display: block;
+    text-decoration: none;
+}
+
+nav img {
+    margin-bottom: 1rem;
+    width: 75px;
+    height: 75px;
+}
+
+.content {
+    padding-left: 250px;
 }
