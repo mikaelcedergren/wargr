@@ -6,10 +6,24 @@ html, body {
     color: #555;
 }
 
+html {
+    display: flex;
+    flex-flow: row nowrap;  
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    height:100%;
+    margin: 0;
+    padding: 0;
+}
+
 body {
-    max-width: 900px;
     padding: 3rem;
-    margin: 0 auto;
+    flex: 0 1 auto;
+    align-self: auto;
+    width: 100%;
+    max-width: 900px;
+    height: 100%;
 }
 
 nav {
