@@ -9,6 +9,7 @@ html, body {
 body {
     max-width: 900px;
     padding: 3rem;
+    margin: 0 auto;
 }
 
 nav {
@@ -20,7 +21,7 @@ nav {
     z-index: 1;
     overflow-x: hidden;
     font-size: 0.8rem;
-    color: red;
+    color: #89B0AE;
 }
 
 nav a {
