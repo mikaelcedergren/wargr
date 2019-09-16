@@ -5,6 +5,10 @@ html, body {
     font-size: 18px;
 }
 
+* {
+    font-family: Vollkorn, serif;
+}
+
 body {
     max-width: 900px;
     padding: 3rem;
