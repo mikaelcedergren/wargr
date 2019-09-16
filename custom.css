@@ -1,11 +1,9 @@
 @import url('http://fonts.googleapis.com/css?family=Vollkorn:400,400i,700,700i,900,900i&display=swap');
---color: red;
---body-color: #444444;
 
 html, body {
     font-family: Vollkorn, serif;
     font-size: 18px;
-    color: var(--body-color);
+    color: #555;
 }
 
 body {
@@ -22,6 +20,7 @@ nav {
     z-index: 1;
     overflow-x: hidden;
     font-size: 0.8rem;
+    color: red;
 }
 
 nav a {
