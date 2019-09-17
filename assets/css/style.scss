@@ -8,13 +8,24 @@ $primary-color: #8c0c3d;
 
 
 html, body{
-font-family: Vollkorn;}
+font-family: Vollkorn;
+font-size: 18px;
+}
 
 a {
   color: $primary-color;
+  
+  &:hover {
+    color: $primary-color;
+    font-weight: normal;
+    text-decoration: none;
+  }
 }
 
 header {
+  img {
+    margin-bottom: 2rem;
+  }
 a {
   display: block;
   }
