@@ -4,6 +4,18 @@
 @import "{{ site.theme }}";
 
 @import url('https://fonts.googleapis.com/css?family=Vollkorn:400,400i,900&display=swap');
+$primary-color: #8c0c3d;
+
 
 html, body{
 font-family: Vollkorn;}
+
+a {
+  color: $primary-color;
+}
+
+header {
+a {
+  display: block;
+  }
+}
