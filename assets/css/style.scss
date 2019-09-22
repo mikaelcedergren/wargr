@@ -3,18 +3,18 @@
 
 @import "{{ site.theme }}";
 
-@import url("https://fonts.googleapis.com/css?family=Vollkorn:400,400i,900&display=swap");
+@import url('https://fonts.googleapis.com/css?family=Vollkorn:400,400i,900&display=swap');
 $primary-color: #8c0c3d;
 
-html,
-body {
-  font-family: Vollkorn;
-  font-size: 18px;
+
+html, body{
+font-family: Vollkorn;
+font-size: 18px;
 }
 
 a {
   color: $primary-color;
-
+  
   &:hover {
     color: $primary-color;
     font-weight: normal;
@@ -26,7 +26,7 @@ header {
   img {
     margin-bottom: 2rem;
   }
-  a {
-    display: block;
+a {
+  display: block;
   }
 }
