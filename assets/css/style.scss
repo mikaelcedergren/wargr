@@ -5,20 +5,24 @@
 
 @import url("https://fonts.googleapis.com/css?family=Vollkorn:400,400i,900&display=swap");
 $primary-color: #8c0c3d;
+$black: #444444;
+$bg-color: #eeeeee;
 
 html,
 body {
   font-family: Vollkorn;
   font-size: 18px;
+  color: $black;
+  background-color: $bg-color;
 }
 
 a {
-  color: $primary-color;
+  color: $black;
+  font-weight: normal;
+  text-decoration: none;
 
   &:hover {
     color: $primary-color;
-    font-weight: normal;
-    text-decoration: none;
   }
 }
 
