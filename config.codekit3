@@ -7,7 +7,7 @@
       "uuidString" : "5B2EEF3E-685D-4027-8CF1-0445A801CD66"
     }
   ],
-  "creatorBuild" : "34564",
+  "creatorBuild" : "34576",
   "files" : {
     "\/_config.yml" : {
       "cB" : 0,
@@ -142,6 +142,24 @@
       "hM" : 0,
       "oA" : 0,
       "oAP" : "\/CNAME",
+      "oF" : 0
+    },
+    "\/images\/logo-black.svg" : {
+      "ft" : 2097152,
+      "miP" : 0,
+      "oA" : 2,
+      "oAP" : "\/images\/logo-black.svg",
+      "oF" : 0,
+      "opt" : 0,
+      "plM" : 52780316221407,
+      "prP" : 0
+    },
+    "\/images\/logo.ai" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/images\/logo.ai",
       "oF" : 0
     },
     "\/images\/logo.svg" : {

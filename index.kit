@@ -1,20 +1,65 @@
 <html>
-    <head>
-        <style>
-            body {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                flex-flow: row nowrap;
-                background-color: #e3e3e3;
-                height: 100vh;
-            }
-            img {
-                max-width: 200px;
-            }
-        </style>
-    </head>
-    <body>
-        <img src="/images/logo.svg">
-    </body>
+  <head>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-flow: row nowrap;
+        background-color: #0d1a24;
+        height: 100vh;
+        padding: 3rem;
+        margin: 0;
+      }
+      img {
+        width: 100%;
+        max-width: 250px;
+
+        @media only screen and (max-width: 600px) {
+            max-width: 560px;
+        }
+      }
+      .wipe {
+        /* animation: wipe 4s ease-in-out 2s infinite; */
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 100%;
+        background-color: #e7e8e9;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-flow: row nowrap;
+        overflow: hidden;
+
+        img {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+      }
+
+      /* @keyframes wipe {
+                    0% {
+                        bottom: 100%;
+                    }
+
+                    100% {
+                        bottom: 0;
+                    }
+                    
+                } */
+    </style>
+  </head>
+  <body>
+    <img src="/images/logo.svg" />
+    <!-- <div class="wipe">
+            <img src="/images/logo-black.svg">
+        </div> -->
+  </body>
 </html>
