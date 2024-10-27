@@ -1,53 +1,58 @@
 <html>
-  <head>
-    <title>Michael Wargr | Unique Perspectives on Self-Development & Happiness</title>
-    <meta name="description" content="Join Michael Wargr as he explores unique approaches to self-development, focusing on achieving happiness and contentment in life through insightful videos.">
-    <meta name="keywords" content="Michael Wargr, Self-Development, Happiness, Contentment, Personal Growth, Life Coaching, Mindfulness, Positive Living, Self-Improvement, Unique Perspectives, Video Content, Mental Wellbeing, Inspirational Videos, Life Satisfaction, Personal Fulfillment">
-    <style>
-      * {
-        box-sizing: border-box;
+<head>
+  <title>Michael Wargr | Unique Perspectives on Self-Development & Happiness</title>
+  <meta name="description" content="Join Michael Wargr as he explores unique approaches to self-development, focusing on achieving happiness and contentment in life through insightful videos.">
+  <meta name="keywords" content="Michael Wargr, Self-Development, Happiness, Contentment, Personal Growth, Life Coaching, Mindfulness, Positive Living, Self-Improvement, Unique Perspectives, Video Content, Mental Wellbeing, Inspirational Videos, Life Satisfaction, Personal Fulfillment">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-flow: row nowrap;
+      background-color: #0d1a24;
+      height: 100vh;
+      padding: 3rem;
+      margin: 0;
+    }
+
+    img {
+      width: 100%;
+      max-width: 250px;
+      position: relative;
+      left: -20px;
+
+      @media only screen and (max-width: 600px) {
+        max-width: 560px;
       }
-      body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-flow: row nowrap;
-        background-color: #0d1a24;
-        height: 100vh;
-        padding: 3rem;
-        margin: 0;
-      }
+    }
+
+    .wipe {
+      /* animation: wipe 4s ease-in-out 2s infinite; */
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 100%;
+      background-color: #e7e8e9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-flow: row nowrap;
+      overflow: hidden;
+
       img {
-        width: 100%;
-        max-width: 250px;
-
-        @media only screen and (max-width: 600px) {
-            max-width: 560px;
-        }
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
       }
-      .wipe {
-        /* animation: wipe 4s ease-in-out 2s infinite; */
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 100%;
-        background-color: #e7e8e9;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-flow: row nowrap;
-        overflow: hidden;
+    }
 
-        img {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-        }
-      }
-
-      /* @keyframes wipe {
+    /* @keyframes wipe {
                     0% {
                         bottom: 100%;
                     }
@@ -55,14 +60,15 @@
                     100% {
                         bottom: 0;
                     }
-                    
+
                 } */
-    </style>
-  </head>
-  <body>
-    <img src="/images/logo.svg" />
-    <!-- <div class="wipe">
+  </style>
+</head>
+
+<body>
+  <img src="/images/logo.svg" />
+  <!-- <div class="wipe">
             <img src="/images/logo-black.svg">
         </div> -->
-  </body>
+</body>
 </html>
