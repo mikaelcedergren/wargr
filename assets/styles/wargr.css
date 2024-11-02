@@ -8,7 +8,7 @@ body {
   font-weight: 200;
   color: white;
   background-color: #0D1A24;
-  line-height: 1.5;
+  line-height: 1.8;
 }
 
 main {
@@ -31,6 +31,10 @@ h2 {
 
 iframe {
   border-radius: 8px;
+  min-width: 100%;
+  position: relative;
+  width: 100%;
+  height: 42%;
 }
 
 a {
@@ -45,7 +49,7 @@ a {
   width: 100%;
   min-height: calc(100vh - 4rem);
   font-size: 0.85rem;
-  line-height: 1.5;
+  line-height: 1.8;
 }
 .sidebar img {
   margin-bottom: 2rem;

@@ -1,1 +1,0 @@
-You already believe in a lot of lies and uncertanties, so why not believe in whatever helps you. Wether it's true or not doesn't matter if it doesn't impact others in a negative way, what's important is that it helps you and that it aligns with your own values and common sense.
