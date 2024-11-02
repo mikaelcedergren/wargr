@@ -7,7 +7,7 @@
       "uuidString" : "5B2EEF3E-685D-4027-8CF1-0445A801CD66"
     }
   ],
-  "creatorBuild" : "34590",
+  "creatorBuild" : "34592",
   "files" : {
     "\/_config.yml" : {
       "cB" : 0,
@@ -3187,6 +3187,21 @@
       "ma" : 0,
       "oA" : 0,
       "oAP" : "\/styles\/styles.css",
+      "oF" : 0,
+      "oS" : 0,
+      "pg" : 0,
+      "sct" : 0
+    },
+    "\/styles\/wargr.scss" : {
+      "aP" : 0,
+      "bl" : 0,
+      "co" : 0,
+      "dP" : 10,
+      "ec" : 1,
+      "ft" : 4,
+      "ma" : 0,
+      "oA" : 0,
+      "oAP" : "\/styles\/wargr.css",
       "oF" : 0,
       "oS" : 0,
       "pg" : 0,
