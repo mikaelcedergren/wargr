@@ -195,36 +195,6 @@
       "oAP" : "\/assets\/images\/favicon\/favicon.ico",
       "oF" : 0
     },
-    "\/assets\/images\/hamburger.svg" : {
-      "ft" : 2097152,
-      "miP" : 0,
-      "oA" : 2,
-      "oAP" : "\/assets\/images\/hamburger.svg",
-      "oF" : 0,
-      "opt" : 0,
-      "plM" : 52780316221407,
-      "prP" : 0
-    },
-    "\/assets\/images\/intro-logo.gif" : {
-      "ft" : 4194304,
-      "iS" : 453762,
-      "oA" : 0,
-      "oAP" : "\/assets\/images\/intro-logo.gif",
-      "oF" : 0,
-      "opt" : 0,
-      "ou" : "lpckwebp-none",
-      "rq" : 75
-    },
-    "\/assets\/images\/logo-black.svg" : {
-      "ft" : 2097152,
-      "miP" : 0,
-      "oA" : 2,
-      "oAP" : "\/assets\/images\/logo-black.svg",
-      "oF" : 0,
-      "opt" : 0,
-      "plM" : 52780316221407,
-      "prP" : 0
-    },
     "\/assets\/images\/og-image.jpg" : {
       "ft" : 16384,
       "iS" : 21055,
@@ -236,16 +206,6 @@
       "opt" : 0,
       "ou" : "lpckwebp-none",
       "q" : 100,
-      "rq" : 75
-    },
-    "\/assets\/images\/portfolio\/animated-logo-loop.gif" : {
-      "ft" : 4194304,
-      "iS" : 313283,
-      "oA" : 0,
-      "oAP" : "\/assets\/images\/portfolio\/animated-logo-loop.gif",
-      "oF" : 0,
-      "opt" : 0,
-      "ou" : "lpckwebp-none",
       "rq" : 75
     },
     "\/assets\/images\/portfolio\/animated-logo.gif" : {
@@ -1456,19 +1416,6 @@
       "opt" : 0,
       "ou" : "lpckwebp-none",
       "q" : 100,
-      "rq" : 75
-    },
-    "\/assets\/images\/portfolio\/logo.png" : {
-      "ft" : 32768,
-      "iS" : 1338,
-      "oA" : 0,
-      "oAP" : "\/assets\/images\/portfolio\/logo.png",
-      "oF" : 0,
-      "oIPL" : 0,
-      "opt" : 0,
-      "oT" : 1,
-      "ou" : "lpckwebp-none",
-      "q" : 90,
       "rq" : 75
     },
     "\/assets\/images\/portfolio\/photography\/interior-1.jpg" : {
@@ -2820,6 +2767,16 @@
       "q" : 90,
       "rq" : 75
     },
+    "\/assets\/images\/resume\/social-linkedin.svg" : {
+      "ft" : 2097152,
+      "miP" : 0,
+      "oA" : 2,
+      "oAP" : "\/assets\/images\/resume\/social-linkedin.svg",
+      "oF" : 0,
+      "opt" : 0,
+      "plM" : 52780316221407,
+      "prP" : 0
+    },
     "\/assets\/images\/signature.svg" : {
       "ft" : 2097152,
       "miP" : 0,
@@ -2830,11 +2787,11 @@
       "plM" : 52780316221407,
       "prP" : 0
     },
-    "\/assets\/images\/social-linkedin.svg" : {
+    "\/assets\/images\/wargr\/icon-play.svg" : {
       "ft" : 2097152,
       "miP" : 0,
       "oA" : 2,
-      "oAP" : "\/assets\/images\/social-linkedin.svg",
+      "oAP" : "\/assets\/images\/wargr\/icon-play.svg",
       "oF" : 0,
       "opt" : 0,
       "plM" : 52780316221407,
@@ -2849,6 +2806,19 @@
       "opt" : 0,
       "plM" : 52780316221407,
       "prP" : 0
+    },
+    "\/assets\/images\/wargr\/video-thumbnails\/proxy-image.jpg" : {
+      "ft" : 16384,
+      "iS" : 124842,
+      "jF" : 0,
+      "oA" : 0,
+      "oAP" : "\/assets\/images\/wargr\/video-thumbnails\/proxy-image.jpg",
+      "oF" : 0,
+      "oIPL" : 0,
+      "opt" : 0,
+      "ou" : "lpckwebp-none",
+      "q" : 100,
+      "rq" : 75
     },
     "\/assets\/print\/resume-of-mikael-cedergren.pdf" : {
       "cB" : 0,

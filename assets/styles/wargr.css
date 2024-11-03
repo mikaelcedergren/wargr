@@ -3,6 +3,17 @@
   box-sizing: border-box;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+p {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
 body {
   font-family: "Plus Jakarta Sans";
   font-weight: 200;
@@ -26,7 +37,10 @@ main {
 
 h1,
 h2 {
-  font-weight: 200;
+  text-transform: uppercase;
+  font-weight: 900;
+  font-size: 1.2rem;
+  letter-spacing: 0.25rem;
 }
 
 iframe {
@@ -35,6 +49,47 @@ iframe {
   position: relative;
   width: 100%;
   height: 42%;
+}
+
+.entry {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-flow: row nowrap;
+  gap: 1rem;
+}
+.entry p {
+  font-weight: 400;
+  font-size: 1.25rem;
+  color: white;
+}
+.entry .thumbnail {
+  position: relative;
+}
+.entry .thumbnail::after {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  content: "";
+  background-color: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(3px);
+  border-radius: 8px;
+}
+.entry .thumbnail .icon-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 64px;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+.entry .thumbnail img {
+  max-width: 180px;
+  border-radius: 8px;
+  position: relative;
+  z-index: 0;
 }
 
 a {
@@ -60,14 +115,4 @@ a {
 
 .content {
   width: 100%;
-}
-.content img {
-  width: 100%;
-  max-width: 250px;
-  margin-bottom: 2rem;
-}
-@media only screen and (max-width: 600px) {
-  .content img {
-    max-width: 560px;
-  }
 }
