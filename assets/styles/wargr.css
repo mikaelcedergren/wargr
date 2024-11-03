@@ -15,7 +15,7 @@ p {
 }
 
 body {
-  font-family: "Plus Jakarta Sans";
+  font-family: "Plus Jakarta Sans", Arial, Helvetica, sans-serif;
   font-weight: 200;
   color: white;
   background-color: #0D1A24;
