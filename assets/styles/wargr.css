@@ -52,19 +52,23 @@ iframe {
 }
 
 .entry {
+  transition: all 0.1s ease-out;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-flow: row wrap;
   gap: 0.5rem;
   padding: rem;
-  max-width: calc(50% - 0.5rem);
+  max-width: calc(50% - 1rem);
   border-radius: 16px;
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
 }
 .entry:hover {
+  transform: scale(1.1);
   background-color: rgba(255, 255, 255, 0.05);
+  box-shadow: 3px 8px 16px rgba(0, 0, 0, 0.3);
 }
-.entry:hover img {
+.entry:hover .thumbnail img {
   border-radius: 8px 8px 0 0;
 }
 .entry p {
@@ -129,6 +133,6 @@ a {
   align-items: flex-start;
   justify-content: flex-start;
   flex-flow: row wrap;
-  gap: 1rem;
+  gap: 2rem;
   width: 100%;
 }
