@@ -43,6 +43,23 @@ h2 {
   letter-spacing: 0.25rem;
 }
 
+.under-construction-cover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #0D1A24;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-flow: row nowrap;
+  gap: 1rem;
+}
+.under-construction-cover img {
+  max-width: 220px;
+}
+
 iframe {
   border-radius: 8px;
   min-width: 100%;
