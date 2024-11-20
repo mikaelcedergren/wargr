@@ -829,16 +829,16 @@ blockquote span div {
   opacity: 0;
 }
 .animate.delay-1 {
-  animation-delay: 1.25s;
+  animation-delay: 0.75s;
 }
 .animate.delay-2 {
-  animation-delay: 1.5s;
+  animation-delay: 1s;
 }
 .animate.delay-3 {
-  animation-delay: 1.75s;
+  animation-delay: 1.25s;
 }
 .animate.delay-4 {
-  animation-delay: 2s;
+  animation-delay: 1.5s;
 }
 @keyframes slidein {
   from {

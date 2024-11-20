@@ -1,4 +1,2 @@
 User-agent: *
-Disallow: /resume/
-Disallow: /portfolio/
-Disallow: /about/
+Disallow: /artworks/

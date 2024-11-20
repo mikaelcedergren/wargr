@@ -704,19 +704,19 @@ blockquote {
   opacity: 0;
 
   &.delay-1 {
-    animation-delay: 1.25s;
+    animation-delay: 0.75s;
   }
 
   &.delay-2 {
-    animation-delay: 1.5s;
+    animation-delay: 1s;
   }
 
   &.delay-3 {
-    animation-delay: 1.75s;
+    animation-delay: 1.25s;
   }
 
   &.delay-4 {
-    animation-delay: 2s;
+    animation-delay: 1.5s;
   }
 
   @keyframes slidein {
