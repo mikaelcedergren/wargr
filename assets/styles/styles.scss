@@ -804,4 +804,59 @@ blockquote {
   }
 }
 
+#blog {
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  flex-flow: row wrap;
+  gap: 2rem;
+
+  @media (max-width: $breakpoint-medium) {
+    flex-flow: column nowrap;
+  }
+
+  .blog-entry {
+    flex: 1 1 33%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-flow: column nowrap;
+    gap: 1rem;
+    border: $line;
+    padding: 2rem;
+    min-height: 100%;
+    max-width: calc(50% - 2rem);
+
+    @media (max-width: $breakpoint-medium) {
+      max-width: 100%;
+    }
+
+    p {
+      font-weight: $font-regular;
+    }
+
+    .fake-button {
+      display: block;
+      width: 100%;
+      border-top: $line;
+      line-height: 1;
+      padding: 2rem 2rem 0 2rem;
+      margin: 0 -2rem;
+      width: calc(100% + 4rem);
+    }
+  }
+}
+
+#blog-post {
+
+  p {
+    font-size: 1.2rem;
+    font-weight: $font-regular;
+  }
+
+  h2 {
+    font-size: 2rem;
+  }
+}
+
 // @import '_print-resume.scss';

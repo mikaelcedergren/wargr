@@ -2939,6 +2939,46 @@
       "pg" : 0,
       "sct" : 0
     },
+    "\/blog\/index.html" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/blog\/index.html",
+      "oF" : 0
+    },
+    "\/blog\/index.kit" : {
+      "cB" : 0,
+      "ft" : 2048,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/blog\/index.html",
+      "oF" : 0
+    },
+    "\/blog\/posts\/brainstorming.kit" : {
+      "cB" : 0,
+      "ft" : 2048,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/blog\/posts\/brainstorming.html",
+      "oF" : 0
+    },
+    "\/blog\/posts\/ui-and-ux.html" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/blog\/posts\/ui-and-ux.html",
+      "oF" : 0
+    },
+    "\/blog\/posts\/ui-and-ux.kit" : {
+      "cB" : 0,
+      "ft" : 2048,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/blog\/posts\/ui-and-ux.html",
+      "oF" : 0
+    },
     "\/CNAME" : {
       "cB" : 0,
       "ft" : 8192,
