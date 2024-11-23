@@ -2,24 +2,31 @@
   .mt-#{$i} {
     margin-top: $i + rem !important;
   }
+
   .mr-#{$i} {
     margin-right: $i + rem !important;
   }
+
   .mb-#{$i} {
     margin-bottom: $i + rem !important;
   }
+
   .ml-#{$i} {
     margin-left: $i + rem !important;
   }
+
   .pt-#{$i} {
     padding-top: $i + rem !important;
   }
+
   .pr-#{$i} {
     padding-right: $i + rem !important;
   }
+
   .pb-#{$i} {
     padding-bottom: $i + rem !important;
   }
+
   .pl-#{$i} {
     padding-left: $i + rem !important;
   }
@@ -43,6 +50,14 @@
 
 .text-small {
   font-size: 0.8rem;
+
+  @media (max-width: $breakpoint-medium) {
+    font-size: 1rem;
+  }
+}
+
+.text-large {
+  font-size: 1.2rem;
 }
 
 .text-bold {
