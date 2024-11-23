@@ -192,7 +192,8 @@ ul {
 }
 
 nav {
-  background-color: $white;
+  background-color: rgba(white, 0.9);
+  backdrop-filter: blur(4px);
   border-bottom: $line;
   position: fixed;
   top: 0;
