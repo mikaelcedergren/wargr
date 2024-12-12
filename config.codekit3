@@ -3096,12 +3096,20 @@
       "oAP" : "\/blog\/posts\/ui-and-ux.html",
       "oF" : 0
     },
-    "\/blog\/posts\/what-makes-a-brand-work.kit" : {
+    "\/blog\/posts\/whats-a-designer-and-why-do-you-need-one.html" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/blog\/posts\/whats-a-designer-and-why-do-you-need-one.html",
+      "oF" : 0
+    },
+    "\/blog\/posts\/whats-a-designer-and-why-do-you-need-one.kit" : {
       "cB" : 0,
       "ft" : 2048,
       "hM" : 0,
       "oA" : 0,
-      "oAP" : "\/blog\/posts\/what-makes-a-brand-work.html",
+      "oAP" : "\/blog\/posts\/whats-a-designer-and-why-do-you-need-one.html",
       "oF" : 0
     },
     "\/CNAME" : {
