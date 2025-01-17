@@ -863,6 +863,7 @@ blockquote span div {
   top: calc(64px + 2rem);
   font-size: 0.75rem;
   width: 260px;
+  line-height: 1;
 }
 .sidebar .links {
   display: flex;
@@ -884,7 +885,7 @@ blockquote span div {
   display: none;
 }
 .sidebar .portrait {
-  max-width: 100px;
+  max-width: 80px;
   border-radius: 100%;
   margin-bottom: 1rem;
 }
@@ -895,6 +896,8 @@ blockquote span div {
   position: static;
   padding: 0;
   margin: 0;
+  display: block;
+  margin-bottom: 0.1rem;
 }
 
 .grid-row {

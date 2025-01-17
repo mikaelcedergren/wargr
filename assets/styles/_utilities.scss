@@ -1,3 +1,5 @@
+@use 'variables' as *;
+
 @for $i from 0 to 5 {
   .mt-#{$i} {
     margin-top: $i + rem !important;
