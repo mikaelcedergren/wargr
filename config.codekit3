@@ -7,7 +7,7 @@
       "uuidString" : "5B2EEF3E-685D-4027-8CF1-0445A801CD66"
     }
   ],
-  "creatorBuild" : "34680",
+  "creatorBuild" : "34689",
   "files" : {
     "\/.gitignore" : {
       "cB" : 0,
@@ -3559,8 +3559,6 @@
     "buildFolderActive" : 0,
     "buildFolderName" : "build",
     "cleanBuild" : 1,
-    "cssoForceMediaMerge" : 0,
-    "cssoRestructure" : 1,
     "environmentVariableEntries" : [
       "NODE_ENV:::production"
     ],
