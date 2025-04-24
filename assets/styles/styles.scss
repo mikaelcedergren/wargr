@@ -856,7 +856,20 @@ blockquote {
     font-weight: $font-regular;
   }
 
+  ul {
+    li {
+      font-size: 1.2rem;
+      font-weight: $font-regular;
+    }
+  }
+
   h2 {
+    margin-top: 2rem;
     font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    font-size: 1.4rem;
   }
 }

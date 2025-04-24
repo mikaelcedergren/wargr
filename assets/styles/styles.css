@@ -966,6 +966,15 @@ blockquote span div {
   font-size: 1.2rem;
   font-weight: 400;
 }
+#blog-post ul li {
+  font-size: 1.2rem;
+  font-weight: 400;
+}
 #blog-post h2 {
+  margin-top: 2rem;
   font-size: 2rem;
+  margin-bottom: 1rem;
+}
+#blog-post h3 {
+  font-size: 1.4rem;
 }
