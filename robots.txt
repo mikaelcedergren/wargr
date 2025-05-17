@@ -1,2 +1,8 @@
 User-agent: *
+Disallow: /about/
 Disallow: /artworks/
+Disallow: /blog/
+Disallow: /concepts/
+Disallow: /photography/
+Disallow: /portfolio/
+Disallow: /resume/

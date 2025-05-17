@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 * {
   box-sizing: border-box;
 }
@@ -15,10 +15,10 @@ p {
 }
 
 body {
-  font-family: "Plus Jakarta Sans", Arial, Helvetica, sans-serif;
+  font-family: 'Plus Jakarta Sans', Arial, Helvetica, sans-serif;
   font-weight: 200;
   color: white;
-  background-color: #0D1A24;
+  background-color: #000;
   line-height: 1.7;
 }
 
@@ -49,7 +49,7 @@ h2 {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #0D1A24;
+  background-color: #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -57,7 +57,7 @@ h2 {
   gap: 1rem;
 }
 .under-construction-cover img {
-  max-width: 220px;
+  max-width: 160px;
 }
 
 iframe {
@@ -104,7 +104,7 @@ iframe {
   right: 0;
   bottom: 0;
   top: 0;
-  content: "";
+  content: '';
   background-color: rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(3px);
   border-radius: 8px;
@@ -125,7 +125,7 @@ iframe {
 }
 
 a {
-  color: #00E3C2;
+  color: #00e3c2;
   text-decoration: none;
 }
 
