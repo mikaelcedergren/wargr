@@ -3265,6 +3265,14 @@
       "oAP" : "\/robots.txt",
       "oF" : 0
     },
+    "\/youtube\/index.html" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/youtube\/index.html",
+      "oF" : 0
+    },
     "\/youtube\/index.kit" : {
       "cB" : 0,
       "ft" : 2048,
