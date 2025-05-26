@@ -2884,6 +2884,32 @@
       "plM" : 52780316221407,
       "prP" : 0
     },
+    "\/assets\/images\/wargr\/video-thumbnails\/drowning-thumbnail.png" : {
+      "ft" : 32768,
+      "iS" : 1480465,
+      "oA" : 0,
+      "oAP" : "\/assets\/images\/wargr\/video-thumbnails\/drowning-thumbnail.png",
+      "oF" : 0,
+      "oIPL" : 0,
+      "opt" : 0,
+      "oT" : 1,
+      "ou" : "lpckwebp-none",
+      "q" : 90,
+      "rq" : 75
+    },
+    "\/assets\/images\/wargr\/video-thumbnails\/mirror-thumbnail.jpg" : {
+      "ft" : 16384,
+      "iS" : 1019407,
+      "jF" : 0,
+      "oA" : 0,
+      "oAP" : "\/assets\/images\/wargr\/video-thumbnails\/mirror-thumbnail.jpg",
+      "oF" : 0,
+      "oIPL" : 0,
+      "opt" : 0,
+      "ou" : "lpckwebp-none",
+      "q" : 100,
+      "rq" : 75
+    },
     "\/assets\/images\/wargr\/video-thumbnails\/proxy-image.jpg" : {
       "ft" : 16384,
       "iS" : 124842,

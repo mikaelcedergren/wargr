@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 
-$contrast: #0D1A24;
+$contrast: #160f20;
 $primary: #00E3C2;
 $font-size: 16px;
 $border-radius: 8px;
@@ -24,7 +24,7 @@ p {
 
 body {
     font-family: 'Plus Jakarta Sans', Arial, Helvetica, sans-serif;
-    font-weight: 200;
+    font-weight: 300;
     color: white;
     background-color: $contrast;
     line-height: 1.7;
@@ -94,18 +94,59 @@ a {
 }
 
 .post {
+    transition: all 0.3s ease-out;
     background-color: rgba(black, 0.2);
     border-radius: $border-radius * 4;
-    padding: 2rem;
+    padding: 3rem;
     width: 100%;
     max-width: 600px;
     margin-bottom: 1rem;
+    will-change: transform;
+
+    &:hover {
+        background-color: $primary;
+        transform: scale(102%);
+        box-shadow: 0 16px 32px rgba($primary, 0.2);
+
+        h3,
+        p {
+            color: $contrast;
+        }
+    }
 
     h3 {
+        font-size: 1.5rem;
+        color: white;
+        text-decoration: none;
         margin-top: 0;
+        margin-bottom: 0.5rem;
     }
 
     p {
+        font-size: 1.25rem;
+        color: white;
+        text-decoration: none;
         width: 100%;
+        margin-top: 0;
+    }
+
+    .video {
+        position: relative;
+
+        img {
+            margin-top: 1rem;
+            max-width: 100%;
+            border-radius: $border-radius * 3;
+        }
+
+        .ti {
+            transition: all 0.2s ease-out;
+            color: white;
+            font-size: 4rem;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            left: 50%;
+            top: 50%;
+        }
     }
 }
