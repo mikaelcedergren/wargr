@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 
-$contrast: #160f20;
+$contrast: #10081b;
 $primary: #00E3C2;
 $font-size: 16px;
 $border-radius: 8px;
@@ -34,6 +34,20 @@ body {
     flex-flow: column nowrap;
     gap: 1rem;
     padding: 3rem 1rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-flow: column nowrap;
+    gap: 1rem;
+
+    p {
+        text-align: center;
+    }
 }
 
 main {
@@ -95,7 +109,7 @@ a {
 
 .post {
     transition: all 0.3s ease-out;
-    background-color: rgba(black, 0.2);
+    background-color: rgba(black, 0.4);
     border-radius: $border-radius * 4;
     padding: 3rem;
     width: 100%;
@@ -103,10 +117,16 @@ a {
     margin-bottom: 1rem;
     will-change: transform;
 
+    @media (max-width: 600px) {
+        padding: 1rem;
+        border-radius: $border-radius * 3;
+    }
+
     &:hover {
         background-color: $primary;
         transform: scale(102%);
-        box-shadow: 0 16px 32px rgba($primary, 0.2);
+        box-shadow: 0 16px 40px rgba($primary, 0.3);
+        z-index: 9999;
 
         h3,
         p {
