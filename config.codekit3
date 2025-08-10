@@ -17,6 +17,22 @@
       "oAP" : "\/.gitignore",
       "oF" : 0
     },
+    "\/assets\/components\/_footer.kit" : {
+      "cB" : 0,
+      "ft" : 2048,
+      "hM" : 0,
+      "oA" : 1,
+      "oAP" : "\/assets\/components\/_footer.html",
+      "oF" : 0
+    },
+    "\/assets\/components\/_header.kit" : {
+      "cB" : 0,
+      "ft" : 2048,
+      "hM" : 0,
+      "oA" : 1,
+      "oAP" : "\/assets\/components\/_header.html",
+      "oF" : 0
+    },
     "\/assets\/styles\/normalize.css" : {
       "aP" : 1,
       "bl" : 0,
@@ -72,6 +88,22 @@
       "hM" : 0,
       "oA" : 0,
       "oAP" : "\/career\/artworks\/index.html",
+      "oF" : 0
+    },
+    "\/career\/assets\/components\/_career-footer.kit" : {
+      "cB" : 0,
+      "ft" : 2048,
+      "hM" : 0,
+      "oA" : 1,
+      "oAP" : "\/career\/assets\/components\/_career-footer.html",
+      "oF" : 0
+    },
+    "\/career\/assets\/components\/_career-header.kit" : {
+      "cB" : 0,
+      "ft" : 2048,
+      "hM" : 0,
+      "oA" : 1,
+      "oAP" : "\/career\/assets\/components\/_career-header.html",
       "oF" : 0
     },
     "\/career\/assets\/images\/company-logos\/boss-media-logo.png" : {
@@ -3158,22 +3190,6 @@
       "hM" : 0,
       "oA" : 0,
       "oAP" : "\/career\/blog\/posts\/whats-a-designer-and-why-do-you-need-one.html",
-      "oF" : 0
-    },
-    "\/career\/components\/_career-footer.kit" : {
-      "cB" : 0,
-      "ft" : 2048,
-      "hM" : 0,
-      "oA" : 1,
-      "oAP" : "\/career\/components\/_career-footer.html",
-      "oF" : 0
-    },
-    "\/career\/components\/_career-header.kit" : {
-      "cB" : 0,
-      "ft" : 2048,
-      "hM" : 0,
-      "oA" : 1,
-      "oAP" : "\/career\/components\/_career-header.html",
       "oF" : 0
     },
     "\/career\/concepts\/index.html" : {
