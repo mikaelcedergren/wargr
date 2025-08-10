@@ -33,6 +33,75 @@
       "oAP" : "\/assets\/components\/_header.html",
       "oF" : 0
     },
+    "\/assets\/images\/animated-logo.gif" : {
+      "ft" : 4194304,
+      "iS" : 628525,
+      "oA" : 0,
+      "oAP" : "\/assets\/images\/animated-logo.gif",
+      "oF" : 0,
+      "opt" : 0,
+      "ou" : "lpckwebp-none",
+      "rq" : 75
+    },
+    "\/assets\/images\/icon-play.svg" : {
+      "ft" : 2097152,
+      "miP" : 0,
+      "oA" : 2,
+      "oAP" : "\/assets\/images\/icon-play.svg",
+      "oF" : 0,
+      "opt" : 0,
+      "plM" : 52780316221407,
+      "prP" : 0
+    },
+    "\/assets\/images\/logo.svg" : {
+      "ft" : 2097152,
+      "miP" : 0,
+      "oA" : 2,
+      "oAP" : "\/assets\/images\/logo.svg",
+      "oF" : 0,
+      "opt" : 0,
+      "plM" : 52780316221407,
+      "prP" : 0
+    },
+    "\/assets\/images\/video-thumbnails\/drowning-thumbnail.png" : {
+      "ft" : 32768,
+      "iS" : 1480465,
+      "oA" : 0,
+      "oAP" : "\/assets\/images\/video-thumbnails\/drowning-thumbnail.png",
+      "oF" : 0,
+      "oIPL" : 0,
+      "opt" : 0,
+      "oT" : 1,
+      "ou" : "lpckwebp-none",
+      "q" : 90,
+      "rq" : 75
+    },
+    "\/assets\/images\/video-thumbnails\/mirror-thumbnail.jpg" : {
+      "ft" : 16384,
+      "iS" : 1019407,
+      "jF" : 0,
+      "oA" : 0,
+      "oAP" : "\/assets\/images\/video-thumbnails\/mirror-thumbnail.jpg",
+      "oF" : 0,
+      "oIPL" : 0,
+      "opt" : 0,
+      "ou" : "lpckwebp-none",
+      "q" : 100,
+      "rq" : 75
+    },
+    "\/assets\/images\/video-thumbnails\/proxy-image.jpg" : {
+      "ft" : 16384,
+      "iS" : 124842,
+      "jF" : 0,
+      "oA" : 0,
+      "oAP" : "\/assets\/images\/video-thumbnails\/proxy-image.jpg",
+      "oF" : 0,
+      "oIPL" : 0,
+      "opt" : 0,
+      "ou" : "lpckwebp-none",
+      "q" : 100,
+      "rq" : 75
+    },
     "\/assets\/styles\/normalize.css" : {
       "aP" : 1,
       "bl" : 0,
@@ -42,6 +111,18 @@
       "ma" : 0,
       "oA" : 0,
       "oAP" : "\/assets\/styles\/normalize-min.css",
+      "oF" : 0,
+      "pg" : 0
+    },
+    "\/assets\/styles\/wargr.css" : {
+      "aP" : 1,
+      "bl" : 0,
+      "ci" : 0,
+      "co" : 0,
+      "ft" : 16,
+      "ma" : 0,
+      "oA" : 0,
+      "oAP" : "\/assets\/styles\/wargr-min.css",
       "oF" : 0,
       "pg" : 0
     },
@@ -2910,75 +2991,6 @@
       "opt" : 0,
       "plM" : 52780316221407,
       "prP" : 0
-    },
-    "\/career\/assets\/images\/wargr\/animated-logo.gif" : {
-      "ft" : 4194304,
-      "iS" : 628525,
-      "oA" : 0,
-      "oAP" : "\/career\/assets\/images\/wargr\/animated-logo.gif",
-      "oF" : 0,
-      "opt" : 0,
-      "ou" : "lpckwebp-none",
-      "rq" : 75
-    },
-    "\/career\/assets\/images\/wargr\/icon-play.svg" : {
-      "ft" : 2097152,
-      "miP" : 0,
-      "oA" : 2,
-      "oAP" : "\/career\/assets\/images\/wargr\/icon-play.svg",
-      "oF" : 0,
-      "opt" : 0,
-      "plM" : 52780316221407,
-      "prP" : 0
-    },
-    "\/career\/assets\/images\/wargr\/logo.svg" : {
-      "ft" : 2097152,
-      "miP" : 0,
-      "oA" : 2,
-      "oAP" : "\/career\/assets\/images\/wargr\/logo.svg",
-      "oF" : 0,
-      "opt" : 0,
-      "plM" : 52780316221407,
-      "prP" : 0
-    },
-    "\/career\/assets\/images\/wargr\/video-thumbnails\/drowning-thumbnail.png" : {
-      "ft" : 32768,
-      "iS" : 1480465,
-      "oA" : 0,
-      "oAP" : "\/career\/assets\/images\/wargr\/video-thumbnails\/drowning-thumbnail.png",
-      "oF" : 0,
-      "oIPL" : 0,
-      "opt" : 0,
-      "oT" : 1,
-      "ou" : "lpckwebp-none",
-      "q" : 90,
-      "rq" : 75
-    },
-    "\/career\/assets\/images\/wargr\/video-thumbnails\/mirror-thumbnail.jpg" : {
-      "ft" : 16384,
-      "iS" : 1019407,
-      "jF" : 0,
-      "oA" : 0,
-      "oAP" : "\/career\/assets\/images\/wargr\/video-thumbnails\/mirror-thumbnail.jpg",
-      "oF" : 0,
-      "oIPL" : 0,
-      "opt" : 0,
-      "ou" : "lpckwebp-none",
-      "q" : 100,
-      "rq" : 75
-    },
-    "\/career\/assets\/images\/wargr\/video-thumbnails\/proxy-image.jpg" : {
-      "ft" : 16384,
-      "iS" : 124842,
-      "jF" : 0,
-      "oA" : 0,
-      "oAP" : "\/career\/assets\/images\/wargr\/video-thumbnails\/proxy-image.jpg",
-      "oF" : 0,
-      "oIPL" : 0,
-      "opt" : 0,
-      "ou" : "lpckwebp-none",
-      "q" : 100,
-      "rq" : 75
     },
     "\/career\/assets\/print\/resume-of-mikael-cedergren.pdf" : {
       "cB" : 0,
