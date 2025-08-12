@@ -4,6 +4,11 @@
   box-sizing: border-box;
 }
 
+html,
+body {
+  height: auto;
+}
+
 h1,
 h2,
 h3,
@@ -43,7 +48,6 @@ aside {
   min-width: 140px;
   font-size: 17px;
   line-height: 1.2;
-  height: 100%;
   padding: 0.5rem;
 }
 aside a:hover {
