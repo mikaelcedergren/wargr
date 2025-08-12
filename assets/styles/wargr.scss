@@ -6,6 +6,7 @@ $background: #fff;
 $black: #363737;
 $grey: #ddd;
 $font-size: 21px;
+$font-size-small: 17px;
 $border-radius: 8px;
 $max-width: 768px;
 $line: 1px solid $grey;
@@ -36,18 +37,84 @@ body {
     background-color: $background;
     line-height: 1.5;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-flow: column nowrap;
-    gap: 1rem;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-flow: row nowrap;
+    gap: 2rem;
     padding: 3rem 1rem;
     max-width: $max-width;
     margin: 0 auto;
 }
 
+aside {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-flow: column nowrap;
+    gap: 0.25rem;
+    border-right: $line;
+    min-width: 140px;
+    font-size: $font-size-small;
+    line-height: 1.2;
+    height: 100%;
+
+    a {
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    .logo {
+        max-width: 80px;
+        width: 80px;
+        margin-bottom: 2rem;
+    }
+
+    // background-color: red;
+}
+
+main {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-flow: column nowrap;
+    gap: 0;
+
+
+    .post {
+        transition: background-color 0.3s ease-out;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-flow: row nowrap;
+        gap: 1rem;
+        font-size: $font-size-small;
+        padding: 0.5rem;
+
+        &:hover {
+            background-color: rgba(black, 0.05);
+            border-radius: $font-size;
+        }
+
+        h3 {
+            font-family: $font-family-heading;
+            font-size: $font-size-small;
+        }
+
+        img {
+            max-width: 200px;
+            border-radius: $font-size;
+        }
+
+        p {
+            margin-bottom: 0;
+        }
+    }
+}
+
 h1 {
     font-family: $font-family-heading;
-    font-size: 5rem;
+    font-size: 4.3rem;
     line-height: 1;
     font-weight: 200;
 }
@@ -70,7 +137,6 @@ a {
 }
 
 article {
-    border-bottom: $line;
     padding-bottom: 2rem;
 }
 
@@ -80,22 +146,4 @@ hr {
     width: 100%;
     height: 1px;
     border-top: 1px solid $grey;
-}
-
-.logo {
-    max-width: 80px;
-    width: 80px;
-}
-
-.post {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-flow: row nowrap;
-    gap: 1rem;
-
-    img {
-        max-width: 200px;
-        border-radius: $font-size;
-    }
 }

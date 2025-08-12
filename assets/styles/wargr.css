@@ -24,18 +24,72 @@ body {
   background-color: #fff;
   line-height: 1.5;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-flow: column nowrap;
-  gap: 1rem;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-flow: row nowrap;
+  gap: 2rem;
   padding: 3rem 1rem;
   max-width: 768px;
   margin: 0 auto;
 }
 
+aside {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-flow: column nowrap;
+  gap: 0.25rem;
+  border-right: 1px solid #ddd;
+  min-width: 140px;
+  font-size: 17px;
+  line-height: 1.2;
+  height: 100%;
+}
+aside a:hover {
+  text-decoration: underline;
+}
+aside .logo {
+  max-width: 80px;
+  width: 80px;
+  margin-bottom: 2rem;
+}
+
+main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-flow: column nowrap;
+  gap: 0;
+}
+main .post {
+  transition: background-color 0.3s ease-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-flow: row nowrap;
+  gap: 1rem;
+  font-size: 17px;
+  padding: 0.5rem;
+}
+main .post:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 21px;
+}
+main .post h3 {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 17px;
+}
+main .post img {
+  max-width: 200px;
+  border-radius: 21px;
+}
+main .post p {
+  margin-bottom: 0;
+}
+
 h1 {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 5rem;
+  font-size: 4.3rem;
   line-height: 1;
   font-weight: 200;
 }
@@ -58,7 +112,6 @@ a {
 }
 
 article {
-  border-bottom: 1px solid #ddd;
   padding-bottom: 2rem;
 }
 
@@ -68,21 +121,4 @@ hr {
   width: 100%;
   height: 1px;
   border-top: 1px solid #ddd;
-}
-
-.logo {
-  max-width: 80px;
-  width: 80px;
-}
-
-.post {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-flow: row nowrap;
-  gap: 1rem;
-}
-.post img {
-  max-width: 200px;
-  border-radius: 21px;
 }
