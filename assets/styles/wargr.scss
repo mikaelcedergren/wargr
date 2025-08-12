@@ -3,15 +3,16 @@
 
 
 $background: #fff;
-$black: #363737;
+$black: #333;
 $grey: #ddd;
-$font-size: 21px;
-$font-size-small: 17px;
-$border-radius: 5px;
-$max-width: 850px;
+$font-size: 22px;
+$font-size-small: 16px;
+$border-radius: 4px;
+$max-width: 960px;
 $line: 1px solid rgba(black, 0.08);
 $font-family-body: 'Crimson Text', 'Times New Roman', Times, serif;
 $font-family-heading: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$breakpoint: 450px;
 
 * {
     box-sizing: border-box;
@@ -27,7 +28,9 @@ h2,
 h3,
 h4,
 h5,
-p {
+p,
+em,
+a {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -41,14 +44,23 @@ body {
     color: $black;
     background-color: $background;
     line-height: 1.5;
+
+}
+
+.wrapper {
     display: flex;
-    align-items: flex-start;
+    align-items: stretch;
     justify-content: flex-start;
     flex-flow: row nowrap;
     gap: 2rem;
     padding: 3rem 1rem;
     max-width: $max-width;
     margin: 0 auto;
+
+    @media (max-width: $breakpoint) {
+        flex-flow: column nowrap;
+        align-items: flex-start;
+    }
 }
 
 aside {
@@ -58,14 +70,28 @@ aside {
     flex-flow: column nowrap;
     gap: 0.25rem;
     border-right: $line;
-    min-width: 140px;
+    width: 240px;
+    min-width: 240px;
     font-size: $font-size-small;
     line-height: 1.2;
-    padding: 0.5rem;
+    padding: 0.5rem 2rem;
+    min-height: 100vh;
 
-    a {
+    @media (max-width: $breakpoint) {
+        min-height: 0;
+        border-right: none;
+        align-items: center;
+        width: 100%;
+        border-bottom: $line;
+    }
+
+    .social-link {
         &:hover {
             text-decoration: underline;
+        }
+
+        @media (max-width: $breakpoint) {
+            display: none;
         }
     }
 
@@ -75,7 +101,11 @@ aside {
         margin-bottom: 2rem;
     }
 
-    // background-color: red;
+    p {
+        @media (max-width: $breakpoint) {
+            display: none;
+        }
+    }
 }
 
 main {
@@ -93,23 +123,29 @@ main {
         align-items: center;
         justify-content: flex-start;
         flex-flow: row nowrap;
-        gap: 1rem;
+        gap: 2rem;
         font-size: $font-size-small;
         padding: 0.5rem;
+        line-height: 1.4;
 
         &:hover {
-            background-color: rgba(black, 0.05);
-            border-radius: $border-radius * 1.5;
+            background-color: rgba(black, 0.03);
+            border-radius: $border-radius * 2;
         }
 
         h3 {
             font-family: $font-family-heading;
             font-size: $font-size-small;
+            margin-bottom: 0.25rem;
         }
 
         img {
             max-width: 200px;
             border-radius: $border-radius;
+
+            @media (max-width: $breakpoint) {
+                display: none;
+            }
         }
 
         p {
@@ -121,8 +157,12 @@ main {
 h1 {
     font-family: $font-family-heading;
     font-size: 4.3rem;
-    line-height: 1;
+    line-height: 1.1;
     font-weight: 200;
+
+    @media (max-width: $breakpoint) {
+        font-size: 2rem;
+    }
 }
 
 h2 {
@@ -130,6 +170,10 @@ h2 {
     line-height: 1.4;
     font-weight: 400;
     padding-bottom: 1rem;
+
+    @media (max-width: $breakpoint) {
+        font-size: 1.5rem;
+    }
 }
 
 h3 {
@@ -151,4 +195,13 @@ hr {
     width: 100%;
     height: 1px;
     border-top: 1px solid $grey;
+}
+
+.promo {
+    border-top: $line;
+    padding-top: 2rem;
+
+    a {
+        text-decoration: underline;
+    }
 }

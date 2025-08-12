@@ -14,7 +14,9 @@ h2,
 h3,
 h4,
 h5,
-p {
+p,
+em,
+a {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -24,18 +26,27 @@ p {
 body {
   font-family: "Crimson Text", "Times New Roman", Times, serif;
   font-weight: 400;
-  font-size: 21px;
-  color: #363737;
+  font-size: 22px;
+  color: #333;
   background-color: #fff;
   line-height: 1.5;
+}
+
+.wrapper {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   justify-content: flex-start;
   flex-flow: row nowrap;
   gap: 2rem;
   padding: 3rem 1rem;
-  max-width: 850px;
+  max-width: 960px;
   margin: 0 auto;
+}
+@media (max-width: 450px) {
+  .wrapper {
+    flex-flow: column nowrap;
+    align-items: flex-start;
+  }
 }
 
 aside {
@@ -45,18 +56,39 @@ aside {
   flex-flow: column nowrap;
   gap: 0.25rem;
   border-right: 1px solid rgba(0, 0, 0, 0.08);
-  min-width: 140px;
-  font-size: 17px;
+  width: 240px;
+  min-width: 240px;
+  font-size: 16px;
   line-height: 1.2;
-  padding: 0.5rem;
+  padding: 0.5rem 2rem;
+  min-height: 100vh;
 }
-aside a:hover {
+@media (max-width: 450px) {
+  aside {
+    min-height: 0;
+    border-right: none;
+    align-items: center;
+    width: 100%;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+}
+aside .social-link:hover {
   text-decoration: underline;
+}
+@media (max-width: 450px) {
+  aside .social-link {
+    display: none;
+  }
 }
 aside .logo {
   max-width: 80px;
   width: 80px;
   margin-bottom: 2rem;
+}
+@media (max-width: 450px) {
+  aside p {
+    display: none;
+  }
 }
 
 main {
@@ -73,21 +105,28 @@ main .post {
   align-items: center;
   justify-content: flex-start;
   flex-flow: row nowrap;
-  gap: 1rem;
-  font-size: 17px;
+  gap: 2rem;
+  font-size: 16px;
   padding: 0.5rem;
+  line-height: 1.4;
 }
 main .post:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 7.5px;
+  background-color: rgba(0, 0, 0, 0.03);
+  border-radius: 8px;
 }
 main .post h3 {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
+  margin-bottom: 0.25rem;
 }
 main .post img {
   max-width: 200px;
-  border-radius: 5px;
+  border-radius: 4px;
+}
+@media (max-width: 450px) {
+  main .post img {
+    display: none;
+  }
 }
 main .post p {
   margin-bottom: 0;
@@ -96,8 +135,13 @@ main .post p {
 h1 {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 4.3rem;
-  line-height: 1;
+  line-height: 1.1;
   font-weight: 200;
+}
+@media (max-width: 450px) {
+  h1 {
+    font-size: 2rem;
+  }
 }
 
 h2 {
@@ -106,13 +150,18 @@ h2 {
   font-weight: 400;
   padding-bottom: 1rem;
 }
+@media (max-width: 450px) {
+  h2 {
+    font-size: 1.5rem;
+  }
+}
 
 h3 {
   margin-bottom: 0;
 }
 
 a {
-  color: #363737;
+  color: #333;
   text-decoration: none;
 }
 
@@ -126,4 +175,12 @@ hr {
   width: 100%;
   height: 1px;
   border-top: 1px solid #ddd;
+}
+
+.promo {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: 2rem;
+}
+.promo a {
+  text-decoration: underline;
 }

@@ -33,6 +33,14 @@
       "oAP" : "\/assets\/components\/_header.html",
       "oF" : 0
     },
+    "\/assets\/components\/_promo.kit" : {
+      "cB" : 0,
+      "ft" : 2048,
+      "hM" : 0,
+      "oA" : 1,
+      "oAP" : "\/assets\/components\/_promo.html",
+      "oF" : 0
+    },
     "\/assets\/images\/animated-logo.gif" : {
       "ft" : 4194304,
       "iS" : 628525,
@@ -3416,6 +3424,38 @@
       "hM" : 0,
       "oA" : 0,
       "oAP" : "\/posts\/how-we-choose-the-slaughterhouse.html",
+      "oF" : 0
+    },
+    "\/posts\/the-quiet-rise-of-babylons-whore.html" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/posts\/the-quiet-rise-of-babylons-whore.html",
+      "oF" : 0
+    },
+    "\/posts\/the-quiet-rise-of-babylons-whore.kit" : {
+      "cB" : 0,
+      "ft" : 2048,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/posts\/the-quiet-rise-of-babylons-whore.html",
+      "oF" : 0
+    },
+    "\/posts\/the-quiet-shape-of-corruption.html" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/posts\/the-quiet-shape-of-corruption.html",
+      "oF" : 0
+    },
+    "\/posts\/the-quiet-shape-of-corruption.kit" : {
+      "cB" : 0,
+      "ft" : 2048,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/posts\/the-quiet-shape-of-corruption.html",
       "oF" : 0
     },
     "\/posts\/what-the-mirror-does-not-show-you.html" : {
