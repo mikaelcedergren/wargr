@@ -81,9 +81,13 @@ aside .social-link:hover {
   }
 }
 aside .logo {
+  transition: opacity 0.3s ease-out;
   max-width: 80px;
   width: 80px;
   margin-bottom: 2rem;
+}
+aside .logo:hover {
+  opacity: 0.8;
 }
 @media (max-width: 450px) {
   aside p {
@@ -167,6 +171,36 @@ a {
 
 article {
   padding-bottom: 2rem;
+}
+article .video {
+  display: block;
+  transition: opacity 0.3s ease-out;
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 4px;
+  margin-bottom: 2rem;
+  max-height: 369px;
+  cursor: pointer;
+}
+article .video:hover {
+  opacity: 0.8;
+}
+article .video:after {
+  content: "";
+  background-image: url(/assets/images/icon-play.svg);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  position: absolute;
+  height: 100px;
+  width: 100px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+article .video img {
+  width: 100%;
+  object-fit: cover;
 }
 
 hr {
