@@ -108,32 +108,33 @@ main .spotlight {
   height: 320px;
   overflow: hidden;
   border-radius: 4px;
-  margin: 0 1rem 1rem 0.5rem;
+  margin-bottom: 0.5rem;
 }
 @media (max-width: 450px) {
   main .spotlight {
     display: none;
   }
 }
-main .spotlight:hover h3 {
-  background-color: #000;
-  color: #fff;
-}
-main .spotlight h3 {
+main .spotlight div {
   transition: all 0.3 ease-out;
   position: absolute;
-  left: 1rem;
-  bottom: 1rem;
+  left: 0;
+  bottom: 0;
   color: #fff;
   max-width: 70%;
+  padding: 1rem;
+}
+main .spotlight div h3 {
   font-size: 3rem;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 300;
   line-height: 1;
-  background-color: rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(8px);
-  padding: 0.5rem;
-  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+main .spotlight div p {
+  font-size: 16px;
+  line-height: 1.4;
+  margin: 0;
 }
 main .spotlight img {
   object-fit: cover;
@@ -151,13 +152,9 @@ main .post {
   flex-flow: row nowrap;
   gap: 2rem;
   font-size: 16px;
-  padding: 0.5rem 1.5rem 0.5rem 0.5rem;
   line-height: 1.4;
+  padding-bottom: 0.5rem;
   border-radius: 8px;
-}
-main .post:hover {
-  background-color: #000;
-  color: #fff;
 }
 main .post h3 {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;

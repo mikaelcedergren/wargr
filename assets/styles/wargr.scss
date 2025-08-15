@@ -127,34 +127,35 @@ main {
         height: 320px;
         overflow: hidden;
         border-radius: $border-radius;
-        margin: 0 1rem 1rem 0.5rem;
+        margin-bottom: 0.5rem;
 
         @media (max-width: $breakpoint) {
             display: none;
         }
 
-        &:hover {
-            h3 {
-                background-color: $deep-black;
-                color: $background;
-            }
-        }
-
-        h3 {
+        div {
             transition: all 0.3 ease-out;
             position: absolute;
-            left: 1rem;
-            bottom: 1rem;
+            left: 0;
+            bottom: 0;
             color: $background;
             max-width: 70%;
-            font-size: 3rem;
-            font-family: $font-family-heading;
-            font-weight: 300;
-            line-height: 1;
-            background-color: rgba(black, 0.1);
-            backdrop-filter: blur(8px);
-            padding: 0.5rem;
-            border-radius: $border-radius;
+            padding: 1rem;
+
+            h3 {
+                font-size: 3rem;
+                font-family: $font-family-heading;
+                font-weight: 300;
+                line-height: 1;
+                margin-bottom: 0.5rem;
+            }
+
+            p {
+                font-size: $font-size-small;
+                line-height: 1.4;
+                margin: 0;
+            }
+
         }
 
         img {
@@ -176,14 +177,9 @@ main {
         flex-flow: row nowrap;
         gap: 2rem;
         font-size: $font-size-small;
-        padding: 0.5rem 1.5rem 0.5rem 0.5rem;
         line-height: 1.4;
+        padding-bottom: 0.5rem;
         border-radius: $border-radius * 2;
-
-        &:hover {
-            background-color: $deep-black;
-            color: $background;
-        }
 
         h3 {
             font-family: $font-family-heading;
