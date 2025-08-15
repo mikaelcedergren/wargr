@@ -4,6 +4,7 @@
 
 $background: #fff;
 $black: #333;
+$deep-black: #000;
 $grey: #ddd;
 $font-size: 22px;
 $font-size-small: 16px;
@@ -120,22 +121,68 @@ main {
     flex-flow: column nowrap;
     gap: 0;
 
+    .spotlight {
+        position: relative;
+        width: calc(100% - 0.5rem);
+        height: 320px;
+        overflow: hidden;
+        border-radius: $border-radius;
+        margin: 0 1rem 1rem 0.5rem;
+
+        @media (max-width: $breakpoint) {
+            display: none;
+        }
+
+        &:hover {
+            h3 {
+                background-color: $deep-black;
+                color: $background;
+            }
+        }
+
+        h3 {
+            transition: all 0.3 ease-out;
+            position: absolute;
+            left: 1rem;
+            bottom: 1rem;
+            color: $background;
+            max-width: 70%;
+            font-size: 3rem;
+            font-family: $font-family-heading;
+            font-weight: 300;
+            line-height: 1;
+            background-color: rgba(black, 0.1);
+            backdrop-filter: blur(8px);
+            padding: 0.5rem;
+            border-radius: $border-radius;
+        }
+
+        img {
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+    }
+
 
     .post {
         width: 100%;
-        transition: background-color 0.3s ease-out;
         display: flex;
         align-items: center;
         justify-content: flex-start;
         flex-flow: row nowrap;
         gap: 2rem;
         font-size: $font-size-small;
-        padding: 0.5rem;
+        padding: 0.5rem 1.5rem 0.5rem 0.5rem;
         line-height: 1.4;
+        border-radius: $border-radius * 2;
 
         &:hover {
-            background-color: rgba(black, 0.03);
-            border-radius: $border-radius * 2;
+            background-color: $deep-black;
+            color: $background;
         }
 
         h3 {
