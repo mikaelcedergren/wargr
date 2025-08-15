@@ -5,7 +5,7 @@
 $background: #fff;
 $black: #333;
 $deep-black: #000;
-$grey: #ddd;
+$discreet: #555;
 $font-size: 22px;
 $font-size-small: 16px;
 $border-radius: 4px;
@@ -13,7 +13,7 @@ $max-width: 960px;
 $line: 1px solid rgba(black, 0.08);
 $font-family-body: 'Crimson Text', 'Times New Roman', Times, serif;
 $font-family-heading: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-$breakpoint: 450px;
+$breakpoint: 650px;
 
 * {
     box-sizing: border-box;
@@ -123,11 +123,18 @@ main {
 
     .spotlight {
         position: relative;
-        width: calc(100% - 0.5rem);
+        width: 100%;
         height: 320px;
         overflow: hidden;
         border-radius: $border-radius;
-        margin-bottom: 0.5rem;
+        margin-bottom: 2rem;
+        transition: outline-width 0.2s linear;
+        outline-width: 0;
+        outline-offset: 1px;
+
+        &:hover {
+            outline: 3px solid $black;
+        }
 
         @media (max-width: $breakpoint) {
             display: none;
@@ -159,12 +166,16 @@ main {
         }
 
         img {
-            object-fit: cover;
             position: absolute;
             top: 0;
             bottom: 0;
             left: 0;
             right: 0;
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+
+
         }
     }
 
@@ -178,26 +189,61 @@ main {
         gap: 2rem;
         font-size: $font-size-small;
         line-height: 1.4;
-        padding-bottom: 0.5rem;
-        border-radius: $border-radius * 2;
+        padding-bottom: 1.5rem;
+        border-bottom: $line;
+        margin-bottom: 1.5rem;
+
+        @media (max-width: $breakpoint) {
+            gap: 1rem;
+        }
+
+        &:hover {
+            color: $deep-black;
+
+            p {
+                color: $deep-black;
+
+            }
+        }
+
+        div {
+            width: 100%;
+        }
 
         h3 {
+            font-size: 1.2rem;
             font-family: $font-family-heading;
-            font-size: $font-size-small;
             margin-bottom: 0.25rem;
+
+            @media (max-width: $breakpoint) {
+                font-size: 1rem;
+            }
         }
 
         img {
-            max-width: 200px;
+            width: 100%;
+            max-width: 180px;
+            object-fit: cover;
             border-radius: $border-radius;
+            aspect-ratio: 12 / 9;
 
             @media (max-width: $breakpoint) {
-                display: none;
+                max-width: 80px;
+                aspect-ratio: 9 / 12;
             }
         }
 
         p {
             margin-bottom: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            color: $discreet;
+
+            @media (max-width: $breakpoint) {
+                -webkit-line-clamp: 2;
+            }
         }
     }
 }
@@ -276,12 +322,14 @@ hr {
     display: block;
     width: 100%;
     height: 1px;
-    border-top: 1px solid $grey;
+    border-top: $line;
 }
 
 .promo {
     border-top: $line;
-    padding-top: 2rem;
+    padding: 2rem 0;
+    border-bottom: $line;
+    margin-bottom: 2rem;
 
     a {
         text-decoration: underline;
