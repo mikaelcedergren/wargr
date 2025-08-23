@@ -79,6 +79,19 @@
       "plM" : 52780316221407,
       "prP" : 0
     },
+    "\/assets\/images\/og-image.jpg" : {
+      "ft" : 16384,
+      "iS" : 111462,
+      "jF" : 0,
+      "oA" : 0,
+      "oAP" : "\/assets\/images\/og-image.jpg",
+      "oF" : 0,
+      "oIPL" : 0,
+      "opt" : 0,
+      "ou" : "lpckwebp-none",
+      "q" : 100,
+      "rq" : 75
+    },
     "\/assets\/images\/posts\/babylons-whore-thumbnail.jpg" : {
       "ft" : 16384,
       "iS" : 1479046,
@@ -3582,20 +3595,20 @@
       "oAP" : "\/posts\/what-the-mirror-does-not-show-you.html",
       "oF" : 0
     },
-    "\/posts\/why-do-i-feel-so-overwhelmed-tips.html" : {
+    "\/posts\/why-you-feel-stuck-and-how-to-find-clarity-again.html" : {
       "cB" : 0,
       "ft" : 8192,
       "hM" : 0,
       "oA" : 0,
-      "oAP" : "\/posts\/why-do-i-feel-so-overwhelmed-tips.html",
+      "oAP" : "\/posts\/why-you-feel-stuck-and-how-to-find-clarity-again.html",
       "oF" : 0
     },
-    "\/posts\/why-do-i-feel-so-overwhelmed-tips.kit" : {
+    "\/posts\/why-you-feel-stuck-and-how-to-find-clarity-again.kit" : {
       "cB" : 0,
       "ft" : 2048,
       "hM" : 0,
       "oA" : 0,
-      "oAP" : "\/posts\/why-do-i-feel-so-overwhelmed-tips.html",
+      "oAP" : "\/posts\/why-you-feel-stuck-and-how-to-find-clarity-again.html",
       "oF" : 0
     },
     "\/posts\/wtf-is-self-love.html" : {
