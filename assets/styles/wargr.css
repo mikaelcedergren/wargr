@@ -183,6 +183,7 @@ main .post h3 {
   font-size: 1.2rem;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   margin-bottom: 0.25rem;
+  font-weight: 400;
 }
 @media (max-width: 650px) {
   main .post h3 {
@@ -257,12 +258,13 @@ article .video {
   position: relative;
   width: 100%;
   overflow: hidden;
-  margin-bottom: 2rem;
   max-height: 369px;
   cursor: pointer;
   transition: outline-width 0.2s linear;
   outline-width: 0;
   outline-offset: 1px;
+  margin: 0 -2rem 2rem -2rem;
+  width: calc(100% + 2rem);
 }
 article .video:hover {
   outline: 3px solid #333;

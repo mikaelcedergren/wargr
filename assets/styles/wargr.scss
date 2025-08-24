@@ -215,6 +215,7 @@ main {
             font-size: 1.2rem;
             font-family: $font-family-heading;
             margin-bottom: 0.25rem;
+            font-weight: 400;
 
             @media (max-width: $breakpoint) {
                 font-size: 1rem;
@@ -288,12 +289,13 @@ article {
         position: relative;
         width: 100%;
         overflow: hidden;
-        margin-bottom: 2rem;
         max-height: 369px;
         cursor: pointer;
         transition: outline-width 0.2s linear;
         outline-width: 0;
         outline-offset: 1px;
+        margin: 0 -2rem 2rem -2rem;
+        width: calc(100% + 2rem);
 
         &:hover {
             outline: 3px solid $black;
