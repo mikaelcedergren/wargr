@@ -126,7 +126,6 @@ main {
         width: 100%;
         height: 320px;
         overflow: hidden;
-        border-radius: $border-radius;
         margin-bottom: 2rem;
         transition: outline-width 0.2s linear;
         outline-width: 0;
@@ -189,9 +188,7 @@ main {
         gap: 2rem;
         font-size: $font-size-small;
         line-height: 1.4;
-        padding-bottom: 1.5rem;
         border-bottom: $line;
-        margin-bottom: 1.5rem;
 
         @media (max-width: $breakpoint) {
             gap: 1rem;
@@ -199,6 +196,10 @@ main {
 
         &:hover {
             color: $deep-black;
+
+            img {
+                opacity: 0.8;
+            }
 
             p {
                 color: $deep-black;
@@ -221,10 +222,10 @@ main {
         }
 
         img {
+            transition: all 0.3s ease;
             width: 100%;
             max-width: 180px;
             object-fit: cover;
-            border-radius: $border-radius;
             aspect-ratio: 12 / 9;
 
             @media (max-width: $breakpoint) {
@@ -284,17 +285,18 @@ article {
 
     .video {
         display: block;
-        transition: opacity 0.3s ease-out;
         position: relative;
         width: 100%;
         overflow: hidden;
-        border-radius: $border-radius;
         margin-bottom: 2rem;
         max-height: 369px;
         cursor: pointer;
+        transition: outline-width 0.2s linear;
+        outline-width: 0;
+        outline-offset: 1px;
 
         &:hover {
-            opacity: 0.8;
+            outline: 3px solid $black;
         }
 
         &:after {
@@ -303,8 +305,8 @@ article {
             background-size: 100% 100%;
             background-repeat: no-repeat;
             position: absolute;
-            height: 100px;
-            width: 100px;
+            height: 150px;
+            width: 150px;
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
