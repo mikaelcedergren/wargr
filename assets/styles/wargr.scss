@@ -190,6 +190,10 @@ main {
         line-height: 1.4;
         border-bottom: $line;
 
+        &:last-child {
+            border-bottom: none;
+        }
+
         @media (max-width: $breakpoint) {
             gap: 1rem;
         }
@@ -307,8 +311,8 @@ article {
             background-size: 100% 100%;
             background-repeat: no-repeat;
             position: absolute;
-            height: 150px;
-            width: 150px;
+            height: 48px;
+            width: 48px;
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
