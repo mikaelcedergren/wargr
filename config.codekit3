@@ -232,6 +232,19 @@
       "q" : 100,
       "rq" : 75
     },
+    "\/assets\/images\/posts\/stuck-thumbnail.jpg" : {
+      "ft" : 16384,
+      "iS" : 219096,
+      "jF" : 0,
+      "oA" : 0,
+      "oAP" : "\/assets\/images\/posts\/stuck-thumbnail.jpg",
+      "oF" : 0,
+      "oIPL" : 0,
+      "opt" : 0,
+      "ou" : "lpckwebp-none",
+      "q" : 100,
+      "rq" : 75
+    },
     "\/assets\/images\/posts\/two-photos-thumbnail.jpg" : {
       "ft" : 16384,
       "iS" : 529202,
