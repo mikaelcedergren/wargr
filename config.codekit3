@@ -59,6 +59,53 @@
       "ou" : "lpckwebp-none",
       "rq" : 75
     },
+    "\/assets\/images\/apple-touch-icon.png" : {
+      "ft" : 32768,
+      "iS" : 35184,
+      "oA" : 0,
+      "oAP" : "\/assets\/images\/apple-touch-icon.png",
+      "oF" : 0,
+      "oIPL" : 0,
+      "opt" : 0,
+      "oT" : 1,
+      "ou" : "lpckwebp-none",
+      "q" : 90,
+      "rq" : 75
+    },
+    "\/assets\/images\/favicon-16x16.png" : {
+      "ft" : 32768,
+      "iS" : 1548,
+      "oA" : 0,
+      "oAP" : "\/assets\/images\/favicon-16x16.png",
+      "oF" : 0,
+      "oIPL" : 0,
+      "opt" : 0,
+      "oT" : 1,
+      "ou" : "lpckwebp-none",
+      "q" : 90,
+      "rq" : 75
+    },
+    "\/assets\/images\/favicon-32x32.png" : {
+      "ft" : 32768,
+      "iS" : 2893,
+      "oA" : 0,
+      "oAP" : "\/assets\/images\/favicon-32x32.png",
+      "oF" : 0,
+      "oIPL" : 0,
+      "opt" : 0,
+      "oT" : 1,
+      "ou" : "lpckwebp-none",
+      "q" : 90,
+      "rq" : 75
+    },
+    "\/assets\/images\/favicon.ico" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/assets\/images\/favicon.ico",
+      "oF" : 0
+    },
     "\/assets\/images\/icon-back.svg" : {
       "ft" : 2097152,
       "miP" : 0,
@@ -3741,7 +3788,7 @@
     "creationDate" : 735923161.14453399,
     "displayValue" : "wargr",
     "displayValueWasSetByUser" : 0,
-    "iconImageName" : "\/career\/assets\/images\/favicon\/apple-touch-icon.png",
+    "iconImageName" : "\/assets\/images\/apple-touch-icon.png",
     "iconImageWasSetByUser" : 0
   },
   "projectSettings" : {
