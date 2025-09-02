@@ -82,8 +82,8 @@ aside .social-link:hover {
 }
 aside .logo {
   transition: opacity 0.3s ease-out;
-  max-width: 80px;
-  width: 80px;
+  max-width: 100px;
+  width: 100px;
   margin-bottom: 2rem;
 }
 aside .logo:hover {

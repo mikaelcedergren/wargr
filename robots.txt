@@ -1,3 +1,2 @@
 User-agent: *
-Disallow: /career/
 Sitemap: https://wargr.com/sitemap.xml
