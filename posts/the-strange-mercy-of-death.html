@@ -20,7 +20,13 @@
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://wargr.com/">
     <meta property="og:image" content="https://wargr.com/assets/images/og-image.jpg">
-    <link rel="stylesheet" type="text/css" href="/assets/styles/normalize.css" />
+    <link id="main-style" rel="stylesheet" href="https://mikaelcedergren.github.io/catalyst/catalyst.css">
+    <script>
+        const link = document.getElementById('main-style');
+        const url = new URL(link.href);
+        url.searchParams.set('v', Date.now()); // bust cache with timestamp
+        link.href = url.toString();
+    </script>
     <link rel="stylesheet" type="text/css" href="/assets/styles/wargr.css" />
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">

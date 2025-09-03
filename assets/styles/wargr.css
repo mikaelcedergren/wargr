@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap");
 * {
   box-sizing: border-box;
 }
@@ -24,7 +22,7 @@ a {
 }
 
 body {
-  font-family: "EB Garamond", "Times New Roman", Times, serif;
+  font-family: var(--font-family-body);
   font-weight: 400;
   font-size: 23px;
   color: #333;
@@ -58,7 +56,7 @@ aside {
   border-right: 1px solid rgba(0, 0, 0, 0.08);
   width: 240px;
   min-width: 240px;
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1.2;
   padding: 0.5rem 2rem;
   min-height: 100vh;
@@ -156,18 +154,18 @@ main .spotlight div {
   left: 0;
   bottom: 0;
   color: #fff;
-  max-width: 70%;
-  padding: 1rem;
+  max-width: 80%;
+  padding: 2rem;
 }
 main .spotlight div h3 {
   font-size: 3rem;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-family-heading);
   font-weight: 300;
   line-height: 1;
   margin-bottom: 0.5rem;
 }
 main .spotlight div p {
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1.4;
   margin: 0;
 }
@@ -188,7 +186,7 @@ main .post {
   justify-content: flex-start;
   flex-flow: row nowrap;
   gap: 2rem;
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1.4;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
@@ -214,7 +212,7 @@ main .post div {
 }
 main .post h3 {
   font-size: 1.2rem;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-family-heading);
   margin-bottom: 0.25rem;
   font-weight: 400;
 }
@@ -239,7 +237,7 @@ main .post img {
 main .post p {
   margin-bottom: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   color: #555;
@@ -251,7 +249,7 @@ main .post p {
 }
 
 h1 {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-family-heading);
   font-size: 4.3rem;
   line-height: 1.1;
   font-weight: 200;
@@ -263,6 +261,7 @@ h1 {
 }
 
 h2 {
+  font-family: var(--font-family-body);
   font-size: 2rem;
   line-height: 1.3;
   font-weight: 400;
