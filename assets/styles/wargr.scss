@@ -102,6 +102,7 @@ aside {
 
     p {
         line-height: 1.5;
+        color: $discreet;
 
         @media (max-width: $breakpoint) {
             display: none;
