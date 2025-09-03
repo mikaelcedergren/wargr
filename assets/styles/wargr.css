@@ -165,14 +165,16 @@ main .spotlight div {
 main .spotlight div h3 {
   font-size: 4rem;
   font-family: var(--font-family-heading);
-  font-weight: 300;
+  font-weight: var(--font-weight-light);
   line-height: 1;
   margin-bottom: 0.5rem;
 }
 main .spotlight div p {
-  max-width: 75%;
-  line-height: 1.6;
+  max-width: 90%;
+  line-height: 1.5;
   margin: 0;
+  font-style: italic;
+  font-size: 1.4rem;
 }
 main .spotlight img {
   position: absolute;
@@ -219,7 +221,8 @@ main .post h3 {
   font-size: 1.2rem;
   font-family: var(--font-family-heading);
   margin-bottom: 0.25rem;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
+  font-style: italic;
 }
 @media (max-width: 650px) {
   main .post h3 {
@@ -271,6 +274,8 @@ h2 {
   line-height: 1.6;
   font-weight: 400;
   padding-bottom: 1rem;
+  font-style: italic;
+  letter-spacing: unset;
 }
 @media (max-width: 650px) {
   h2 {
@@ -341,7 +346,11 @@ hr {
   border-top: 1px solid rgba(0, 0, 0, 0.08);
   padding: 2rem 0;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  margin-bottom: 2rem;
+  margin-bottom: 0;
+  line-height: 1.75;
+}
+.promo em {
+  line-height: inherit;
 }
 .promo a {
   text-decoration: underline;

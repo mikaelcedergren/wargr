@@ -181,15 +181,17 @@ main {
             h3 {
                 font-size: 4rem;
                 font-family: var(--font-family-heading);
-                font-weight: 300;
+                font-weight: var(--font-weight-light);
                 line-height: 1;
                 margin-bottom: 0.5rem;
             }
 
             p {
-                max-width: 75%;
-                line-height: 1.6;
+                max-width: 90%;
+                line-height: 1.5;
                 margin: 0;
+                font-style: italic;
+                font-size: 1.4rem;
             }
 
         }
@@ -247,7 +249,8 @@ main {
             font-size: 1.2rem;
             font-family: var(--font-family-heading);
             margin-bottom: 0.25rem;
-            font-weight: 400;
+            font-weight: var(--font-weight-regular);
+            font-style: italic;
 
             @media (max-width: $breakpoint) {
                 font-size: 1rem;
@@ -299,6 +302,8 @@ h2 {
     line-height: 1.6;
     font-weight: 400;
     padding-bottom: 1rem;
+    font-style: italic;
+    letter-spacing: unset;
 
     @media (max-width: $breakpoint) {
         font-size: 1.5rem;
@@ -371,7 +376,12 @@ hr {
     border-top: $line;
     padding: 2rem 0;
     border-bottom: $line;
-    margin-bottom: 2rem;
+    margin-bottom: 0;
+    line-height: 1.75;
+
+    em {
+        line-height: inherit;
+    }
 
     a {
         text-decoration: underline;
