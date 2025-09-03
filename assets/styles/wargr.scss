@@ -152,12 +152,13 @@ main {
     .spotlight {
         transition: opacity 0.3s ease;
         position: relative;
-        width: 100%;
-        height: 320px;
+        height: 420px;
         overflow: hidden;
         margin-bottom: 1px;
         outline-width: 0;
         outline-offset: 1px;
+        margin-left: -2rem;
+        width: calc(100% + 2rem);
 
         &:hover {
             opacity: 0.9;
@@ -173,11 +174,10 @@ main {
             left: 0;
             bottom: 0;
             color: $background;
-            max-width: 80%;
             padding: 2rem;
 
             h3 {
-                font-size: 3rem;
+                font-size: 4rem;
                 font-family: var(--font-family-heading);
                 font-weight: 300;
                 line-height: 1;
@@ -185,8 +185,8 @@ main {
             }
 
             p {
-                font-size: $font-size-small;
-                line-height: 1.4;
+                max-width: 75%;
+                line-height: 1.6;
                 margin: 0;
             }
 
@@ -199,10 +199,8 @@ main {
             left: 0;
             right: 0;
             width: 100%;
-            height: 320px;
+            height: 420px;
             object-fit: cover;
-
-
         }
     }
 
