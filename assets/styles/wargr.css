@@ -25,7 +25,7 @@ body {
   font-family: var(--font-family-body);
   font-weight: 400;
   font-size: 23px;
-  color: #1a1a1a;
+  color: var(--ink);
   background-color: #fff;
   line-height: 1.4;
 }
@@ -278,7 +278,7 @@ h3 {
 }
 
 a {
-  color: #1a1a1a;
+  color: var(--ink);
   text-decoration: none;
 }
 

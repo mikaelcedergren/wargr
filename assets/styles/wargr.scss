@@ -1,5 +1,4 @@
 $background: #fff;
-$black: #1a1a1a;
 $deep-black: #000;
 $discreet: #555;
 $font-size: 23px;
@@ -36,7 +35,7 @@ body {
     font-family: var(--font-family-body);
     font-weight: 400;
     font-size: $font-size;
-    color: $black;
+    color: var(--ink);
     background-color: $background;
     line-height: 1.4;
 
@@ -309,7 +308,7 @@ h3 {
 }
 
 a {
-    color: $black;
+    color: var(--ink);
     text-decoration: none;
 }
 
@@ -335,7 +334,6 @@ article {
         }
 
         &:hover {
-            // outline: 1px solid $black;
             opacity: 0.9;
         }
 
