@@ -624,14 +624,6 @@
       "oAP" : "\/robots.txt",
       "oF" : 0
     },
-    "\/sitemap.xml" : {
-      "cB" : 0,
-      "ft" : 8192,
-      "hM" : 0,
-      "oA" : 0,
-      "oAP" : "\/sitemap.xml",
-      "oF" : 0
-    },
     "\/youtube\/index.html" : {
       "cB" : 0,
       "ft" : 8192,
