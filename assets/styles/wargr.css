@@ -87,6 +87,9 @@ aside .logo {
 aside .logo:hover {
   opacity: 0.8;
 }
+aside p {
+  line-height: 1.5;
+}
 @media (max-width: 650px) {
   aside p {
     display: none;

@@ -101,6 +101,8 @@ aside {
     }
 
     p {
+        line-height: 1.5;
+
         @media (max-width: $breakpoint) {
             display: none;
         }
