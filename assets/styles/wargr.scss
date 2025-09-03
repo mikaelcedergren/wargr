@@ -43,7 +43,7 @@ body {
 
 .wrapper {
     display: flex;
-    align-items: stretch;
+    align-items: flex-start;
     justify-content: flex-start;
     flex-flow: row nowrap;
     gap: 2rem;
@@ -58,6 +58,8 @@ body {
 }
 
 aside {
+    position: sticky;
+    top: 1rem;
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
