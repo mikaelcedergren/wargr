@@ -1,2 +1,1 @@
 User-agent: *
-Sitemap: https://wargr.com/sitemap.xml
