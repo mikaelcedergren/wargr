@@ -24,7 +24,7 @@ a {
 body {
   font-family: var(--font-family-body);
   font-weight: 400;
-  font-size: 23px;
+  font-size: 17px;
   color: var(--ink);
   background-color: var(--surface);
   line-height: 1.4;
@@ -56,7 +56,7 @@ aside {
   border-right: 1px solid rgba(0, 0, 0, 0.08);
   width: 240px;
   min-width: 240px;
-  font-size: 18px;
+  font-size: 14px;
   line-height: 1.2;
   padding: 0.5rem 2rem;
   min-height: 100vh;
@@ -165,7 +165,7 @@ main .spotlight div h3 {
   margin-bottom: 0.5rem;
 }
 main .spotlight div p {
-  font-size: 18px;
+  font-size: 14px;
   line-height: 1.4;
   margin: 0;
 }
@@ -186,7 +186,7 @@ main .post {
   justify-content: flex-start;
   flex-flow: row nowrap;
   gap: 2rem;
-  font-size: 18px;
+  font-size: 14px;
   line-height: 1.4;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
@@ -262,8 +262,8 @@ h1 {
 
 h2 {
   font-family: var(--font-family-body);
-  font-size: 2rem;
-  line-height: 1.3;
+  font-size: 1.5rem;
+  line-height: 1.6;
   font-weight: 400;
   padding-bottom: 1rem;
 }
