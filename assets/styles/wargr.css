@@ -90,6 +90,7 @@ aside .logo:hover {
 aside p {
   line-height: 1.5;
   color: #555;
+  font-style: italic;
 }
 @media (max-width: 650px) {
   aside p {
