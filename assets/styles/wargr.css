@@ -224,7 +224,6 @@ main .post h3 {
   font-family: var(--font-family-heading);
   margin-bottom: 0.25rem;
   font-weight: var(--font-weight-regular);
-  font-style: italic;
 }
 @media (max-width: 650px) {
   main .post h3 {
