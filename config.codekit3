@@ -162,6 +162,19 @@
       "q" : 100,
       "rq" : 75
     },
+    "\/assets\/images\/posts\/charlie-thumbnail.jpg" : {
+      "ft" : 16384,
+      "iS" : 551001,
+      "jF" : 0,
+      "oA" : 0,
+      "oAP" : "\/assets\/images\/posts\/charlie-thumbnail.jpg",
+      "oF" : 0,
+      "oIPL" : 0,
+      "opt" : 0,
+      "ou" : "lpckwebp-none",
+      "q" : 100,
+      "rq" : 75
+    },
     "\/assets\/images\/posts\/confidence-thumbnail.jpg" : {
       "ft" : 16384,
       "iS" : 525820,
@@ -483,6 +496,22 @@
       "hM" : 0,
       "oA" : 0,
       "oAP" : "\/posts\/stop-chasing-purpose.html",
+      "oF" : 0
+    },
+    "\/posts\/the-death-of-charlie-kirk-a-bitter-turning-point.html" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/posts\/the-death-of-charlie-kirk-a-bitter-turning-point.html",
+      "oF" : 0
+    },
+    "\/posts\/the-death-of-charlie-kirk-a-bitter-turning-point.kit" : {
+      "cB" : 0,
+      "ft" : 2048,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/posts\/the-death-of-charlie-kirk-a-bitter-turning-point.html",
       "oF" : 0
     },
     "\/posts\/the-photo-that-decides-your-future.html" : {
