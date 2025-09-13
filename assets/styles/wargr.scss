@@ -74,11 +74,19 @@ aside {
     min-height: 100vh;
 
     @media (max-width: $breakpoint) {
+        background-color: var(--surface);
+        top: 0;
+        z-index: 1;
         min-height: 0;
         border-right: none;
         align-items: center;
         width: 100%;
         border-bottom: $line;
+        padding: 1rem;
+
+        .logo {
+            margin: 0 !important;
+        }
     }
 
     .social-link {

@@ -65,11 +65,18 @@ aside {
 }
 @media (max-width: 650px) {
   aside {
+    background-color: var(--surface);
+    top: 0;
+    z-index: 1;
     min-height: 0;
     border-right: none;
     align-items: center;
     width: 100%;
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 1rem;
+  }
+  aside .logo {
+    margin: 0 !important;
   }
 }
 aside .social-link:hover {
