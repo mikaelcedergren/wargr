@@ -38,7 +38,7 @@ body {
     color: var(--ink);
     background-color: var(--surface);
     line-height: 1.4;
-
+    padding: 0;
 }
 
 .wrapper {
@@ -229,6 +229,7 @@ main {
         font-size: $font-size-small;
         line-height: 1.4;
         border-bottom: $line;
+        padding: 1rem 0;
 
         &:last-child {
             border-bottom: none;
@@ -272,6 +273,7 @@ main {
             max-width: 180px;
             object-fit: cover;
             aspect-ratio: 12 / 9;
+            margin: -1rem 0;
 
             @media (max-width: $breakpoint) {
                 max-width: 80px;
