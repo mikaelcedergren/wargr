@@ -240,6 +240,19 @@
       "q" : 100,
       "rq" : 75
     },
+    "\/assets\/images\/posts\/politics-thumbnail.jpg" : {
+      "ft" : 16384,
+      "iS" : 736672,
+      "jF" : 0,
+      "oA" : 0,
+      "oAP" : "\/assets\/images\/posts\/politics-thumbnail.jpg",
+      "oF" : 0,
+      "oIPL" : 0,
+      "opt" : 0,
+      "ou" : "lpckwebp-none",
+      "q" : 100,
+      "rq" : 75
+    },
     "\/assets\/images\/posts\/purpose-thumbnail.jpg" : {
       "ft" : 16384,
       "iS" : 1395712,
@@ -480,6 +493,22 @@
       "hM" : 0,
       "oA" : 0,
       "oAP" : "\/posts\/how-we-choose-the-slaughterhouse.html",
+      "oF" : 0
+    },
+    "\/posts\/politics-something-doesnt-add-up.html" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/posts\/politics-something-doesnt-add-up.html",
+      "oF" : 0
+    },
+    "\/posts\/politics-something-doesnt-add-up.kit" : {
+      "cB" : 0,
+      "ft" : 2048,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/posts\/politics-something-doesnt-add-up.html",
       "oF" : 0
     },
     "\/posts\/stop-chasing-purpose.html" : {
