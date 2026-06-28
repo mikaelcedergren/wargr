@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://wargr.com/sitemap.xml

@@ -1,0 +1,28 @@
+#!/bin/zsh
+# Rebuild wargr.com from the ghostwriter essays. Triggered by launchd (com.wargr.sync) on changes to
+# ../ghostwriter/wargr, plus a periodic safety poll. The running web service serves dist/browser
+# straight from disk, so a rebuild needs no service restart (and no root).
+#
+# Guard: only rebuild when the PUBLISHED set actually changed — the signature is over the ☑-marked
+# files' names + mtimes + sizes, so editing a draft (no ☑) never triggers a build.
+set -eu
+export PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin
+
+REPO=/Users/cortex/Development/wargr
+SRC=/Users/cortex/Development/ghostwriter/wargr
+STAMP="$REPO/.run/ghostwriter.stamp"
+cd "$REPO"
+
+sig=$(find "$SRC" -maxdepth 1 -name '☑*.md' -exec stat -f '%N %m %z' {} \; 2>/dev/null | sort | shasum | awk '{print $1}')
+
+if [[ -f "$STAMP" && "$(cat "$STAMP")" == "$sig" ]]; then
+  exit 0   # published set unchanged — nothing to do
+fi
+
+ts() { date -u +%FT%TZ }
+echo "[$(ts)] published set changed — rebuilding wargr.com"
+node scripts/import-articles.mjs
+./node_modules/.bin/ng build --configuration prod
+node scripts/flatten.mjs
+echo "$sig" > "$STAMP"
+echo "[$(ts)] wargr.com rebuilt (server serves the updated dist/browser live)"

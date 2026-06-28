@@ -1,0 +1,224 @@
+// wargr.com global styles — built on cx-framework tokens (light theme default), with a long-form
+// reading layer layered on top (the framework's type scale is dashboard-sized; essays need a
+// larger, calmer reading rhythm). Substack-like: one centered column, generous space, quiet chrome.
+@use '@mikaelcedergren/cx-framework/tokens';
+@use '@mikaelcedergren/cx-framework/styles/base';
+
+:root {
+  color-scheme: light;
+  // Reading-specific scale (not in the framework, which targets app UI).
+  --reading-size: 1.19rem;
+  --reading-leading: 1.72;
+  --reading-measure: 40rem; // ~640px, matches --measure-md
+}
+
+body {
+  background: var(--surface-mid);
+  color: var(--ink);
+}
+
+a {
+  color: inherit;
+}
+
+// ---- Shell ----
+.wg-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+.wg-container {
+  width: 100%;
+  max-width: var(--reading-measure);
+  margin-inline: auto;
+  padding-inline: var(--space-lg);
+}
+
+// ---- Masthead ----
+.wg-masthead {
+  text-align: center;
+  padding: var(--space-2xl) var(--space-lg) var(--space-xl);
+  border-bottom: var(--border-width) solid color-mix(in srgb, var(--ink) 10%, transparent);
+}
+.wg-masthead__title {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 2.8rem);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+.wg-masthead__title a {
+  text-decoration: none;
+}
+.wg-masthead__byline {
+  margin: var(--space-xs) 0 0;
+  color: color-mix(in srgb, var(--ink) 58%, transparent);
+  font-size: var(--font-size-body-lg);
+}
+
+// ---- Article index ----
+.wg-feed {
+  padding: var(--space-xl) 0 var(--space-2xl);
+}
+.wg-entry {
+  padding: var(--space-lg) 0;
+  border-bottom: var(--border-width) solid color-mix(in srgb, var(--ink) 8%, transparent);
+}
+.wg-entry:last-child {
+  border-bottom: 0;
+}
+.wg-entry__title {
+  margin: 0 0 var(--space-2xs);
+  font-size: clamp(1.4rem, 3.5vw, 1.85rem);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+.wg-entry__title a {
+  text-decoration: none;
+}
+.wg-entry__title a:hover {
+  color: var(--primary);
+}
+.wg-entry__dek {
+  margin: 0 0 var(--space-xs);
+  color: color-mix(in srgb, var(--ink) 70%, transparent);
+  font-size: var(--reading-size);
+  line-height: 1.5;
+}
+.wg-meta {
+  color: color-mix(in srgb, var(--ink) 50%, transparent);
+  font-size: var(--font-size-body-sm);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+// ---- Article page ----
+.wg-article {
+  padding: var(--space-xl) 0 var(--space-2xl);
+}
+.wg-back {
+  display: inline-block;
+  margin-bottom: var(--space-lg);
+  color: color-mix(in srgb, var(--ink) 60%, transparent);
+  font-size: var(--font-size-body-sm);
+  text-decoration: none;
+}
+.wg-back:hover {
+  color: var(--primary);
+}
+.wg-article__title {
+  margin: 0 0 var(--space-sm);
+  font-size: clamp(1.9rem, 5vw, 2.6rem);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+}
+.wg-article__dek {
+  margin: 0 0 var(--space-md);
+  color: color-mix(in srgb, var(--ink) 66%, transparent);
+  font-size: clamp(1.15rem, 2.4vw, 1.4rem);
+  line-height: 1.4;
+}
+.wg-article__meta {
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: var(--border-width) solid color-mix(in srgb, var(--ink) 10%, transparent);
+}
+
+// ---- Prose (the rendered markdown body) ----
+.wg-prose {
+  font-size: var(--reading-size);
+  line-height: var(--reading-leading);
+  color: var(--ink);
+}
+.wg-prose > * + * {
+  margin-top: 1.5em;
+}
+.wg-prose p {
+  margin: 0;
+}
+.wg-prose strong {
+  font-weight: var(--font-weight-bold);
+}
+.wg-prose em {
+  font-style: italic;
+}
+.wg-prose h2 {
+  margin-top: 2.2em;
+  font-size: 1.5em;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.wg-prose h3 {
+  margin-top: 1.8em;
+  font-size: 1.2em;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.25;
+}
+.wg-prose a {
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 0.06em;
+}
+.wg-prose blockquote {
+  margin: 1.6em 0;
+  padding-left: var(--space-lg);
+  border-left: 3px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  color: color-mix(in srgb, var(--ink) 78%, transparent);
+  font-style: italic;
+}
+.wg-prose ul,
+.wg-prose ol {
+  margin: 0;
+  padding-left: 1.4em;
+}
+.wg-prose li + li {
+  margin-top: 0.5em;
+}
+.wg-prose hr {
+  margin: 2.4em 0;
+  border: 0;
+  border-top: var(--border-width) solid color-mix(in srgb, var(--ink) 14%, transparent);
+}
+.wg-prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+}
+.wg-prose code {
+  font-family: var(--font-family-mono);
+  font-size: 0.9em;
+  background: var(--surface-low);
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius-sm);
+}
+
+// ---- Tags ----
+.wg-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+  margin-top: var(--space-2xl);
+  padding-top: var(--space-lg);
+  border-top: var(--border-width) solid color-mix(in srgb, var(--ink) 10%, transparent);
+}
+.wg-tag {
+  font-size: var(--font-size-body-sm);
+  color: color-mix(in srgb, var(--ink) 60%, transparent);
+  background: var(--surface-low);
+  padding: 0.25em 0.7em;
+  border-radius: var(--radius-pill);
+}
+
+// ---- Footer ----
+.wg-footer {
+  margin-top: auto;
+  padding: var(--space-xl) var(--space-lg);
+  border-top: var(--border-width) solid color-mix(in srgb, var(--ink) 10%, transparent);
+  text-align: center;
+  color: color-mix(in srgb, var(--ink) 50%, transparent);
+  font-size: var(--font-size-body-sm);
+}
