@@ -7,11 +7,13 @@ import { RouterLink } from '@angular/router';
   imports: [RouterLink],
   template: `
     <section class="wg-container wg-feed">
-      @for (a of articles; track a.slug) {
-        <article class="wg-entry">
+      <p class="wg-feed__dek">Essays on character, fear, and the stories we tell ourselves.</p>
+      @for (a of articles; track a.slug; let first = $first) {
+        <article class="wg-entry" [class.wg-entry--lead]="first">
+          @if (a.kicker) { <p class="wg-kicker">{{ a.kicker }}</p> }
           <h2 class="wg-entry__title"><a [routerLink]="['/', a.slug]">{{ a.title }}</a></h2>
           @if (a.dek) { <p class="wg-entry__dek">{{ a.dek }}</p> }
-          <div class="wg-meta">{{ a.date }}</div>
+          <p class="wg-meta wg-entry__meta">{{ a.meta }}</p>
         </article>
       }
     </section>
@@ -19,5 +21,5 @@ import { RouterLink } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {
-  protected readonly articles = [{"slug":"wtf-is-self-love","title":"WTF is self-love?","dek":"Most people are crueller to themselves than they would ever be to the rudest of strangers. They have been doing it so long they no longer hear it.","date":"June 6, 2026"},{"slug":"whom-to-listen-to","title":"The one you should have listened to","dek":"When a hundred people agree about something and one person doesn't, the one person is usually wrong. Until they aren't, and the cost of having dismissed them has already been paid.","date":"June 6, 2026"},{"slug":"stop-the-pain","title":"How to stop the pain","dek":"The pain you have been outrunning has not moved. It is exactly where you left it, waiting to be heard.","date":"June 6, 2026"},{"slug":"stop-chasing-purpose","title":"Stop chasing purpose","dek":"The search for purpose is a trap most people walk into willingly. It ends only when they notice the search is the problem.","date":"June 6, 2026"},{"slug":"slaughterhouse","title":"How we choose the slaughterhouse","dek":"You think you think for yourself. You don't. You follow, repeat, defend, and never notice the fence.","date":"June 6, 2026"},{"slug":"meant-well","title":"I'm sorry. I meant well.","dek":"The people who hurt you most rarely thought of themselves as the people hurting you.","date":"June 6, 2026"},{"slug":"corruption","title":"How fear turns the good in us into corruption","dek":"Corruption rarely starts with a bad person. It starts with a good one who has too much to lose.","date":"June 6, 2026"}];
+  protected readonly articles = [{"slug":"wtf-is-self-love","title":"WTF is self-love?","dek":"Most people are crueller to themselves than they would ever be to the rudest of strangers. They have been doing it so long they no longer hear it.","kicker":"self-love","meta":"June 2026 · 3 min read"},{"slug":"whom-to-listen-to","title":"The one you should have listened to","dek":"When a hundred people agree about something and one person doesn't, the one person is usually wrong. Until they aren't, and the cost of having dismissed them has already been paid.","kicker":"philosophy","meta":"June 2026 · 5 min read"},{"slug":"stop-the-pain","title":"How to stop the pain","dek":"The pain you have been outrunning has not moved. It is exactly where you left it, waiting to be heard.","kicker":"pain","meta":"June 2026 · 5 min read"},{"slug":"stop-chasing-purpose","title":"Stop chasing purpose","dek":"The search for purpose is a trap most people walk into willingly. It ends only when they notice the search is the problem.","kicker":"philosophy","meta":"June 2026 · 2 min read"},{"slug":"slaughterhouse","title":"How we choose the slaughterhouse","dek":"You think you think for yourself. You don't. You follow, repeat, defend, and never notice the fence.","kicker":"philosophy","meta":"June 2026 · 5 min read"},{"slug":"meant-well","title":"I'm sorry. I meant well.","dek":"The people who hurt you most rarely thought of themselves as the people hurting you.","kicker":"philosophy","meta":"June 2026 · 7 min read"},{"slug":"corruption","title":"How fear turns the good in us into corruption","dek":"Corruption rarely starts with a bad person. It starts with a good one who has too much to lose.","kicker":"ethics","meta":"June 2026 · 3 min read"}];
 }

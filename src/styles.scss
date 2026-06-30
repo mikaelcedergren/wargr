@@ -1,15 +1,39 @@
-// wargr.com global styles — built on cx-framework tokens (light theme default), with a long-form
-// reading layer layered on top (the framework's type scale is dashboard-sized; essays need a
-// larger, calmer reading rhythm). Substack-like: one centered column, generous space, quiet chrome.
+// wargr.com global styles — "The Quiet Press": a de-chromed editorial reading space built on
+// cx-framework tokens. Source Serif 4 carries the voice (wordmark, titles, deks, pull-quotes); Inter
+// reads the body; Roboto Mono marks the facts (kickers, meta, folios); a single rationed brand thread
+// (var(--brand) = the framework --primary) ties it together. Hairlines and whitespace, no shadows.
+// Light is the default; the whole palette is token-derived so theme-dark works for free.
 @use '@mikaelcedergren/cx-framework/tokens';
 @use '@mikaelcedergren/cx-framework/styles/base';
 
 :root {
   color-scheme: light;
+
+  // Display serif (the one font we add on top of the framework). Falls back gracefully.
+  --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+
   // Reading-specific scale (not in the framework, which targets app UI).
-  --reading-size: 1.19rem;
-  --reading-leading: 1.72;
-  --reading-measure: 40rem; // ~640px, matches --measure-md
+  --reading-size: 1.2rem;
+  --reading-leading: 1.7;
+  --reading-measure: 38rem; // ~62 characters — a calm, book-like column
+
+  // The single brand accent. Kept as a token so it tracks the active theme and a future dark
+  // variant stays a clean swap; never hard-coded.
+  --brand: var(--primary);
+
+  // Reusable hairlines (the only structural lines on the site).
+  --wg-hair: color-mix(in srgb, var(--ink) 11%, transparent);
+  --wg-hair-soft: color-mix(in srgb, var(--ink) 8%, transparent);
+
+  // Ink tints, following the existing site convention.
+  --wg-dek: color-mix(in srgb, var(--ink) 64%, transparent);
+  --wg-mute: color-mix(in srgb, var(--ink) 60%, transparent);
+  --wg-faint: color-mix(in srgb, var(--ink) 52%, transparent);
+}
+
+:root.theme-dark,
+:root.theme-night {
+  color-scheme: dark;
 }
 
 body {
@@ -21,11 +45,36 @@ a {
   color: inherit;
 }
 
+// Brand focus ring (overrides the framework's blue tab outline, same specificity, declared later).
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+// Visually hidden but available to screen readers (e.g. the logo's accessible name).
+.wg-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 // ---- Shell ----
 .wg-shell {
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
+}
+// The routed page component (a custom element) sits between the masthead and footer; make it a
+// full-width block so the article page's full-bleed "what's next" band can span the viewport.
+.wg-shell > :not(.wg-masthead):not(.wg-footer):not(router-outlet) {
+  display: block;
 }
 .wg-container {
   width: 100%;
@@ -34,96 +83,249 @@ a {
   padding-inline: var(--space-lg);
 }
 
+// ---- Mono editorial marks (kickers, meta lines, folios) ----
+.wg-meta,
+.wg-kicker {
+  font-family: var(--font-family-mono);
+  text-transform: uppercase;
+  color: var(--wg-faint);
+}
+.wg-meta {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+}
+.wg-kicker {
+  margin: 0 0 var(--space-sm);
+  font-size: 0.72rem;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.16em;
+  color: color-mix(in srgb, var(--ink) 50%, transparent);
+}
+
 // ---- Masthead ----
 .wg-masthead {
   text-align: center;
-  padding: var(--space-2xl) var(--space-lg) var(--space-xl);
-  border-bottom: var(--border-width) solid color-mix(in srgb, var(--ink) 10%, transparent);
+  padding: var(--space-xl) var(--space-lg) var(--space-lg);
+  border-bottom: var(--border-width) solid var(--wg-hair);
 }
 .wg-masthead__title {
   margin: 0;
-  font-size: clamp(2rem, 6vw, 2.8rem);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: -0.02em;
-  line-height: 1.05;
+  line-height: 0; // the mark is an image; kill inline-box leading so it centres cleanly
 }
-.wg-masthead__title a {
-  text-decoration: none;
+.wg-logo {
+  display: inline-block;
+  transition: opacity var(--motion-base) var(--ease-out);
+}
+.wg-logo:hover {
+  opacity: 0.62;
+}
+// One mark per theme; swap on the html theme class the toggle (and no-flash script) sets.
+.wg-logo__img {
+  display: block;
+  height: clamp(2rem, 5.5vw, 2.6rem);
+  width: auto;
+}
+.wg-logo__img--dark {
+  display: none;
+}
+:root.theme-dark .wg-logo__img--light,
+:root.theme-night .wg-logo__img--light {
+  display: none;
+}
+:root.theme-dark .wg-logo__img--dark,
+:root.theme-night .wg-logo__img--dark {
+  display: block;
 }
 .wg-masthead__byline {
-  margin: var(--space-xs) 0 0;
-  color: color-mix(in srgb, var(--ink) 58%, transparent);
-  font-size: var(--font-size-body-lg);
+  margin: var(--space-sm) 0 0;
+  font-family: var(--font-family-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--wg-faint);
 }
 
-// ---- Article index ----
+// ---- Home feed ----
 .wg-feed {
   padding: var(--space-xl) 0 var(--space-2xl);
 }
+.wg-feed__dek {
+  margin: 0 0 var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: var(--border-width) solid var(--wg-hair);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+  line-height: 1.4;
+  color: var(--wg-mute);
+}
 .wg-entry {
   padding: var(--space-lg) 0;
-  border-bottom: var(--border-width) solid color-mix(in srgb, var(--ink) 8%, transparent);
+  border-bottom: var(--border-width) solid var(--wg-hair-soft);
 }
 .wg-entry:last-child {
   border-bottom: 0;
 }
 .wg-entry__title {
-  margin: 0 0 var(--space-2xs);
-  font-size: clamp(1.4rem, 3.5vw, 1.85rem);
+  margin: 0 0 var(--space-xs);
+  font-family: var(--font-serif);
+  font-size: clamp(1.4rem, 3vw, 1.6rem);
   font-weight: var(--font-weight-bold);
   letter-spacing: -0.015em;
-  line-height: 1.15;
+  line-height: 1.18;
 }
 .wg-entry__title a {
   text-decoration: none;
+  color: var(--ink);
+  transition: color var(--motion-base) var(--ease-out);
 }
 .wg-entry__title a:hover {
-  color: var(--primary);
+  color: var(--brand);
 }
 .wg-entry__dek {
-  margin: 0 0 var(--space-xs);
-  color: color-mix(in srgb, var(--ink) 70%, transparent);
-  font-size: var(--reading-size);
-  line-height: 1.5;
+  margin: 0 0 var(--space-sm);
+  font-size: 1.05rem;
+  line-height: 1.45;
+  color: var(--wg-dek);
 }
-.wg-meta {
-  color: color-mix(in srgb, var(--ink) 50%, transparent);
-  font-size: var(--font-size-body-sm);
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+.wg-entry:not(.wg-entry--lead) .wg-entry__dek {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wg-entry__meta {
+  margin: 0;
+}
+
+// The lead (newest) essay carries extra weight so the feed reads as a body of work, not a flat list.
+.wg-entry--lead {
+  padding-bottom: var(--space-2xl);
+  border-bottom: var(--border-width) solid var(--wg-hair);
+}
+.wg-entry--lead .wg-entry__title {
+  margin-top: var(--space-2xs);
+  font-size: clamp(1.9rem, 4.4vw, 2.4rem);
+  line-height: 1.1;
+}
+.wg-entry--lead .wg-entry__dek {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(1.15rem, 2.4vw, 1.4rem);
+  line-height: 1.4;
 }
 
 // ---- Article page ----
 .wg-article {
-  padding: var(--space-xl) 0 var(--space-2xl);
+  padding: var(--space-xl) 0;
 }
 .wg-back {
   display: inline-block;
-  margin-bottom: var(--space-lg);
-  color: color-mix(in srgb, var(--ink) 60%, transparent);
-  font-size: var(--font-size-body-sm);
+  margin-bottom: var(--space-xl);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--ink) 56%, transparent);
   text-decoration: none;
 }
 .wg-back:hover {
-  color: var(--primary);
+  color: var(--brand);
 }
 .wg-article__title {
-  margin: 0 0 var(--space-sm);
-  font-size: clamp(1.9rem, 5vw, 2.6rem);
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-serif);
+  font-size: clamp(2.1rem, 5vw, 3rem);
   font-weight: var(--font-weight-bold);
   letter-spacing: -0.02em;
-  line-height: 1.12;
+  line-height: 1.08;
 }
 .wg-article__dek {
   margin: 0 0 var(--space-md);
-  color: color-mix(in srgb, var(--ink) 66%, transparent);
-  font-size: clamp(1.15rem, 2.4vw, 1.4rem);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(1.3rem, 2.6vw, 1.55rem);
   line-height: 1.4;
+  color: var(--wg-dek);
 }
 .wg-article__meta {
-  margin-bottom: var(--space-xl);
+  margin: 0 0 var(--space-xl);
   padding-bottom: var(--space-lg);
-  border-bottom: var(--border-width) solid color-mix(in srgb, var(--ink) 10%, transparent);
+  border-bottom: var(--border-width) solid var(--wg-hair);
+}
+
+// ---- Article hero (optional full-bleed photo behind the header; see import-articles.mjs) ----
+// Always a dark zone (photo + scrim + light text), so it reads the same in light and dark themes.
+.wg-hero {
+  position: relative;
+  width: 100%;
+  height: clamp(360px, 60vh, 640px);
+  overflow: hidden;
+  background: #0d0d12; // shows while the photo decodes / behind any letterboxing
+  isolation: isolate;
+}
+.wg-hero__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 28%; // bias toward the upper subject
+}
+.wg-hero__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  // Darken the top (for the back-link) and, more heavily, the bottom (where the title sits).
+  background:
+    linear-gradient(to bottom, rgba(13, 13, 18, 0.5) 0%, transparent 24%),
+    linear-gradient(
+      to top,
+      rgba(13, 13, 18, 0.94) 0%,
+      rgba(13, 13, 18, 0.5) 30%,
+      rgba(13, 13, 18, 0.1) 62%,
+      transparent 100%
+    );
+}
+.wg-hero__inner {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; // back-link pinned top, header pinned bottom
+  padding-top: var(--space-lg);
+  padding-bottom: var(--space-2xl);
+}
+.wg-hero__head > * {
+  margin: 0;
+}
+.wg-hero__head > * + * {
+  margin-top: var(--space-sm);
+}
+// Light text over the photo (constant across themes).
+.wg-hero .wg-kicker {
+  color: rgba(255, 255, 255, 0.74);
+}
+.wg-hero .wg-article__title {
+  color: #fff;
+}
+.wg-hero .wg-article__dek {
+  color: rgba(255, 255, 255, 0.86);
+}
+.wg-hero .wg-article__meta {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: rgba(255, 255, 255, 0.62);
+}
+.wg-back--hero {
+  align-self: flex-start;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.82);
+}
+.wg-back--hero:hover {
+  color: #fff;
+}
+// With a hero the title block lives in the photo, so the body just needs breathing room above it.
+.wg-article--hero {
+  padding-top: var(--space-2xl);
 }
 
 // ---- Prose (the rendered markdown body) ----
@@ -132,11 +334,15 @@ a {
   line-height: var(--reading-leading);
   color: var(--ink);
 }
-.wg-prose > * + * {
-  margin-top: 1.5em;
-}
-.wg-prose p {
+// Paragraph rhythm: reset every block, then space consecutive ones. The gap must clearly exceed the
+// line-height (1.7) or stacked paragraphs read as one dense chunk. NB: reset via `> *` (specificity
+// 0,1,0) — a plain `.wg-prose p { margin: 0 }` (0,1,1) out-ranks the flow rule and silently kills all
+// paragraph spacing. Headings + blockquote widen the gap further below.
+.wg-prose > * {
   margin: 0;
+}
+.wg-prose > * + * {
+  margin-top: 2em;
 }
 .wg-prose strong {
   font-weight: var(--font-weight-bold);
@@ -145,15 +351,16 @@ a {
   font-style: italic;
 }
 .wg-prose h2 {
-  margin-top: 2.2em;
+  margin-top: 2.9em;
+  font-family: var(--font-serif);
   font-size: 1.5em;
   font-weight: var(--font-weight-bold);
   line-height: 1.2;
   letter-spacing: -0.01em;
 }
 .wg-prose h3 {
-  margin-top: 1.8em;
-  font-size: 1.2em;
+  margin-top: 2.4em;
+  font-size: 1.18em;
   font-weight: var(--font-weight-bold);
   line-height: 1.25;
 }
@@ -164,7 +371,7 @@ a {
   text-decoration-thickness: 0.06em;
 }
 .wg-prose blockquote {
-  margin: 1.6em 0;
+  margin: 2em 0;
   padding-left: var(--space-lg);
   border-left: 3px solid color-mix(in srgb, var(--ink) 22%, transparent);
   color: color-mix(in srgb, var(--ink) 78%, transparent);
@@ -172,7 +379,6 @@ a {
 }
 .wg-prose ul,
 .wg-prose ol {
-  margin: 0;
   padding-left: 1.4em;
 }
 .wg-prose li + li {
@@ -196,29 +402,233 @@ a {
   border-radius: var(--radius-sm);
 }
 
-// ---- Tags ----
-.wg-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2xs);
-  margin-top: var(--space-2xl);
-  padding-top: var(--space-lg);
-  border-top: var(--border-width) solid color-mix(in srgb, var(--ink) 10%, transparent);
-}
-.wg-tag {
-  font-size: var(--font-size-body-sm);
-  color: color-mix(in srgb, var(--ink) 60%, transparent);
-  background: var(--surface-low);
-  padding: 0.25em 0.7em;
-  border-radius: var(--radius-pill);
+// One classical move: a serif drop cap on the opening paragraph (only when the body starts with one).
+.wg-prose--dropcap > p:first-of-type::first-letter {
+  float: left;
+  margin: 0.02em 0.1em 0 0;
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-bold);
+  font-size: 3.2em;
+  line-height: 0.74;
+  color: var(--ink);
 }
 
-// ---- Footer ----
+// ---- Pull-quote (reclaimed from ghostwriter; rendered as a template figure, never spliced in) ----
+.wg-pullquote {
+  margin: var(--space-2xl) 0;
+  padding-left: var(--space-lg);
+  border-left: 2px solid var(--brand);
+}
+.wg-pullquote__hook {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-medium);
+  font-size: clamp(1.5rem, 3.2vw, 1.9rem);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+.wg-pullquote__hook::before {
+  content: '\201C';
+  margin-right: 0.06em;
+  color: var(--brand);
+  font-weight: var(--font-weight-bold);
+}
+.wg-pullquote__elab {
+  margin-top: var(--space-md);
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--wg-mute);
+}
+
+// ---- Tags (quiet inline text, not pills) + finis ----
+.wg-filed {
+  margin: var(--space-xl) 0 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--ink) 55%, transparent);
+}
+.wg-finis {
+  margin: var(--space-lg) 0 0;
+  text-align: center;
+  font-family: var(--font-family-mono);
+  font-size: 1rem;
+  color: color-mix(in srgb, var(--ink) 38%, transparent);
+}
+
+// ---- "What's next" corridor (full-bleed band: related essays + prev/next flip) ----
+.wg-next {
+  margin-top: var(--space-lg);
+  padding: var(--space-2xl) 0;
+  background: color-mix(in srgb, var(--ink) 3%, var(--surface-mid));
+  border-top: var(--border-width) solid var(--wg-hair);
+}
+.wg-related__head {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-family-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--wg-faint);
+}
+.wg-related__head::before {
+  content: '';
+  width: 1.5rem;
+  height: 2px;
+  background: var(--brand);
+}
+.wg-related__item {
+  display: block;
+  padding: var(--space-md) 0;
+  border-bottom: var(--border-width) solid var(--wg-hair-soft);
+  text-decoration: none;
+  color: inherit;
+}
+.wg-related__item:last-of-type {
+  border-bottom: 0;
+}
+.wg-related__title {
+  display: block;
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-bold);
+  font-size: clamp(1.15rem, 2.4vw, 1.3rem);
+  line-height: 1.25;
+  color: var(--ink);
+  transition: color var(--motion-base) var(--ease-out);
+}
+.wg-related__item:hover .wg-related__title {
+  color: var(--brand);
+}
+.wg-related__dek {
+  display: block;
+  margin-top: 0.35em;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: var(--wg-mute);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wg-related__meta {
+  display: block;
+  margin-top: 0.55em;
+  color: color-mix(in srgb, var(--ink) 46%, transparent);
+}
+
+.wg-flip {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  margin-top: var(--space-2xl);
+  padding-top: var(--space-xl);
+  border-top: var(--border-width) solid var(--wg-hair);
+}
+.wg-flip__side {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55em;
+  text-decoration: none;
+  color: inherit;
+}
+.wg-flip__side:empty {
+  display: none;
+}
+.wg-flip__next {
+  text-align: right;
+  align-items: flex-end;
+}
+.wg-flip__label {
+  font-family: var(--font-family-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink) 46%, transparent);
+}
+.wg-flip__title {
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-medium);
+  font-size: 1.1rem;
+  line-height: 1.3;
+  color: var(--ink);
+  transition: color var(--motion-base) var(--ease-out);
+}
+.wg-flip__side:hover .wg-flip__title {
+  color: var(--brand);
+}
+.wg-flip__prev .wg-flip__title::before {
+  content: '← ';
+  color: var(--brand);
+}
+.wg-flip__next .wg-flip__title::after {
+  content: ' →';
+  color: var(--brand);
+}
+
+// ---- Footer (with the low-key light/dark switch) ----
 .wg-footer {
   margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
   padding: var(--space-xl) var(--space-lg);
-  border-top: var(--border-width) solid color-mix(in srgb, var(--ink) 10%, transparent);
-  text-align: center;
-  color: color-mix(in srgb, var(--ink) 50%, transparent);
+  border-top: var(--border-width) solid var(--wg-hair);
   font-size: var(--font-size-body-sm);
+  color: var(--wg-faint);
+}
+.wg-theme {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0.25em 0.35em;
+  font-size: 1rem;
+  line-height: 1;
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--radius-pill);
+  transition: color var(--motion-fast) var(--ease-out);
+}
+.wg-theme:hover {
+  color: var(--brand);
+}
+
+// ---- Motion details (only when the reader hasn't opted out) ----
+@media (prefers-reduced-motion: no-preference) {
+  .wg-flip__title::before,
+  .wg-flip__title::after {
+    display: inline-block;
+    transition: transform var(--motion-fast) var(--ease-out);
+  }
+  .wg-flip__prev:hover .wg-flip__title::before {
+    transform: translateX(-3px);
+  }
+  .wg-flip__next:hover .wg-flip__title::after {
+    transform: translateX(3px);
+  }
+}
+
+// ---- Phone (cx breakpoint = 720px) ----
+@media (max-width: 720px) {
+  .wg-pullquote {
+    margin-inline: 0;
+  }
+  .wg-flip {
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
+  }
+  // Forward momentum first: NEXT sits on top when the flip stacks.
+  .wg-flip__next {
+    order: -1;
+    text-align: left;
+    align-items: flex-start;
+  }
+}
+
+// Let the pull-quote breathe slightly outside the reading measure on wider viewports.
+@media (min-width: 721px) {
+  .wg-pullquote {
+    margin-inline: -2rem;
+  }
 }

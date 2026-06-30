@@ -1,10 +1,38 @@
 <div class="wg-shell">
   <header class="wg-masthead">
-    <h1 class="wg-masthead__title"><a routerLink="/">Wargr</a></h1>
-    <p class="wg-masthead__byline">Michael Wargr</p>
+    <h1 class="wg-masthead__title">
+      <a routerLink="/" class="wg-logo">
+        <img
+          class="wg-logo__img wg-logo__img--light"
+          src="/assets/brand/mark-light.png"
+          alt=""
+          width="737"
+          height="320"
+        />
+        <img
+          class="wg-logo__img wg-logo__img--dark"
+          src="/assets/brand/mark-dark.png"
+          alt=""
+          width="737"
+          height="320"
+        />
+        <span class="wg-sr-only">Wargr — essays by Michael Wargr</span>
+      </a>
+    </h1>
+    <p class="wg-masthead__byline">Essays · Michael Wargr</p>
   </header>
 
   <router-outlet />
 
-  <footer class="wg-footer">© {{ year }} Michael Wargr · wargr.com</footer>
+  <footer class="wg-footer">
+    <button
+      type="button"
+      class="wg-theme"
+      (click)="toggleTheme()"
+      [attr.aria-label]="dark() ? 'Switch to light theme' : 'Switch to dark theme'"
+    >
+      <span aria-hidden="true">{{ dark() ? '☀' : '☾' }}</span>
+    </button>
+    <span class="wg-footer__line">© {{ year }} Michael Wargr · wargr.com</span>
+  </footer>
 </div>

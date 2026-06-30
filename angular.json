@@ -27,7 +27,7 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               {
-                "glob": "{robots.txt,sitemap.xml}",
+                "glob": "{robots.txt,sitemap.xml,feed.xml}",
                 "input": "public",
                 "output": "/"
               },
@@ -69,5 +69,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }

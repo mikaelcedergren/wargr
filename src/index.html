@@ -7,13 +7,36 @@
     <meta name="author" content="Michael Wargr" />
     <meta name="description" content="Essays by Michael Wargr." />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#ffffff" />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26' font-family='Inter,sans-serif' font-weight='700'>W</text></svg>" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/png" href="/assets/brand/favicon.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="/assets/brand/favicon-dark.png"
+      media="(prefers-color-scheme: dark)"
+    />
+    <link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="Wargr — essays by Michael Wargr"
+      href="/feed.xml"
+    />
+    <!-- Apply the reader's saved theme before first paint so the page never flashes. Light is the default. -->
+    <script>
+      try {
+        if (localStorage.getItem('wg-theme') === 'dark') {
+          document.documentElement.classList.remove('theme-light');
+          document.documentElement.classList.add('theme-dark');
+        }
+      } catch (e) {}
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto+Mono&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&display=swap"
     />
   </head>
   <body>
