@@ -1,8 +1,8 @@
 // wargr.com global styles — "The Quiet Press": a de-chromed editorial reading space built on
 // cx-framework tokens. Source Serif 4 carries the voice (wordmark, titles, deks, pull-quotes); Inter
-// reads the body; Roboto Mono marks the facts (kickers, meta, folios); a single rationed brand thread
-// (var(--brand) = the framework --primary) ties it together. Hairlines and whitespace, no shadows.
-// Light is the default; the whole palette is token-derived so theme-dark works for free.
+// reads the body; Roboto Mono marks the facts (kickers, meta, folios). Hairlines, whitespace, no
+// primary-colour chrome.
+// Light is the default; the whole palette is token-derived so theme-night works for free.
 @use '@mikaelcedergren/cx-framework/tokens';
 @use '@mikaelcedergren/cx-framework/styles/base';
 
@@ -15,15 +15,14 @@
   // Reading-specific scale (not in the framework, which targets app UI).
   --reading-size: 1.2rem;
   --reading-leading: 1.7;
-  --reading-measure: 38rem; // ~62 characters — a calm, book-like column
-
-  // The single brand accent. Kept as a token so it tracks the active theme and a future dark
-  // variant stays a clean swap; never hard-coded.
-  --brand: var(--primary);
+  --reading-measure: calc(640px + (var(--space-lg) * 2));
 
   // Reusable hairlines (the only structural lines on the site).
   --wg-hair: color-mix(in srgb, var(--ink) 11%, transparent);
   --wg-hair-soft: color-mix(in srgb, var(--ink) 8%, transparent);
+  --wg-focus: color-mix(in srgb, var(--ink) 44%, transparent);
+  --wg-link-underline-lift: 5px;
+  --wg-link-underline-thickness: 2px;
 
   // Ink tints, following the existing site convention.
   --wg-dek: color-mix(in srgb, var(--ink) 64%, transparent);
@@ -31,7 +30,6 @@
   --wg-faint: color-mix(in srgb, var(--ink) 52%, transparent);
 }
 
-:root.theme-dark,
 :root.theme-night {
   color-scheme: dark;
 }
@@ -41,15 +39,48 @@ body {
   color: var(--ink);
 }
 
-a {
+a,
+a:visited,
+a:hover,
+a:active {
   color: inherit;
 }
 
-// Brand focus ring (overrides the framework's blue tab outline, same specificity, declared later).
+// Quiet focus ring (overrides the framework's blue tab outline, same specificity, declared later).
 a:focus-visible,
 button:focus-visible {
-  outline: 2px solid var(--brand);
+  outline: 2px solid var(--wg-focus);
   outline-offset: 2px;
+}
+
+// Editorial link treatment: no accent colour, just a slightly detached underline that draws in.
+.wg-entry__title-text,
+.wg-prose a,
+.wg-back,
+.wg-related__title,
+.wg-flip__title {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0 calc(100% - var(--wg-link-underline-lift));
+  background-repeat: no-repeat;
+  background-size: 0 var(--wg-link-underline-thickness);
+  padding-bottom: 0.045em;
+  text-decoration: none;
+  transition:
+    background-size var(--motion-base) var(--ease-out),
+    color var(--motion-fast) var(--ease-out);
+}
+
+.wg-entry:hover .wg-entry__title-text,
+.wg-entry:focus-visible .wg-entry__title-text,
+.wg-prose a:hover,
+.wg-prose a:focus-visible,
+.wg-back:hover,
+.wg-back:focus-visible,
+.wg-related__item:hover .wg-related__title,
+.wg-related__item:focus-visible .wg-related__title,
+.wg-flip__side:hover .wg-flip__title,
+.wg-flip__side:focus-visible .wg-flip__title {
+  background-size: 100% var(--wg-link-underline-thickness);
 }
 
 // Visually hidden but available to screen readers (e.g. the logo's accessible name).
@@ -128,11 +159,9 @@ button:focus-visible {
 .wg-logo__img--dark {
   display: none;
 }
-:root.theme-dark .wg-logo__img--light,
 :root.theme-night .wg-logo__img--light {
   display: none;
 }
-:root.theme-dark .wg-logo__img--dark,
 :root.theme-night .wg-logo__img--dark {
   display: block;
 }
@@ -147,24 +176,46 @@ button:focus-visible {
 
 // ---- Home feed ----
 .wg-feed {
-  padding: var(--space-xl) 0 var(--space-2xl);
-}
-.wg-feed__dek {
-  margin: 0 0 var(--space-xl);
-  padding-bottom: var(--space-lg);
-  border-bottom: var(--border-width) solid var(--wg-hair);
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: clamp(1.05rem, 2.4vw, 1.25rem);
-  line-height: 1.4;
-  color: var(--wg-mute);
+  padding-block: var(--space-xl) var(--space-2xl);
 }
 .wg-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(7rem, 20vw, 9rem);
+  align-items: center;
+  gap: var(--space-md);
   padding: var(--space-lg) 0;
   border-bottom: var(--border-width) solid var(--wg-hair-soft);
+  color: inherit;
+  text-decoration: none;
 }
 .wg-entry:last-child {
   border-bottom: 0;
+}
+.wg-entry__body {
+  min-width: 0;
+}
+.wg-entry__media {
+  display: block;
+  order: 2;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #0d0d12;
+  text-decoration: none;
+}
+.wg-entry__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition:
+    transform var(--motion-base) var(--ease-out),
+    opacity var(--motion-base) var(--ease-out);
+}
+.wg-entry:hover .wg-entry__media img,
+.wg-entry:focus-visible .wg-entry__media img {
+  opacity: 0.88;
+  transform: scale(1.035);
 }
 .wg-entry__title {
   margin: 0 0 var(--space-xs);
@@ -174,13 +225,8 @@ button:focus-visible {
   letter-spacing: -0.015em;
   line-height: 1.18;
 }
-.wg-entry__title a {
-  text-decoration: none;
+.wg-entry__title-text {
   color: var(--ink);
-  transition: color var(--motion-base) var(--ease-out);
-}
-.wg-entry__title a:hover {
-  color: var(--brand);
 }
 .wg-entry__dek {
   margin: 0 0 var(--space-sm);
@@ -199,11 +245,17 @@ button:focus-visible {
 
 // The lead (newest) essay carries extra weight so the feed reads as a body of work, not a flat list.
 .wg-entry--lead {
+  display: block;
   padding-bottom: var(--space-2xl);
   border-bottom: var(--border-width) solid var(--wg-hair);
 }
+.wg-entry--lead .wg-entry__media {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  margin-bottom: var(--space-md);
+}
 .wg-entry--lead .wg-entry__title {
-  margin-top: var(--space-2xs);
+  margin-top: 0;
   font-size: clamp(1.9rem, 4.4vw, 2.4rem);
   line-height: 1.1;
 }
@@ -216,7 +268,7 @@ button:focus-visible {
 
 // ---- Article page ----
 .wg-article {
-  padding: var(--space-xl) 0;
+  padding-block: var(--space-xl);
 }
 .wg-back {
   display: inline-block;
@@ -224,10 +276,9 @@ button:focus-visible {
   font-size: 0.82rem;
   letter-spacing: 0.02em;
   color: color-mix(in srgb, var(--ink) 56%, transparent);
-  text-decoration: none;
 }
 .wg-back:hover {
-  color: var(--brand);
+  color: var(--ink);
 }
 .wg-article__title {
   margin: 0 0 var(--space-md);
@@ -246,13 +297,13 @@ button:focus-visible {
   color: var(--wg-dek);
 }
 .wg-article__meta {
-  margin: 0 0 var(--space-xl);
+  margin: var(--space-lg) 0 var(--space-xl);
   padding-bottom: var(--space-lg);
   border-bottom: var(--border-width) solid var(--wg-hair);
 }
 
 // ---- Article hero (optional full-bleed photo behind the header; see import-articles.mjs) ----
-// Always a dark zone (photo + scrim + light text), so it reads the same in light and dark themes.
+// Always a night zone (photo + scrim + light text), so it reads the same in light and night themes.
 .wg-hero {
   position: relative;
   width: 100%;
@@ -310,7 +361,7 @@ button:focus-visible {
   color: rgba(255, 255, 255, 0.86);
 }
 .wg-hero .wg-article__meta {
-  margin: 0;
+  margin: var(--space-md) 0 0;
   padding: 0;
   border: 0;
   color: rgba(255, 255, 255, 0.62);
@@ -365,10 +416,7 @@ button:focus-visible {
   line-height: 1.25;
 }
 .wg-prose a {
-  color: var(--link);
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
-  text-decoration-thickness: 0.06em;
+  color: inherit;
 }
 .wg-prose blockquote {
   margin: 2em 0;
@@ -402,22 +450,11 @@ button:focus-visible {
   border-radius: var(--radius-sm);
 }
 
-// One classical move: a serif drop cap on the opening paragraph (only when the body starts with one).
-.wg-prose--dropcap > p:first-of-type::first-letter {
-  float: left;
-  margin: 0.02em 0.1em 0 0;
-  font-family: var(--font-serif);
-  font-weight: var(--font-weight-bold);
-  font-size: 3.2em;
-  line-height: 0.74;
-  color: var(--ink);
-}
-
 // ---- Pull-quote (reclaimed from ghostwriter; rendered as a template figure, never spliced in) ----
 .wg-pullquote {
   margin: var(--space-2xl) 0;
   padding-left: var(--space-lg);
-  border-left: 2px solid var(--brand);
+  border-left: 2px solid color-mix(in srgb, var(--ink) 32%, transparent);
 }
 .wg-pullquote__hook {
   margin: 0;
@@ -430,7 +467,7 @@ button:focus-visible {
 .wg-pullquote__hook::before {
   content: '\201C';
   margin-right: 0.06em;
-  color: var(--brand);
+  color: color-mix(in srgb, var(--ink) 42%, transparent);
   font-weight: var(--font-weight-bold);
 }
 .wg-pullquote__elab {
@@ -441,12 +478,6 @@ button:focus-visible {
 }
 
 // ---- Tags (quiet inline text, not pills) + finis ----
-.wg-filed {
-  margin: var(--space-xl) 0 0;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: color-mix(in srgb, var(--ink) 55%, transparent);
-}
 .wg-finis {
   margin: var(--space-lg) 0 0;
   text-align: center;
@@ -477,7 +508,7 @@ button:focus-visible {
   content: '';
   width: 1.5rem;
   height: 2px;
-  background: var(--brand);
+  background: color-mix(in srgb, var(--ink) 28%, transparent);
 }
 .wg-related__item {
   display: block;
@@ -490,16 +521,12 @@ button:focus-visible {
   border-bottom: 0;
 }
 .wg-related__title {
-  display: block;
+  display: inline;
   font-family: var(--font-serif);
   font-weight: var(--font-weight-bold);
   font-size: clamp(1.15rem, 2.4vw, 1.3rem);
   line-height: 1.25;
   color: var(--ink);
-  transition: color var(--motion-base) var(--ease-out);
-}
-.wg-related__item:hover .wg-related__title {
-  color: var(--brand);
 }
 .wg-related__dek {
   display: block;
@@ -552,18 +579,14 @@ button:focus-visible {
   font-size: 1.1rem;
   line-height: 1.3;
   color: var(--ink);
-  transition: color var(--motion-base) var(--ease-out);
-}
-.wg-flip__side:hover .wg-flip__title {
-  color: var(--brand);
 }
 .wg-flip__prev .wg-flip__title::before {
   content: '← ';
-  color: var(--brand);
+  color: color-mix(in srgb, var(--ink) 50%, transparent);
 }
 .wg-flip__next .wg-flip__title::after {
   content: ' →';
-  color: var(--brand);
+  color: color-mix(in srgb, var(--ink) 50%, transparent);
 }
 
 // ---- Footer (with the low-key light/dark switch) ----
@@ -591,7 +614,7 @@ button:focus-visible {
   transition: color var(--motion-fast) var(--ease-out);
 }
 .wg-theme:hover {
-  color: var(--brand);
+  color: var(--ink);
 }
 
 // ---- Motion details (only when the reader hasn't opted out) ----
@@ -609,8 +632,24 @@ button:focus-visible {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .wg-entry__title-text,
+  .wg-prose a,
+  .wg-back,
+  .wg-related__title,
+  .wg-flip__title {
+    transition: none;
+  }
+}
+
 // ---- Phone (cx breakpoint = 720px) ----
 @media (max-width: 720px) {
+  .wg-entry {
+    grid-template-columns: minmax(0, 1fr) 6rem;
+  }
+  .wg-entry:not(.wg-entry--lead) .wg-entry__title {
+    font-size: 1.22rem;
+  }
   .wg-pullquote {
     margin-inline: 0;
   }

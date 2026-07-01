@@ -5,7 +5,10 @@
     <base href="/" />
     <title>Wargr</title>
     <meta name="author" content="Michael Wargr" />
-    <meta name="description" content="Essays by Michael Wargr." />
+    <meta
+      name="description"
+      content="Essays by Michael Wargr on philosophy, ethics, fear, self-deception, conformity, purpose, pain, and human nature."
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
@@ -26,9 +29,12 @@
     <!-- Apply the reader's saved theme before first paint so the page never flashes. Light is the default. -->
     <script>
       try {
-        if (localStorage.getItem('wg-theme') === 'dark') {
+        var savedTheme = localStorage.getItem('wg-theme');
+        if (savedTheme === 'night' || savedTheme === 'dark') {
           document.documentElement.classList.remove('theme-light');
-          document.documentElement.classList.add('theme-dark');
+          document.documentElement.classList.remove('theme-dark');
+          document.documentElement.classList.add('theme-night');
+          if (savedTheme === 'dark') localStorage.setItem('wg-theme', 'night');
         }
       } catch (e) {}
     </script>

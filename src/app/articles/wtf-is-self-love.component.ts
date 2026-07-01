@@ -6,7 +6,6 @@ import { DomSanitizer } from '@angular/platform-browser';
 const HTML = "<p>I caught myself once, walking back to my desk after a meeting where I had said something that did not land. The voice in my head was running it back: &quot;You sounded like an idiot.&quot; It had been at it for hours. The thing that stopped me was the realisation that if anybody else had spoken to me that way, I would have asked them to leave, but the voice does not leave when you ask it to, because the hardest person you live with is the one inside your head.</p>\n<p>You do not get to leave that person. Every morning, every commute, every night you cannot sleep, the voice is there. It narrates your life: what you are doing wrong, what you should have done instead, the look of your face in the bathroom mirror, your performance in the meeting, the way you said hello at the party. It is the one voice you can never put on mute.</p>\n<p>For most of us, that voice is not kind, and sometimes it is abusive. It calls you lazy. It calls you stupid. Get tired and it reaches for the word &quot;weak.&quot; Need rest and it reaches for &quot;soft.&quot; Admit you are afraid and it goes quiet for a beat, then comes back later, when you are alone, to remind you of it. Most people call this honesty. It is cruelty delivered by the one person who can never be made to apologise for it.</p>\n<p>If a friend showed up at your door worn down, would you sneer at them for being weak? Would you list every previous failure they had mentioned to you and itemise the pattern? You would not even consider it. You would put a hand on their shoulder and say something gentler. And yet we say such things to ourselves every day.</p>\n<p>It gets worse. The average person speaks at about 150 words a minute, and your thoughts run something like six or seven times faster. Every insult you fire at yourself does not just land once. It lands at a rate no real person could keep up with. A stranger insulting you on the street has to take a breath between sentences. The voice in your head does not.</p>\n<p>Loneliness has less to do with the absence of other people than with the absence of safety inside your own head. You have felt it. You can be in a crowd, in a relationship, in a house full of family, and still feel alone, because the person you cannot get away from is the one who has been on your case all day.</p>\n<p>This is what self-love actually is, and it is not what the wellness aisle sells you. It is not bubble baths and affirmations in the mirror. It is the absence of the running cruelty, the daily choice to speak to yourself the way you would speak to somebody you actually liked, the willingness to let yourself rest without filing a report about it afterwards.</p>\n<p>So notice when the voice starts in on you, and talk back twice as hard.</p>\n";
 
 type WgLink = { slug: string; title: string };
-type WgQuote = { hook: string; elab: string };
 type WgRelated = { slug: string; title: string; dek: string; meta: string };
 
 @Component({
@@ -15,12 +14,11 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
   template: `
     @if (hero) {
       <header class="wg-hero">
-        <img class="wg-hero__img" [src]="hero" alt="" fetchpriority="high" />
+        <img class="wg-hero__img" [src]="hero" [alt]="imageAlt" fetchpriority="high" />
         <div class="wg-hero__scrim" aria-hidden="true"></div>
         <div class="wg-hero__inner wg-container">
           <a class="wg-back wg-back--hero" routerLink="/">← Essays</a>
           <div class="wg-hero__head">
-            @if (kicker) { <p class="wg-kicker">{{ kicker }}</p> }
             <h1 class="wg-article__title">{{ title }}</h1>
             @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
             <p class="wg-article__meta wg-meta">{{ meta }}</p>
@@ -31,19 +29,11 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
     <article class="wg-container wg-article" [class.wg-article--hero]="!!hero">
       @if (!hero) {
         <a class="wg-back" routerLink="/">← Essays</a>
-        @if (kicker) { <p class="wg-kicker">{{ kicker }}</p> }
         <h1 class="wg-article__title">{{ title }}</h1>
         @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
         <p class="wg-article__meta wg-meta">{{ meta }}</p>
       }
-      <div class="wg-prose wg-prose--dropcap" [innerHTML]="body"></div>
-      @if (coda) {
-        <figure class="wg-pullquote">
-          <p class="wg-pullquote__hook">{{ coda.hook }}</p>
-          @if (coda.elab) { <figcaption class="wg-pullquote__elab">{{ coda.elab }}</figcaption> }
-        </figure>
-      }
-      @if (filed) { <p class="wg-filed">Filed under: {{ filed }}</p> }
+      <div class="wg-prose" [innerHTML]="body"></div>
       <p class="wg-finis" aria-hidden="true">§</p>
     </article>
     @if (related.length || prev || next) {
@@ -90,13 +80,12 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
 export class ArticleWtfIsSelfLoveComponent {
   protected readonly title = "WTF is self-love?";
   protected readonly dek = "Most people are crueller to themselves than they would ever be to the rudest of strangers. They have been doing it so long they no longer hear it.";
-  protected readonly meta = "June 6, 2026 · 3 min read · 516 words";
+  protected readonly meta = "May 24, 2026 · 3 min read · 516 words";
   protected readonly kicker = "self-love";
-  protected readonly filed = "self-love · loneliness · mental health · inner voice · self-talk · wellness-critique";
-  protected readonly coda: WgQuote | null = {"hook":"Self-love is not bubble baths and affirmations in the mirror.","elab":"It is the absence of the running cruelty. The daily choice to speak to yourself the way you would speak to somebody you actually liked."};
-  protected readonly related: WgRelated[] = [{"slug":"stop-the-pain","title":"How to stop the pain","dek":"The pain you have been outrunning has not moved. It is exactly where you left it, waiting to be heard.","meta":"June 2026 · 5 min · Shared: mental health"},{"slug":"stop-chasing-purpose","title":"Stop chasing purpose","dek":"The search for purpose is a trap most people walk into willingly. It ends only when they notice the search is the problem.","meta":"June 2026 · 2 min · Shared: identity"},{"slug":"corruption","title":"How fear turns the good in us into corruption","dek":"Corruption rarely starts with a bad person. It starts with a good one who has too much to lose.","meta":"June 2026 · 3 min · Shared: identity"}];
+  protected readonly imageAlt = "A face reflected in dark glass, matching an essay on self-love and negative self-talk.";
+  protected readonly related: WgRelated[] = [{"slug":"stop-the-pain","title":"How to stop the pain","dek":"The pain you have been outrunning has not moved. It is exactly where you left it, waiting to be heard.","meta":"May 2026 · 5 min · Shared: mental health"},{"slug":"stop-chasing-purpose","title":"Stop chasing purpose","dek":"The search for purpose is a trap most people walk into willingly. It ends only when they notice the search is the problem.","meta":"May 2026 · 2 min · Shared: identity"},{"slug":"corruption","title":"How fear turns the good in us into corruption","dek":"Corruption rarely starts with a bad person. It starts with a good one who has too much to lose.","meta":"May 2026 · 3 min · Shared: identity"}];
   protected readonly prev: WgLink | null = {"slug":"whom-to-listen-to","title":"The one you should have listened to"};
   protected readonly next: WgLink | null = null;
-  protected readonly hero: string | null = null;
+  protected readonly hero: string | null = "/assets/articles/wtf-is-self-love.jpg";
   protected readonly body = inject(DomSanitizer).bypassSecurityTrustHtml(HTML);
 }

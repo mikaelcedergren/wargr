@@ -6,6 +6,20 @@ import { RouterStateSnapshot, TitleStrategy } from '@angular/router';
 export const SITE_ORIGIN = 'https://wargr.com';
 export const SITE_NAME = 'Wargr';
 export const AUTHOR = 'Michael Wargr';
+export const AUTHOR_DESCRIPTION =
+  'Michael Wargr writes reflective essays on philosophy, ethics, fear, self-deception, conformity, purpose, pain, and human nature.';
+export const AUTHOR_KNOWS_ABOUT = [
+  'Philosophy',
+  'Ethics',
+  'Human nature',
+  'Fear',
+  'Self-deception',
+  'Conformity',
+  'Purpose',
+  'Pain',
+  'Accountability',
+  'Moral psychology',
+];
 /** Default social-share card (the designed MW monogram card, 1200×630). Override via PageSeo.ogImage. */
 export const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/assets/brand/og-default.jpg`;
 
@@ -14,16 +28,20 @@ export interface PageSeo {
   /** Canonical path, e.g. '/' or '/corruption/'. */
   path: string;
   description: string;
+  headline?: string;
+  about?: string[];
   keywords?: string;
   ogTitle?: string;
   ogDescription?: string;
   /** Absolute image URL; only emitted if provided (no default — essays have no thumbnail asset yet). */
   ogImage?: string;
+  imageAlt?: string;
   /** og:type — 'website' (default) or 'article'. */
   ogType?: string;
   noindex?: boolean;
   /** Article enrichment (set by the importer for essay routes). */
   datePublished?: string;
+  dateModified?: string;
   wordCount?: number;
   /** Reading time in minutes → emitted as ISO-8601 duration timeRequired. */
   readingTime?: number;
@@ -67,9 +85,7 @@ export class SeoTitleStrategy extends TitleStrategy {
     this.titleService.setTitle(title);
     this.meta.updateTag({ name: 'description', content: seo.description });
     this.meta.updateTag({ name: 'author', content: AUTHOR });
-    if (seo.keywords) {
-      this.meta.updateTag({ name: 'keywords', content: seo.keywords });
-    }
+    this.meta.removeTag("name='keywords'");
     if (seo.noindex) {
       this.meta.updateTag({ name: 'robots', content: 'noindex, follow' });
     } else {
@@ -87,11 +103,15 @@ export class SeoTitleStrategy extends TitleStrategy {
       if (seo.datePublished) {
         this.meta.updateTag({ property: 'article:published_time', content: seo.datePublished });
       }
+      if (seo.dateModified) {
+        this.meta.updateTag({ property: 'article:modified_time', content: seo.dateModified });
+      }
       if (seo.articleSection) {
         this.meta.updateTag({ property: 'article:section', content: seo.articleSection });
       }
     } else {
       this.meta.removeTag("property='article:published_time'");
+      this.meta.removeTag("property='article:modified_time'");
       this.meta.removeTag("property='article:section'");
       this.meta.removeTag("property='article:author'");
     }
@@ -102,7 +122,10 @@ export class SeoTitleStrategy extends TitleStrategy {
     this.meta.updateTag({ property: 'og:image:type', content: 'image/jpeg' });
     this.meta.updateTag({ property: 'og:image:width', content: '1200' });
     this.meta.updateTag({ property: 'og:image:height', content: '630' });
-    this.meta.updateTag({ property: 'og:image:alt', content: `${SITE_NAME} — ${AUTHOR}` });
+    this.meta.updateTag({
+      property: 'og:image:alt',
+      content: seo.imageAlt ?? `${SITE_NAME} — ${AUTHOR}`,
+    });
     this.meta.updateTag({ name: 'twitter:image', content: ogImage });
     this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
 
@@ -149,7 +172,7 @@ export class SeoTitleStrategy extends TitleStrategy {
       '@id': `${canonical}#webpage`,
       url: canonical,
       name: title,
-      headline: title,
+      headline: seo.headline ?? title,
       description: seo.description,
       inLanguage: 'en-US',
       isPartOf: { '@id': `${SITE_ORIGIN}/#blog` },
@@ -158,11 +181,14 @@ export class SeoTitleStrategy extends TitleStrategy {
       mainEntityOfPage: canonical,
       image: seo.ogImage ?? DEFAULT_OG_IMAGE,
     };
+    if (seo.about?.length) {
+      webpage['about'] = seo.about.map((name) => ({ '@type': 'Thing', name }));
+    }
 
     if (isArticle) {
       if (seo.datePublished) {
         webpage['datePublished'] = seo.datePublished;
-        webpage['dateModified'] = seo.datePublished;
+        webpage['dateModified'] = seo.dateModified ?? seo.datePublished;
       }
       if (seo.wordCount) webpage['wordCount'] = seo.wordCount;
       if (seo.readingTime) webpage['timeRequired'] = `PT${seo.readingTime}M`;
@@ -179,6 +205,8 @@ export class SeoTitleStrategy extends TitleStrategy {
         '@id': `${SITE_ORIGIN}/#person`,
         name: AUTHOR,
         url: `${SITE_ORIGIN}/`,
+        description: AUTHOR_DESCRIPTION,
+        knowsAbout: AUTHOR_KNOWS_ABOUT,
       },
       {
         '@type': 'Blog',

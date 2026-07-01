@@ -19,7 +19,7 @@
         <span class="wg-sr-only">Wargr — essays by Michael Wargr</span>
       </a>
     </h1>
-    <p class="wg-masthead__byline">Essays · Michael Wargr</p>
+    <p class="wg-masthead__byline">MICHAEL WARGR</p>
   </header>
 
   <router-outlet />
@@ -29,9 +29,9 @@
       type="button"
       class="wg-theme"
       (click)="toggleTheme()"
-      [attr.aria-label]="dark() ? 'Switch to light theme' : 'Switch to dark theme'"
+      [attr.aria-label]="night() ? 'Switch to light theme' : 'Switch to night theme'"
     >
-      <span aria-hidden="true">{{ dark() ? '☀' : '☾' }}</span>
+      <span aria-hidden="true">{{ night() ? '☀' : '☾' }}</span>
     </button>
     <span class="wg-footer__line">© {{ year }} Michael Wargr · wargr.com</span>
   </footer>

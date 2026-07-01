@@ -7,19 +7,29 @@ import { RouterLink } from '@angular/router';
   imports: [RouterLink],
   template: `
     <section class="wg-container wg-feed">
-      <p class="wg-feed__dek">Essays on character, fear, and the stories we tell ourselves.</p>
       @for (a of articles; track a.slug; let first = $first) {
-        <article class="wg-entry" [class.wg-entry--lead]="first">
-          @if (a.kicker) { <p class="wg-kicker">{{ a.kicker }}</p> }
-          <h2 class="wg-entry__title"><a [routerLink]="['/', a.slug]">{{ a.title }}</a></h2>
-          @if (a.dek) { <p class="wg-entry__dek">{{ a.dek }}</p> }
-          <p class="wg-meta wg-entry__meta">{{ a.meta }}</p>
-        </article>
+        <a class="wg-entry" [class.wg-entry--lead]="first" [routerLink]="['/', a.slug]" [attr.aria-label]="'Read ' + a.title">
+          @if (a.image) {
+            <span class="wg-entry__media">
+              <img
+                [src]="a.image"
+                [alt]="a.imageAlt"
+                [attr.loading]="first ? 'eager' : 'lazy'"
+                [attr.fetchpriority]="first ? 'high' : null"
+              />
+            </span>
+          }
+          <div class="wg-entry__body">
+            <h2 class="wg-entry__title"><span class="wg-entry__title-text">{{ a.title }}</span></h2>
+            @if (a.dek) { <p class="wg-entry__dek">{{ a.dek }}</p> }
+            <p class="wg-meta wg-entry__meta">{{ a.meta }}</p>
+          </div>
+        </a>
       }
     </section>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {
-  protected readonly articles = [{"slug":"wtf-is-self-love","title":"WTF is self-love?","dek":"Most people are crueller to themselves than they would ever be to the rudest of strangers. They have been doing it so long they no longer hear it.","kicker":"self-love","meta":"June 2026 · 3 min read"},{"slug":"whom-to-listen-to","title":"The one you should have listened to","dek":"When a hundred people agree about something and one person doesn't, the one person is usually wrong. Until they aren't, and the cost of having dismissed them has already been paid.","kicker":"philosophy","meta":"June 2026 · 5 min read"},{"slug":"stop-the-pain","title":"How to stop the pain","dek":"The pain you have been outrunning has not moved. It is exactly where you left it, waiting to be heard.","kicker":"pain","meta":"June 2026 · 5 min read"},{"slug":"stop-chasing-purpose","title":"Stop chasing purpose","dek":"The search for purpose is a trap most people walk into willingly. It ends only when they notice the search is the problem.","kicker":"philosophy","meta":"June 2026 · 2 min read"},{"slug":"slaughterhouse","title":"How we choose the slaughterhouse","dek":"You think you think for yourself. You don't. You follow, repeat, defend, and never notice the fence.","kicker":"philosophy","meta":"June 2026 · 5 min read"},{"slug":"meant-well","title":"I'm sorry. I meant well.","dek":"The people who hurt you most rarely thought of themselves as the people hurting you.","kicker":"philosophy","meta":"June 2026 · 7 min read"},{"slug":"corruption","title":"How fear turns the good in us into corruption","dek":"Corruption rarely starts with a bad person. It starts with a good one who has too much to lose.","kicker":"ethics","meta":"June 2026 · 3 min read"}];
+  protected readonly articles = [{"slug":"wtf-is-self-love","title":"WTF is self-love?","dek":"Most people are crueller to themselves than they would ever be to the rudest of strangers. They have been doing it so long they no longer hear it.","image":"/assets/articles/wtf-is-self-love.jpg","imageAlt":"A face reflected in dark glass, matching an essay on self-love and negative self-talk.","meta":"May 2026 · 3 min read"},{"slug":"whom-to-listen-to","title":"The one you should have listened to","dek":"When a hundred people agree about something and one person doesn't, the one person is usually wrong. Until they aren't, and the cost of having dismissed them has already been paid.","image":"/assets/articles/whom-to-listen-to.jpg","imageAlt":"A microphone on an empty lecture table, matching an essay on consensus and dissent.","meta":"May 2026 · 5 min read"},{"slug":"stop-the-pain","title":"How to stop the pain","dek":"The pain you have been outrunning has not moved. It is exactly where you left it, waiting to be heard.","image":"/assets/articles/stop-the-pain.jpg","imageAlt":"A dark, quiet scene matching an essay on emotional pain, avoidance, and healing.","meta":"May 2026 · 5 min read"},{"slug":"stop-chasing-purpose","title":"Stop chasing purpose","dek":"The search for purpose is a trap most people walk into willingly. It ends only when they notice the search is the problem.","image":"/assets/articles/stop-chasing-purpose.jpg","imageAlt":"A quiet path through open landscape, matching an essay on purpose, meaning, and letting go.","meta":"May 2026 · 2 min read"},{"slug":"slaughterhouse","title":"How we choose the slaughterhouse","dek":"You think you think for yourself. You don't. You follow, repeat, defend, and never notice the fence.","image":"/assets/articles/slaughterhouse.jpg","imageAlt":"Meat on a table in a slaughterhouse, matching an essay on conformity and herd mentality.","meta":"May 2026 · 5 min read"},{"slug":"meant-well","title":"I'm sorry. I meant well.","dek":"The people who hurt you most rarely thought of themselves as the people hurting you.","image":"/assets/articles/meant-well.jpg","imageAlt":"A tense human scene matching an essay on good intentions, harm, and accountability.","meta":"May 2026 · 7 min read"},{"slug":"corruption","title":"How fear turns the good in us into corruption","dek":"Corruption rarely starts with a bad person. It starts with a good one who has too much to lose.","image":"/assets/articles/corruption.jpg","imageAlt":"A solitary figure in a dark room, matching an essay on fear, integrity, and corruption.","meta":"May 2026 · 3 min read"}];
 }

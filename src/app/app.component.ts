@@ -13,19 +13,20 @@ export class AppComponent {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   protected readonly year = new Date().getFullYear();
 
-  /** Light is the default; the pre-paint script in index.html may have switched to dark already. */
-  protected readonly dark = signal(
-    this.isBrowser && this.doc.documentElement.classList.contains('theme-dark'),
+  /** Light is the default; the pre-paint script in index.html may have switched to night already. */
+  protected readonly night = signal(
+    this.isBrowser && this.doc.documentElement.classList.contains('theme-night'),
   );
 
   protected toggleTheme(): void {
-    const next = !this.dark();
-    this.dark.set(next);
+    const next = !this.night();
+    this.night.set(next);
     const root = this.doc.documentElement;
-    root.classList.toggle('theme-dark', next);
+    root.classList.remove('theme-dark');
+    root.classList.toggle('theme-night', next);
     root.classList.toggle('theme-light', !next);
     try {
-      localStorage.setItem('wg-theme', next ? 'dark' : 'light');
+      localStorage.setItem('wg-theme', next ? 'night' : 'light');
     } catch {
       /* storage blocked (private mode) — the toggle still works for this session */
     }

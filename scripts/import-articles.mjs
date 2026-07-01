@@ -43,9 +43,140 @@ const PAGES_DIR = join(APP, 'pages');
 const SITE_ORIGIN = 'https://wargr.com';
 const SITE_NAME = 'Wargr';
 const AUTHOR = 'Michael Wargr';
+const AUTHOR_DESCRIPTION =
+  'Michael Wargr writes reflective essays on philosophy, ethics, fear, self-deception, conformity, purpose, pain, and human nature.';
+const HOME_DESCRIPTION =
+  'Essays by Michael Wargr on philosophy, ethics, fear, self-deception, conformity, purpose, pain, and human nature.';
 const WORDS_PER_MINUTE = 200; // dense, reflective prose reads a little slower than news copy.
 const RELATED_COUNT = 3;
-const FILED_TAGS = 6; // how many tags to show in the reader-facing "Filed under" line.
+
+const AUTHOR_KNOWS_ABOUT = [
+  'Philosophy',
+  'Ethics',
+  'Human nature',
+  'Fear',
+  'Self-deception',
+  'Conformity',
+  'Purpose',
+  'Pain',
+  'Accountability',
+  'Moral psychology',
+];
+
+const SEO_BY_SLUG = {
+  'wtf-is-self-love': {
+    title: 'WTF is self-love? — Michael Wargr',
+    description:
+      'A sharp essay on self-love, negative self-talk, loneliness, and learning to speak to yourself with the kindness you give other people.',
+    phrases: [
+      'self-love',
+      'negative self-talk',
+      'inner voice',
+      'loneliness',
+      'mental health',
+      'self-compassion',
+      'wellness critique',
+      'how to talk to yourself',
+    ],
+    imageAlt: 'A face reflected in dark glass, matching an essay on self-love and negative self-talk.',
+  },
+  'whom-to-listen-to': {
+    title: 'Who to listen to when everyone agrees — Michael Wargr',
+    description:
+      'An essay on consensus, dissent, expertise, and why the lone voice is sometimes worth hearing before everyone else catches up.',
+    phrases: [
+      'who to listen to',
+      'consensus and dissent',
+      'experts and outsiders',
+      'contrarian ideas',
+      'intellectual courage',
+      'truth and consensus',
+      'medical history',
+      'paradigm shifts',
+    ],
+    imageAlt: 'A microphone on an empty lecture table, matching an essay on consensus and dissent.',
+  },
+  'stop-the-pain': {
+    title: 'How to stop emotional pain — Michael Wargr',
+    description:
+      'An essay on emotional pain, avoidance, numbing, and why healing begins when you stop running from what needs to be heard.',
+    phrases: [
+      'how to stop emotional pain',
+      'emotional pain',
+      'avoidance',
+      'numbing',
+      'healing',
+      'sit with pain',
+      'pain and addiction',
+      'mental health',
+    ],
+    imageAlt: 'A dark, quiet scene matching an essay on emotional pain, avoidance, and healing.',
+  },
+  'stop-chasing-purpose': {
+    title: 'Stop chasing purpose — Michael Wargr',
+    description:
+      'An essay on purpose anxiety, meaning, and the quiet freedom of putting down the search for a life-defining mission.',
+    phrases: [
+      'stop chasing purpose',
+      'purpose anxiety',
+      'finding meaning',
+      'meaning in life',
+      'life purpose',
+      'existential search',
+      'self-help critique',
+      'quiet purpose',
+    ],
+    imageAlt: 'A quiet path through open landscape, matching an essay on purpose, meaning, and letting go.',
+  },
+  slaughterhouse: {
+    title: 'Herd mentality and the slaughterhouse — Michael Wargr',
+    description:
+      'An essay on herd mentality, conformity, propaganda, and the invisible ways people choose the stories that lead them.',
+    phrases: [
+      'herd mentality',
+      'conformity',
+      'propaganda',
+      'mass psychology',
+      'consensus',
+      'dissent',
+      'media manipulation',
+      'groupthink',
+    ],
+    imageAlt: 'Meat on a table in a slaughterhouse, matching an essay on conformity and herd mentality.',
+  },
+  'meant-well': {
+    title: "I'm sorry. I meant well. — Michael Wargr",
+    description:
+      'An essay on good intentions, harm, accountability, and why meaning well does not undo the damage people cause.',
+    phrases: [
+      'good intentions',
+      'intentions versus impact',
+      'accountability',
+      'meaning well',
+      'harm and responsibility',
+      'self-deception',
+      'moral philosophy',
+      'relationships',
+    ],
+    imageAlt: 'A tense human scene matching an essay on good intentions, harm, and accountability.',
+  },
+  corruption: {
+    title: 'How fear turns good people into corruption — Michael Wargr',
+    description:
+      'An essay on corruption, moral compromise, fear, integrity, and how good people become what they once opposed.',
+    phrases: [
+      'how good people become corrupt',
+      'corruption',
+      'moral compromise',
+      'fear and integrity',
+      'ethical failure',
+      'power and responsibility',
+      'self-deception',
+      'character',
+    ],
+    imageAlt: 'A solitary figure in a dark room, matching an essay on fear, integrity, and corruption.',
+  },
+};
 
 // Per-article imagery follows a slug convention in public/assets/articles/ (drop the files in and they
 // wire themselves up; no image => the essay keeps the plain header):
@@ -78,20 +209,27 @@ function pascal(slug) {
     .map((w) => w[0].toUpperCase() + w.slice(1))
     .join('');
 }
-function gitDate(filename) {
+function gitDates(filename) {
   try {
-    const iso = execFileSync(
+    const dates = execFileSync(
       'git',
-      ['-C', GHOST, 'log', '-1', '--format=%cI', '--', `wargr/${filename}`],
-      {
-        encoding: 'utf8',
-      },
-    ).trim();
-    if (iso) return iso;
+      ['-C', GHOST, 'log', '--follow', '--format=%cI', '--', `wargr/${filename}`],
+      { encoding: 'utf8' },
+    )
+      .trim()
+      .split('\n')
+      .filter(Boolean);
+    if (dates.length) {
+      return {
+        published: dates[dates.length - 1],
+        modified: dates[0],
+      };
+    }
   } catch {
     /* not a git repo / not committed */
   }
-  return statSync(join(SRC, filename)).mtime.toISOString();
+  const modified = statSync(join(SRC, filename)).mtime.toISOString();
+  return { published: modified, modified };
 }
 function fmtDate(iso) {
   return new Date(iso).toLocaleDateString('en-US', {
@@ -115,6 +253,41 @@ function countWords(md) {
     .replace(/[#>*_~`>\-]/g, ' ') // drop common markdown punctuation
     .split(/\s+/)
     .filter(Boolean).length;
+}
+
+function unique(items) {
+  const seen = new Set();
+  return items
+    .map((item) => String(item || '').trim())
+    .filter(Boolean)
+    .filter((item) => {
+      const key = item.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
+function seoForArticle({ slug, title, dek, tags }) {
+  const configured = SEO_BY_SLUG[slug] ?? {};
+  const topic = tags[0] || '';
+  const phrases = unique([
+    ...(configured.phrases ?? []),
+    `${title.replace(/[“”"]/g, '').trim()} essay`,
+    topic && `${topic} essay`,
+    ...tags,
+    'Michael Wargr',
+    'Wargr essays',
+    'philosophy essays',
+    'essays on human nature',
+  ]);
+
+  return {
+    title: configured.title ?? `${title} — ${AUTHOR}`,
+    description: configured.description ?? (dek || `${title}, an essay by ${AUTHOR}.`),
+    phrases,
+    imageAlt: configured.imageAlt ?? `${title}, an essay by ${AUTHOR}.`,
+  };
 }
 
 /**
@@ -179,11 +352,13 @@ function parse(filename) {
     }
   }
 
-  const iso = gitDate(filename);
+  const dates = gitDates(filename);
   const bodyHtml = marked.parse(bodyMd);
   const wordCount = countWords(bodyMd);
   const readingTime = Math.max(1, Math.round(wordCount / WORDS_PER_MINUTE));
   const pullQuotes = parsePullQuotes(trailing);
+  const seo = seoForArticle({ slug, title, dek, tags });
+  const hero = findArticleImage(slug);
   const ogCard = findArticleImage(slug, '-og');
 
   return {
@@ -191,17 +366,20 @@ function parse(filename) {
     title,
     dek,
     bodyHtml,
-    dropcap: bodyHtml.trimStart().startsWith('<p'), // drop cap only when the first block is a paragraph
     tags,
+    seoTitle: seo.title,
+    seoDescription: seo.description,
+    seoPhrases: seo.phrases,
+    imageAlt: seo.imageAlt,
     dominantTag: tags[0] || '',
-    iso,
-    date: fmtDate(iso),
-    monthYear: fmtMonth(iso),
+    iso: dates.published,
+    modifiedIso: dates.modified,
+    date: fmtDate(dates.published),
+    monthYear: fmtMonth(dates.published),
     wordCount,
     readingTime,
     pullQuotes,
-    coda: pullQuotes.length ? pullQuotes[pullQuotes.length - 1] : null, // close on the sharpest line
-    hero: findArticleImage(slug), // full-bleed header photo, or null for the plain header
+    hero, // full-bleed header photo, or null for the plain header
     ogImage: ogCard ? SITE_ORIGIN + ogCard : null, // per-essay social card overriding the default
   };
 }
@@ -227,14 +405,14 @@ function buildRelated(published) {
         shared.sort((x, y) => df.get(x) - df.get(y)); // rarest (most specific) shared tag first
         return { b, score: shared.length, shared };
       });
-    scored.sort((x, y) => y.score - x.score || (x.b.iso < y.b.iso ? 1 : -1));
+    scored.sort((x, y) => y.score - x.score || (x.b.modifiedIso < y.b.modifiedIso ? 1 : -1));
 
     let top = scored.filter((s) => s.score >= 1).slice(0, RELATED_COUNT);
     if (top.length < RELATED_COUNT) {
       const have = new Set(top.map((s) => s.b.slug));
       const backfill = scored
         .filter((s) => !have.has(s.b.slug))
-        .sort((x, y) => (x.b.iso < y.b.iso ? 1 : -1))
+        .sort((x, y) => (x.b.modifiedIso < y.b.modifiedIso ? 1 : -1))
         .slice(0, RELATED_COUNT - top.length);
       top = top.concat(backfill);
     }
@@ -258,8 +436,6 @@ function buildRelated(published) {
 
 function writeArticleComponent(a) {
   const cls = `Article${pascal(a.slug)}Component`;
-  const proseClass = a.dropcap ? 'wg-prose wg-prose--dropcap' : 'wg-prose';
-  const filed = a.tags.slice(0, FILED_TAGS).join(' · ');
   const meta = `${a.date} · ${a.readingTime} min read · ${a.wordCount} words`;
   const src = `import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
@@ -269,7 +445,6 @@ import { DomSanitizer } from '@angular/platform-browser';
 const HTML = ${JSON.stringify(a.bodyHtml)};
 
 type WgLink = { slug: string; title: string };
-type WgQuote = { hook: string; elab: string };
 type WgRelated = { slug: string; title: string; dek: string; meta: string };
 
 @Component({
@@ -278,12 +453,11 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
   template: \`
     @if (hero) {
       <header class="wg-hero">
-        <img class="wg-hero__img" [src]="hero" alt="" fetchpriority="high" />
+        <img class="wg-hero__img" [src]="hero" [alt]="imageAlt" fetchpriority="high" />
         <div class="wg-hero__scrim" aria-hidden="true"></div>
         <div class="wg-hero__inner wg-container">
           <a class="wg-back wg-back--hero" routerLink="/">← Essays</a>
           <div class="wg-hero__head">
-            @if (kicker) { <p class="wg-kicker">{{ kicker }}</p> }
             <h1 class="wg-article__title">{{ title }}</h1>
             @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
             <p class="wg-article__meta wg-meta">{{ meta }}</p>
@@ -294,19 +468,11 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
     <article class="wg-container wg-article" [class.wg-article--hero]="!!hero">
       @if (!hero) {
         <a class="wg-back" routerLink="/">← Essays</a>
-        @if (kicker) { <p class="wg-kicker">{{ kicker }}</p> }
         <h1 class="wg-article__title">{{ title }}</h1>
         @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
         <p class="wg-article__meta wg-meta">{{ meta }}</p>
       }
-      <div class="${proseClass}" [innerHTML]="body"></div>
-      @if (coda) {
-        <figure class="wg-pullquote">
-          <p class="wg-pullquote__hook">{{ coda.hook }}</p>
-          @if (coda.elab) { <figcaption class="wg-pullquote__elab">{{ coda.elab }}</figcaption> }
-        </figure>
-      }
-      @if (filed) { <p class="wg-filed">Filed under: {{ filed }}</p> }
+      <div class="wg-prose" [innerHTML]="body"></div>
       <p class="wg-finis" aria-hidden="true">§</p>
     </article>
     @if (related.length || prev || next) {
@@ -355,8 +521,7 @@ export class ${cls} {
   protected readonly dek = ${JSON.stringify(a.dek)};
   protected readonly meta = ${JSON.stringify(meta)};
   protected readonly kicker = ${JSON.stringify(a.dominantTag)};
-  protected readonly filed = ${JSON.stringify(filed)};
-  protected readonly coda: WgQuote | null = ${JSON.stringify(a.coda)};
+  protected readonly imageAlt = ${JSON.stringify(a.imageAlt)};
   protected readonly related: WgRelated[] = ${JSON.stringify(a.related)};
   protected readonly prev: WgLink | null = ${JSON.stringify(a.prev)};
   protected readonly next: WgLink | null = ${JSON.stringify(a.next)};
@@ -374,7 +539,8 @@ function writeHome(articles) {
     slug: a.slug,
     title: a.title,
     dek: a.dek,
-    kicker: a.dominantTag,
+    image: a.hero,
+    imageAlt: a.imageAlt,
     meta: `${a.monthYear} · ${a.readingTime} min read`,
   }));
   const src = `import { ChangeDetectionStrategy, Component } from '@angular/core';
@@ -386,14 +552,24 @@ import { RouterLink } from '@angular/router';
   imports: [RouterLink],
   template: \`
     <section class="wg-container wg-feed">
-      <p class="wg-feed__dek">Essays on character, fear, and the stories we tell ourselves.</p>
       @for (a of articles; track a.slug; let first = $first) {
-        <article class="wg-entry" [class.wg-entry--lead]="first">
-          @if (a.kicker) { <p class="wg-kicker">{{ a.kicker }}</p> }
-          <h2 class="wg-entry__title"><a [routerLink]="['/', a.slug]">{{ a.title }}</a></h2>
-          @if (a.dek) { <p class="wg-entry__dek">{{ a.dek }}</p> }
-          <p class="wg-meta wg-entry__meta">{{ a.meta }}</p>
-        </article>
+        <a class="wg-entry" [class.wg-entry--lead]="first" [routerLink]="['/', a.slug]" [attr.aria-label]="'Read ' + a.title">
+          @if (a.image) {
+            <span class="wg-entry__media">
+              <img
+                [src]="a.image"
+                [alt]="a.imageAlt"
+                [attr.loading]="first ? 'eager' : 'lazy'"
+                [attr.fetchpriority]="first ? 'high' : null"
+              />
+            </span>
+          }
+          <div class="wg-entry__body">
+            <h2 class="wg-entry__title"><span class="wg-entry__title-text">{{ a.title }}</span></h2>
+            @if (a.dek) { <p class="wg-entry__dek">{{ a.dek }}</p> }
+            <p class="wg-meta wg-entry__meta">{{ a.meta }}</p>
+          </div>
+        </a>
       }
     </section>
   \`,
@@ -432,12 +608,16 @@ function writeRoutes(articles, classes) {
   const entries = articles.map((a, idx) => {
     const seo = {
       path: `/${a.slug}/`,
-      description: a.dek || a.title,
+      description: a.seoDescription,
       ogType: 'article',
-      ...(a.tags.length ? { keywords: a.tags.join(', ') } : {}),
+      headline: a.title,
+      keywords: a.seoPhrases.join(', '),
+      about: a.seoPhrases,
       datePublished: a.iso,
+      dateModified: a.modifiedIso,
       wordCount: a.wordCount,
       readingTime: a.readingTime,
+      imageAlt: a.imageAlt,
       ...(a.dominantTag ? { articleSection: a.dominantTag } : {}),
       ...(a.related.length ? { relatedSlugs: a.related.map((r) => r.slug) } : {}),
       ...(a.prev ? { prevPath: `/${a.prev.slug}/` } : {}),
@@ -447,13 +627,15 @@ function writeRoutes(articles, classes) {
     return `  {
     path: '${a.slug}',
     loadComponent: () => import('./articles/${a.slug}.component').then((m) => m.${classes[idx]}),
-    title: ${JSON.stringify(`${a.title} — ${SITE_NAME}`)},
+    title: ${JSON.stringify(a.seoTitle)},
     data: { seo: ${JSON.stringify(seo)} satisfies PageSeo },
   },`;
   });
   const homeSeo = {
     path: '/',
-    description: 'Essays by Michael Wargr.',
+    description: HOME_DESCRIPTION,
+    headline: 'Essays by Michael Wargr',
+    about: AUTHOR_KNOWS_ABOUT,
     itemList: articles.map((a) => ({ url: `${SITE_ORIGIN}/${a.slug}/`, name: a.title })),
   };
   const src = `import { Routes } from '@angular/router';
@@ -487,19 +669,21 @@ function writeFeed(articles) {
       <link>${SITE_ORIGIN}/${a.slug}/</link>
       <guid isPermaLink="true">${SITE_ORIGIN}/${a.slug}/</guid>
       <pubDate>${new Date(a.iso).toUTCString()}</pubDate>
-      <description>${escapeXml(a.dek || a.title)}</description>
+      <description>${escapeXml(a.seoDescription)}</description>
       ${a.tags.map((t) => `<category>${escapeXml(t)}</category>`).join('')}
     </item>`,
     )
     .join('\n');
-  const updated = articles[0] ? new Date(articles[0].iso).toUTCString() : new Date(0).toUTCString();
+  const updated = articles[0]
+    ? new Date(Math.max(...articles.map((a) => new Date(a.modifiedIso).getTime()))).toUTCString()
+    : new Date(0).toUTCString();
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>${SITE_NAME} — essays by ${AUTHOR}</title>
     <link>${SITE_ORIGIN}/</link>
     <atom:link href="${SITE_ORIGIN}/feed.xml" rel="self" type="application/rss+xml" />
-    <description>Essays by ${AUTHOR}.</description>
+    <description>${escapeXml(HOME_DESCRIPTION)}</description>
     <language>en-us</language>
     <lastBuildDate>${updated}</lastBuildDate>
 ${items}
@@ -512,14 +696,37 @@ ${items}
 
 function writeSitemapAndRobots(articles) {
   const urls = [`${SITE_ORIGIN}/`, ...articles.map((a) => `${SITE_ORIGIN}/${a.slug}/`)];
-  const lastmod = articles.map((a) => a.iso.slice(0, 10));
+  const lastmod = articles.map((a) => a.modifiedIso.slice(0, 10));
   const body = urls
-    .map(
-      (u, i) =>
-        `  <url><loc>${u}</loc>${i > 0 ? `<lastmod>${lastmod[i - 1]}</lastmod>` : ''}</url>`,
-    )
+    .map((u, i) => {
+      if (i === 0) return `  <url><loc>${u}</loc></url>`;
+      const a = articles[i - 1];
+      const images = [
+        a.hero && {
+          loc: `${SITE_ORIGIN}${a.hero}`,
+          title: a.title,
+          caption: a.imageAlt,
+        },
+        a.ogImage && {
+          loc: a.ogImage,
+          title: `${a.title} social card`,
+          caption: a.seoDescription,
+        },
+      ].filter(Boolean);
+      const imageXml = images
+        .map(
+          (img) => `
+    <image:image>
+      <image:loc>${escapeXml(img.loc)}</image:loc>
+      <image:title>${escapeXml(img.title)}</image:title>
+      <image:caption>${escapeXml(img.caption)}</image:caption>
+    </image:image>`,
+        )
+        .join('');
+      return `  <url><loc>${u}</loc><lastmod>${lastmod[i - 1]}</lastmod>${imageXml}</url>`;
+    })
     .join('\n');
-  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n${body}\n</urlset>\n`;
   mkdirSync(join(REPO, 'public'), { recursive: true });
   writeFileSync(join(REPO, 'public', 'sitemap.xml'), sitemap);
   writeFileSync(
@@ -539,7 +746,7 @@ rmSync(ARTICLES_DIR, { recursive: true, force: true });
 const published = readdirSync(SRC)
   .filter((f) => f.endsWith('.md') && f.trimStart().startsWith('☑'))
   .map(parse)
-  .sort((a, b) => (a.iso < b.iso ? 1 : -1)); // newest first
+  .sort((a, b) => (a.modifiedIso < b.modifiedIso ? 1 : -1)); // newest first
 
 buildRelated(published);
 

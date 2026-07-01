@@ -6,7 +6,6 @@ import { DomSanitizer } from '@angular/platform-browser';
 const HTML = "<p>Start with the clean version. A person spends years building something that helps people. Not because they wanted fame or money, but because they saw a problem nobody else was solving and decided to solve it. The work is hard, it pays nothing for a long time, and they live on belief and stubbornness. Eventually the work begins to land, people use what they built and their lives are better for it, the thing grows, employees join, donors arrive, and a simple effort to fix something becomes an institution of its own.</p>\n<p>Years pass. The work pays bills, and then it pays more than bills. The mortgage runs on it, and so do the school fees, and so do the mortgages and school fees of everybody it employs. Their kids, their plans, their futures, all leaning on the thing that started as one person&#39;s idea. The person at the centre of all this is now, in a real sense, holding up the structure. Pride grows around it, and the pride is honest. The work has done real good.</p>\n<p>At first the favours are small. A donor writes a polite cheque and asks for nothing in return. A friend of a friend asks for a meeting, and the meeting is given freely. The person at the centre is still doing the work they have always done.</p>\n<p>The favours grow. So does the number of people whose lives depend on access to the room. Each individual exchange, looked at on its own, stays clean. Nothing is sold, nothing is openly bought, the cheque arrives later and not because of the meeting, and every party at the table would swear to this and mean it. Greed starts to form.</p>\n<p>The mission is still on the wall, in the speeches, in the annual report. It still receives a portion of what comes in. The portion shrinks over the years, slowly enough that nobody at the centre notices. The salaries grow, the travel grows, the ego grows, and the list of people whose lives lean on the structure stays long.</p>\n<p>The original purpose was the work. The new purpose, never declared and never articulated, is to defend the structure that has grown around it.</p>\n<p>The person does not notice the switch. Almost nobody who makes this switch ever notices it. The mind is built to keep its self-image consistent, and it can do astonishing amounts of work to keep that image intact while the actions underneath drift in a different direction entirely.</p>\n<p>This is what corruption actually looks like, far from the movie version. The movie involves bad people doing bad things because they are bad. The real version involves good people doing increasingly bad things while continuing to be good people in their own description of themselves. They do not wake up evil, and they do not need to.</p>\n<p>They only need to have built something they cannot bear to watch die.</p>\n<p>Here is the uncomfortable part: the person in the chair is not lying. They are not, by their own measure, doing anything wrong. They are doing exactly what most of us would do if our families, our reputations, and our life&#39;s work were on the same line.</p>\n<p>Whether the corrupt are bad people is the easy question, the one we have spent enormous energy debating. The harder question is whether, placed at the same desk, with the same mortgages running on the same product, you would behave any differently. Most people would say yes, of course they would, they believe it — but they have never been tested.</p>\n<p>Character is rarely tested in the cases where the right action is also the easy one. The real test arrives when the right action would destroy something you love.</p>\n<p>You see clearly what the right action would cost. Your mind by this point skewed, your ideas now identity, your justifications now subconscious. You find your hands refusing to do it.</p>\n<p>You become corrupted.</p>\n";
 
 type WgLink = { slug: string; title: string };
-type WgQuote = { hook: string; elab: string };
 type WgRelated = { slug: string; title: string; dek: string; meta: string };
 
 @Component({
@@ -15,12 +14,11 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
   template: `
     @if (hero) {
       <header class="wg-hero">
-        <img class="wg-hero__img" [src]="hero" alt="" fetchpriority="high" />
+        <img class="wg-hero__img" [src]="hero" [alt]="imageAlt" fetchpriority="high" />
         <div class="wg-hero__scrim" aria-hidden="true"></div>
         <div class="wg-hero__inner wg-container">
           <a class="wg-back wg-back--hero" routerLink="/">← Essays</a>
           <div class="wg-hero__head">
-            @if (kicker) { <p class="wg-kicker">{{ kicker }}</p> }
             <h1 class="wg-article__title">{{ title }}</h1>
             @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
             <p class="wg-article__meta wg-meta">{{ meta }}</p>
@@ -31,19 +29,11 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
     <article class="wg-container wg-article" [class.wg-article--hero]="!!hero">
       @if (!hero) {
         <a class="wg-back" routerLink="/">← Essays</a>
-        @if (kicker) { <p class="wg-kicker">{{ kicker }}</p> }
         <h1 class="wg-article__title">{{ title }}</h1>
         @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
         <p class="wg-article__meta wg-meta">{{ meta }}</p>
       }
-      <div class="wg-prose wg-prose--dropcap" [innerHTML]="body"></div>
-      @if (coda) {
-        <figure class="wg-pullquote">
-          <p class="wg-pullquote__hook">{{ coda.hook }}</p>
-          @if (coda.elab) { <figcaption class="wg-pullquote__elab">{{ coda.elab }}</figcaption> }
-        </figure>
-      }
-      @if (filed) { <p class="wg-filed">Filed under: {{ filed }}</p> }
+      <div class="wg-prose" [innerHTML]="body"></div>
       <p class="wg-finis" aria-hidden="true">§</p>
     </article>
     @if (related.length || prev || next) {
@@ -90,11 +80,10 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
 export class ArticleCorruptionComponent {
   protected readonly title = "How fear turns the good in us into corruption";
   protected readonly dek = "Corruption rarely starts with a bad person. It starts with a good one who has too much to lose.";
-  protected readonly meta = "June 6, 2026 · 3 min read · 660 words";
+  protected readonly meta = "May 23, 2026 · 3 min read · 660 words";
   protected readonly kicker = "ethics";
-  protected readonly filed = "ethics · corruption · integrity · character · business · power";
-  protected readonly coda: WgQuote | null = {"hook":"Character is rarely tested in the cases where the right action is also the easy one.","elab":"The real test arrives when the right action would destroy something you love. Almost nobody passes it."};
-  protected readonly related: WgRelated[] = [{"slug":"meant-well","title":"I'm sorry. I meant well.","dek":"The people who hurt you most rarely thought of themselves as the people hurting you.","meta":"June 2026 · 7 min · Shared: ethics"},{"slug":"slaughterhouse","title":"How we choose the slaughterhouse","dek":"You think you think for yourself. You don't. You follow, repeat, defend, and never notice the fence.","meta":"June 2026 · 5 min · Shared: courage"},{"slug":"stop-chasing-purpose","title":"Stop chasing purpose","dek":"The search for purpose is a trap most people walk into willingly. It ends only when they notice the search is the problem.","meta":"June 2026 · 2 min · Shared: identity"}];
+  protected readonly imageAlt = "A solitary figure in a dark room, matching an essay on fear, integrity, and corruption.";
+  protected readonly related: WgRelated[] = [{"slug":"meant-well","title":"I'm sorry. I meant well.","dek":"The people who hurt you most rarely thought of themselves as the people hurting you.","meta":"May 2026 · 7 min · Shared: ethics"},{"slug":"slaughterhouse","title":"How we choose the slaughterhouse","dek":"You think you think for yourself. You don't. You follow, repeat, defend, and never notice the fence.","meta":"May 2026 · 5 min · Shared: courage"},{"slug":"stop-chasing-purpose","title":"Stop chasing purpose","dek":"The search for purpose is a trap most people walk into willingly. It ends only when they notice the search is the problem.","meta":"May 2026 · 2 min · Shared: identity"}];
   protected readonly prev: WgLink | null = null;
   protected readonly next: WgLink | null = {"slug":"meant-well","title":"I'm sorry. I meant well."};
   protected readonly hero: string | null = "/assets/articles/corruption.jpg";
