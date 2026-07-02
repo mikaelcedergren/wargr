@@ -94,7 +94,15 @@ needs **no restart** — new content appears within ~the micro-cache TTL (60s).
 ## cx-framework
 
 Genuinely consumed: `@use '@mikaelcedergren/cx-framework/tokens'` + `/styles/base` in `src/styles.scss`,
-light theme (`theme-light`, the framework default). Fix design issues upstream in cx-framework, not here.
+light theme (`theme-light`, the framework default). Fix design issues in Cortex, package them into
+`cx-framework`, then update this repo.
+
+This repo sits in the **Cortex -> cx-framework -> projects** loop. Cortex authors reusable
+components, tokens, AI skills, guidelines, and framework decisions; `cx-framework` packages them;
+wargr consumes only `@mikaelcedergren/cx-framework`. Do not reference Cortex directly through
+imports, package deps, scripts, styles, local paths, or copied source. If the reading experience
+reveals a reusable framework gap, fix it in Cortex, package/push `cx-framework`, then update wargr
+from the package.
 
 ## Toolchain
 
