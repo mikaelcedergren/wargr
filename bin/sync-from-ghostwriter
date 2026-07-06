@@ -8,10 +8,16 @@
 set -eu
 export PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin
 
-REPO=/Users/cortex/Development/wargr
-SRC=/Users/cortex/Development/ghostwriter/wargr
+# Resolve the repo from this script's own location and ghostwriter as its sibling, so the same
+# script works on the production Mac mini and on a development mirror. cd-normalising keeps the
+# signature paths identical to the previous hardcoded form on production.
+REPO="$(cd "$(dirname "$0")/.." && pwd)"
+SRC="$(cd "$REPO/../ghostwriter/wargr" && pwd)"
 STAMP="$REPO/.run/ghostwriter.stamp"
 cd "$REPO"
+# .run/ may not exist on a fresh checkout; without it the stamp write below fails after a
+# successful build, and every later poll rebuilds again.
+mkdir -p "$REPO/.run"
 
 sig=$(find "$SRC" -maxdepth 1 -name '☑*.md' -exec stat -f '%N %m %z' {} \; 2>/dev/null | sort | shasum | awk '{print $1}')
 

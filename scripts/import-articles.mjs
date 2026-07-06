@@ -33,6 +33,7 @@ import {
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { marked } from 'marked';
+import sanitizeHtml from 'sanitize-html';
 
 const REPO = resolve(fileURLToPath(new URL('.', import.meta.url)), '..');
 const GHOST = resolve(REPO, '..', 'ghostwriter');
@@ -78,7 +79,8 @@ const SEO_BY_SLUG = {
       'wellness critique',
       'how to talk to yourself',
     ],
-    imageAlt: 'A face reflected in dark glass, matching an essay on self-love and negative self-talk.',
+    imageAlt:
+      'A face reflected in dark glass, matching an essay on self-love and negative self-talk.',
   },
   'whom-to-listen-to': {
     title: 'Who to listen to when everyone agrees — Michael Wargr',
@@ -126,7 +128,8 @@ const SEO_BY_SLUG = {
       'self-help critique',
       'quiet purpose',
     ],
-    imageAlt: 'A quiet path through open landscape, matching an essay on purpose, meaning, and letting go.',
+    imageAlt:
+      'A quiet path through open landscape, matching an essay on purpose, meaning, and letting go.',
   },
   slaughterhouse: {
     title: 'Herd mentality and the slaughterhouse — Michael Wargr',
@@ -142,7 +145,8 @@ const SEO_BY_SLUG = {
       'media manipulation',
       'groupthink',
     ],
-    imageAlt: 'Meat on a table in a slaughterhouse, matching an essay on conformity and herd mentality.',
+    imageAlt:
+      'Meat on a table in a slaughterhouse, matching an essay on conformity and herd mentality.',
   },
   'meant-well': {
     title: "I'm sorry. I meant well. — Michael Wargr",
@@ -174,7 +178,8 @@ const SEO_BY_SLUG = {
       'self-deception',
       'character',
     ],
-    imageAlt: 'A solitary figure in a dark room, matching an essay on fear, integrity, and corruption.',
+    imageAlt:
+      'A solitary figure in a dark room, matching an essay on fear, integrity, and corruption.',
   },
 };
 
@@ -192,6 +197,44 @@ function findArticleImage(slug, suffix = '') {
 }
 
 marked.setOptions({ gfm: true, breaks: false });
+
+// The rendered body is injected via [innerHTML] (bypassSecurityTrustHtml in the generated
+// components), so the HTML is sanitized ONCE here at import time — never in the Angular runtime.
+// The allowlist is exactly what the wg-prose reading layer styles plus the rest of marked's plain
+// essay output; scripts, iframes, event handlers and javascript: URLs are stripped. The text filter
+// re-applies marked's quote escaping so legitimate essays pass through byte-identical.
+const SANITIZE_OPTIONS = {
+  allowedTags: [
+    'p',
+    'br',
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'strong',
+    'em',
+    'del',
+    'a',
+    'blockquote',
+    'ul',
+    'ol',
+    'li',
+    'hr',
+    'img',
+    'code',
+    'pre',
+  ],
+  allowedAttributes: {
+    a: ['href', 'title'],
+    img: ['src', 'alt', 'title'],
+    ol: ['start'],
+    code: ['class'], // marked marks fenced code blocks with class="language-…"
+  },
+  allowedClasses: { code: [/^language-/] },
+  allowedSchemes: ['https', 'http', 'mailto'],
+  allowProtocolRelative: false,
+  textFilter: (text) => text.replace(/"/g, '&quot;').replace(/'/g, '&#39;'),
+};
 
 function slugify(name) {
   return name
@@ -353,7 +396,7 @@ function parse(filename) {
   }
 
   const dates = gitDates(filename);
-  const bodyHtml = marked.parse(bodyMd);
+  const bodyHtml = sanitizeHtml(marked.parse(bodyMd), SANITIZE_OPTIONS);
   const wordCount = countWords(bodyMd);
   const readingTime = Math.max(1, Math.round(wordCount / WORDS_PER_MINUTE));
   const pullQuotes = parsePullQuotes(trailing);
