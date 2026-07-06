@@ -1,28 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  <url><loc>https://wargr.com/</loc></url>
-  <url><loc>https://wargr.com/wtf-is-self-love/</loc><lastmod>2026-06-06</lastmod>
-    <image:image>
-      <image:loc>https://wargr.com/assets/articles/wtf-is-self-love.jpg</image:loc>
-      <image:title>WTF is self-love?</image:title>
-      <image:caption>A face reflected in dark glass, matching an essay on self-love and negative self-talk.</image:caption>
-    </image:image>
-    <image:image>
-      <image:loc>https://wargr.com/assets/articles/wtf-is-self-love-og.jpg</image:loc>
-      <image:title>WTF is self-love? social card</image:title>
-      <image:caption>A sharp essay on self-love, negative self-talk, loneliness, and learning to speak to yourself with the kindness you give other people.</image:caption>
-    </image:image></url>
-  <url><loc>https://wargr.com/whom-to-listen-to/</loc><lastmod>2026-06-06</lastmod>
-    <image:image>
-      <image:loc>https://wargr.com/assets/articles/whom-to-listen-to.jpg</image:loc>
-      <image:title>The one you should have listened to</image:title>
-      <image:caption>A microphone on an empty lecture table, matching an essay on consensus and dissent.</image:caption>
-    </image:image>
-    <image:image>
-      <image:loc>https://wargr.com/assets/articles/whom-to-listen-to-og.jpg</image:loc>
-      <image:title>The one you should have listened to social card</image:title>
-      <image:caption>An essay on consensus, dissent, expertise, and why the lone voice is sometimes worth hearing before everyone else catches up.</image:caption>
-    </image:image></url>
+  <url><loc>https://wargr.com/</loc><lastmod>2026-06-06</lastmod></url>
   <url><loc>https://wargr.com/stop-the-pain/</loc><lastmod>2026-06-06</lastmod>
     <image:image>
       <image:loc>https://wargr.com/assets/articles/stop-the-pain.jpg</image:loc>
@@ -55,6 +33,28 @@
       <image:loc>https://wargr.com/assets/articles/slaughterhouse-og.jpg</image:loc>
       <image:title>How we choose the slaughterhouse social card</image:title>
       <image:caption>An essay on herd mentality, conformity, propaganda, and the invisible ways people choose the stories that lead them.</image:caption>
+    </image:image></url>
+  <url><loc>https://wargr.com/wtf-is-self-love/</loc><lastmod>2026-06-06</lastmod>
+    <image:image>
+      <image:loc>https://wargr.com/assets/articles/wtf-is-self-love.jpg</image:loc>
+      <image:title>WTF is self-love?</image:title>
+      <image:caption>A face reflected in dark glass, matching an essay on self-love and negative self-talk.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://wargr.com/assets/articles/wtf-is-self-love-og.jpg</image:loc>
+      <image:title>WTF is self-love? social card</image:title>
+      <image:caption>A sharp essay on self-love, negative self-talk, loneliness, and learning to speak to yourself with the kindness you give other people.</image:caption>
+    </image:image></url>
+  <url><loc>https://wargr.com/whom-to-listen-to/</loc><lastmod>2026-06-06</lastmod>
+    <image:image>
+      <image:loc>https://wargr.com/assets/articles/whom-to-listen-to.jpg</image:loc>
+      <image:title>The one you should have listened to</image:title>
+      <image:caption>A microphone on an empty lecture table, matching an essay on consensus and dissent.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://wargr.com/assets/articles/whom-to-listen-to-og.jpg</image:loc>
+      <image:title>The one you should have listened to social card</image:title>
+      <image:caption>An essay on consensus, dissent, expertise, and why the lone voice is sometimes worth hearing before everyone else catches up.</image:caption>
     </image:image></url>
   <url><loc>https://wargr.com/meant-well/</loc><lastmod>2026-06-06</lastmod>
     <image:image>

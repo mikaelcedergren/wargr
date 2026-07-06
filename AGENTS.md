@@ -55,11 +55,14 @@ launchd/com.wargr.sync.plist     WatchPaths(../ghostwriter/wargr) + 2-min poll -
 
 ### Article parsing
 
-Each ghostwriter file: `# Title` / `## Topic:` (internal, ignored) / `---` / `**ingress**` + body /
-`---` / tags + pull-quotes + thumbnail prompts. The importer takes the **title**, the **ingress** (the
-bold line — used as the reader-facing dek + meta/OG description), the **body** (markdown between the
-two `---`, rendered to HTML), the **tags** (→ keywords + the kicker uses `tags[0]`), and a **date** from
-git history. Slug = filename minus `☑` and `.md`. URLs: home `/`, each essay `/<slug>/`.
+Each ghostwriter file: `# Title` / `## Topic:` (internal, ignored) / `## Published:` (publish date of
+record) / `---` / `**ingress**` + body / `---` / tags + pull-quotes + thumbnail prompts. The importer
+takes the **title**, the **ingress** (the bold line — used as the reader-facing dek + meta/OG
+description), the **body** (markdown between the two `---`, rendered to HTML), the **tags** (→
+keywords + the kicker uses `tags[0]`), and the **dates**: `## Published:` (date-only or full ISO) is
+the publish date of record so every machine builds identical dates; ghostwriter git history supplies
+the modified date and is the published fallback for essays without the line. Slug = filename minus
+`☑` and `.md`. URLs: home `/`, each essay `/<slug>/`.
 
 It then derives, at build time: **reading-time** (`ceil`-ish of body words / 200); the **pull-quotes**
 from the trailing block (the numbered hooks that do NOT start with "Create a" — the "Create a…" ones are

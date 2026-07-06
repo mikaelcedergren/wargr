@@ -7,6 +7,7 @@
 // Each ghostwriter file has the shape:
 //   # <title>
 //   ## Topic: <internal note — NOT shown to readers>
+//   ## Published: <YYYY-MM-DD or full ISO — the publish date of record; see articleDates()>
 //   ---
 //   **<ingress / dek>**          <- reader-facing one-line hook
 //   <body markdown...>
@@ -271,8 +272,21 @@ function gitDates(filename) {
   } catch {
     /* not a git repo / not committed */
   }
-  const modified = statSync(join(SRC, filename)).mtime.toISOString();
-  return { published: modified, modified };
+  return null;
+}
+// The essay's own `## Published:` line is the publish date of record: it travels with the piece, so
+// every machine builds the same dates regardless of how deep its ghostwriter clone's history goes.
+// Git history supplies dateModified (and the published fallback for essays without the line); file
+// mtime is the last resort. A date-only value normalises to noon UTC so it renders as the same
+// calendar day in every timezone.
+function articleDates(filename, publishedLine) {
+  const git = gitDates(filename);
+  let published = publishedLine || git?.published;
+  if (!published) published = statSync(join(SRC, filename)).mtime.toISOString();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(published)) published = `${published}T12:00:00Z`;
+  let modified = git?.modified ?? published;
+  if (new Date(modified) < new Date(published)) modified = published;
+  return { published, modified };
 }
 function fmtDate(iso) {
   return new Date(iso).toLocaleDateString('en-US', {
@@ -363,6 +377,7 @@ function parse(filename) {
   const slug = slugify(filename);
   const titleMatch = raw.match(/^#\s+(.+?)\s*$/m);
   const topicMatch = raw.match(/^##\s+Topic:\s*(.+?)\s*$/m);
+  const publishedMatch = raw.match(/^##\s+Published:\s*(.+?)\s*$/m);
   const title = titleMatch ? titleMatch[1].trim() : slug;
 
   // Split on horizontal rules. Published shape => [preamble, body, trailingMeta].
@@ -395,7 +410,7 @@ function parse(filename) {
     }
   }
 
-  const dates = gitDates(filename);
+  const dates = articleDates(filename, publishedMatch ? publishedMatch[1].trim() : null);
   const bodyHtml = sanitizeHtml(marked.parse(bodyMd), SANITIZE_OPTIONS);
   const wordCount = countWords(bodyMd);
   const readingTime = Math.max(1, Math.round(wordCount / WORDS_PER_MINUTE));
@@ -448,14 +463,21 @@ function buildRelated(published) {
         shared.sort((x, y) => df.get(x) - df.get(y)); // rarest (most specific) shared tag first
         return { b, score: shared.length, shared };
       });
-    scored.sort((x, y) => y.score - x.score || (x.b.modifiedIso < y.b.modifiedIso ? 1 : -1));
+    scored.sort(
+      (x, y) =>
+        y.score - x.score ||
+        new Date(y.b.iso) - new Date(x.b.iso) ||
+        (x.b.slug < y.b.slug ? -1 : 1),
+    );
 
     let top = scored.filter((s) => s.score >= 1).slice(0, RELATED_COUNT);
     if (top.length < RELATED_COUNT) {
       const have = new Set(top.map((s) => s.b.slug));
       const backfill = scored
         .filter((s) => !have.has(s.b.slug))
-        .sort((x, y) => (x.b.modifiedIso < y.b.modifiedIso ? 1 : -1))
+        .sort(
+          (x, y) => new Date(y.b.iso) - new Date(x.b.iso) || (x.b.slug < y.b.slug ? -1 : 1),
+        )
         .slice(0, RELATED_COUNT - top.length);
       top = top.concat(backfill);
     }
@@ -479,7 +501,7 @@ function buildRelated(published) {
 
 function writeArticleComponent(a) {
   const cls = `Article${pascal(a.slug)}Component`;
-  const meta = `${a.date} · ${a.readingTime} min read · ${a.wordCount} words`;
+  const metaRest = ` · ${a.readingTime} min read · ${a.wordCount} words`;
   const src = `import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -503,7 +525,7 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
           <div class="wg-hero__head">
             <h1 class="wg-article__title">{{ title }}</h1>
             @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
-            <p class="wg-article__meta wg-meta">{{ meta }}</p>
+            <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
           </div>
         </div>
       </header>
@@ -513,7 +535,7 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
         <a class="wg-back" routerLink="/">← Essays</a>
         <h1 class="wg-article__title">{{ title }}</h1>
         @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
-        <p class="wg-article__meta wg-meta">{{ meta }}</p>
+        <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
       }
       <div class="wg-prose" [innerHTML]="body"></div>
       <p class="wg-finis" aria-hidden="true">§</p>
@@ -562,7 +584,9 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
 export class ${cls} {
   protected readonly title = ${JSON.stringify(a.title)};
   protected readonly dek = ${JSON.stringify(a.dek)};
-  protected readonly meta = ${JSON.stringify(meta)};
+  protected readonly date = ${JSON.stringify(a.date)};
+  protected readonly datetime = ${JSON.stringify(a.iso.slice(0, 10))};
+  protected readonly metaRest = ${JSON.stringify(metaRest)};
   protected readonly kicker = ${JSON.stringify(a.dominantTag)};
   protected readonly imageAlt = ${JSON.stringify(a.imageAlt)};
   protected readonly related: WgRelated[] = ${JSON.stringify(a.related)};
@@ -584,7 +608,9 @@ function writeHome(articles) {
     dek: a.dek,
     image: a.hero,
     imageAlt: a.imageAlt,
-    meta: `${a.monthYear} · ${a.readingTime} min read`,
+    monthYear: a.monthYear,
+    monthDatetime: a.iso.slice(0, 7),
+    metaRest: ` · ${a.readingTime} min read`,
   }));
   const src = `import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
@@ -610,7 +636,7 @@ import { RouterLink } from '@angular/router';
           <div class="wg-entry__body">
             <h2 class="wg-entry__title"><span class="wg-entry__title-text">{{ a.title }}</span></h2>
             @if (a.dek) { <p class="wg-entry__dek">{{ a.dek }}</p> }
-            <p class="wg-meta wg-entry__meta">{{ a.meta }}</p>
+            <p class="wg-meta wg-entry__meta"><time [attr.datetime]="a.monthDatetime">{{ a.monthYear }}</time>{{ a.metaRest }}</p>
           </div>
         </a>
       }
@@ -740,9 +766,16 @@ ${items}
 function writeSitemapAndRobots(articles) {
   const urls = [`${SITE_ORIGIN}/`, ...articles.map((a) => `${SITE_ORIGIN}/${a.slug}/`)];
   const lastmod = articles.map((a) => a.modifiedIso.slice(0, 10));
+  // The home page changes whenever any essay does, so its lastmod is the newest of them all.
+  const homeLastmod = articles.length
+    ? new Date(Math.max(...articles.map((a) => new Date(a.modifiedIso).getTime())))
+        .toISOString()
+        .slice(0, 10)
+    : null;
   const body = urls
     .map((u, i) => {
-      if (i === 0) return `  <url><loc>${u}</loc></url>`;
+      if (i === 0)
+        return `  <url><loc>${u}</loc>${homeLastmod ? `<lastmod>${homeLastmod}</lastmod>` : ''}</url>`;
       const a = articles[i - 1];
       const images = [
         a.hero && {
@@ -789,7 +822,14 @@ rmSync(ARTICLES_DIR, { recursive: true, force: true });
 const published = readdirSync(SRC)
   .filter((f) => f.endsWith('.md') && f.trimStart().startsWith('☑'))
   .map(parse)
-  .sort((a, b) => (a.modifiedIso < b.modifiedIso ? 1 : -1)); // newest first
+  // Newest first by publish date; ties break by modified date, then slug, so the
+  // feed/prev/next order is identical on every machine.
+  .sort(
+    (a, b) =>
+      new Date(b.iso) - new Date(a.iso) ||
+      new Date(b.modifiedIso) - new Date(a.modifiedIso) ||
+      (a.slug < b.slug ? 1 : -1),
+  );
 
 buildRelated(published);
 

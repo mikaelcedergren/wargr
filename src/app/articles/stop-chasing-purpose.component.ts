@@ -21,7 +21,7 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
           <div class="wg-hero__head">
             <h1 class="wg-article__title">{{ title }}</h1>
             @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
-            <p class="wg-article__meta wg-meta">{{ meta }}</p>
+            <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
           </div>
         </div>
       </header>
@@ -31,7 +31,7 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
         <a class="wg-back" routerLink="/">← Essays</a>
         <h1 class="wg-article__title">{{ title }}</h1>
         @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
-        <p class="wg-article__meta wg-meta">{{ meta }}</p>
+        <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
       }
       <div class="wg-prose" [innerHTML]="body"></div>
       <p class="wg-finis" aria-hidden="true">§</p>
@@ -80,10 +80,12 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
 export class ArticleStopChasingPurposeComponent {
   protected readonly title = "Stop chasing purpose";
   protected readonly dek = "The search for purpose is a trap most people walk into willingly. It ends only when they notice the search is the problem.";
-  protected readonly meta = "May 24, 2026 · 2 min read · 483 words";
+  protected readonly date = "May 24, 2026";
+  protected readonly datetime = "2026-05-24";
+  protected readonly metaRest = " · 2 min read · 483 words";
   protected readonly kicker = "philosophy";
   protected readonly imageAlt = "A quiet path through open landscape, matching an essay on purpose, meaning, and letting go.";
-  protected readonly related: WgRelated[] = [{"slug":"stop-the-pain","title":"How to stop the pain","dek":"The pain you have been outrunning has not moved. It is exactly where you left it, waiting to be heard.","meta":"May 2026 · 5 min · Shared: self-help-critique"},{"slug":"wtf-is-self-love","title":"WTF is self-love?","dek":"Most people are crueller to themselves than they would ever be to the rudest of strangers. They have been doing it so long they no longer hear it.","meta":"May 2026 · 3 min · Shared: identity"},{"slug":"corruption","title":"How fear turns the good in us into corruption","dek":"Corruption rarely starts with a bad person. It starts with a good one who has too much to lose.","meta":"May 2026 · 3 min · Shared: identity"}];
+  protected readonly related: WgRelated[] = [{"slug":"stop-the-pain","title":"How to stop the pain","dek":"The pain you have been outrunning has not moved. It is exactly where you left it, waiting to be heard.","meta":"May 2026 · 5 min · Shared: self-help-critique"},{"slug":"wtf-is-self-love","title":"WTF is self-love?","dek":"Most people are crueller to themselves than they would ever be to the rudest of strangers. They have been doing it so long they no longer hear it.","meta":"May 2026 · 3 min · Shared: identity"},{"slug":"slaughterhouse","title":"How we choose the slaughterhouse","dek":"You think you think for yourself. You don't. You follow, repeat, defend, and never notice the fence.","meta":"May 2026 · 5 min · Shared: narrative"}];
   protected readonly prev: WgLink | null = {"slug":"slaughterhouse","title":"How we choose the slaughterhouse"};
   protected readonly next: WgLink | null = {"slug":"stop-the-pain","title":"How to stop the pain"};
   protected readonly hero: string | null = "/assets/articles/stop-chasing-purpose.jpg";

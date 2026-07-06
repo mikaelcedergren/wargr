@@ -21,7 +21,7 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
           <div class="wg-hero__head">
             <h1 class="wg-article__title">{{ title }}</h1>
             @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
-            <p class="wg-article__meta wg-meta">{{ meta }}</p>
+            <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
           </div>
         </div>
       </header>
@@ -31,7 +31,7 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
         <a class="wg-back" routerLink="/">← Essays</a>
         <h1 class="wg-article__title">{{ title }}</h1>
         @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
-        <p class="wg-article__meta wg-meta">{{ meta }}</p>
+        <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
       }
       <div class="wg-prose" [innerHTML]="body"></div>
       <p class="wg-finis" aria-hidden="true">§</p>
@@ -80,7 +80,9 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
 export class ArticleCorruptionComponent {
   protected readonly title = "How fear turns the good in us into corruption";
   protected readonly dek = "Corruption rarely starts with a bad person. It starts with a good one who has too much to lose.";
-  protected readonly meta = "May 23, 2026 · 3 min read · 660 words";
+  protected readonly date = "May 23, 2026";
+  protected readonly datetime = "2026-05-23";
+  protected readonly metaRest = " · 3 min read · 660 words";
   protected readonly kicker = "ethics";
   protected readonly imageAlt = "A solitary figure in a dark room, matching an essay on fear, integrity, and corruption.";
   protected readonly related: WgRelated[] = [{"slug":"meant-well","title":"I'm sorry. I meant well.","dek":"The people who hurt you most rarely thought of themselves as the people hurting you.","meta":"May 2026 · 7 min · Shared: ethics"},{"slug":"slaughterhouse","title":"How we choose the slaughterhouse","dek":"You think you think for yourself. You don't. You follow, repeat, defend, and never notice the fence.","meta":"May 2026 · 5 min · Shared: courage"},{"slug":"stop-chasing-purpose","title":"Stop chasing purpose","dek":"The search for purpose is a trap most people walk into willingly. It ends only when they notice the search is the problem.","meta":"May 2026 · 2 min · Shared: identity"}];

@@ -21,7 +21,7 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
           <div class="wg-hero__head">
             <h1 class="wg-article__title">{{ title }}</h1>
             @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
-            <p class="wg-article__meta wg-meta">{{ meta }}</p>
+            <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
           </div>
         </div>
       </header>
@@ -31,7 +31,7 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
         <a class="wg-back" routerLink="/">← Essays</a>
         <h1 class="wg-article__title">{{ title }}</h1>
         @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
-        <p class="wg-article__meta wg-meta">{{ meta }}</p>
+        <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
       }
       <div class="wg-prose" [innerHTML]="body"></div>
       <p class="wg-finis" aria-hidden="true">§</p>
@@ -80,12 +80,14 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
 export class ArticleWtfIsSelfLoveComponent {
   protected readonly title = "WTF is self-love?";
   protected readonly dek = "Most people are crueller to themselves than they would ever be to the rudest of strangers. They have been doing it so long they no longer hear it.";
-  protected readonly meta = "May 24, 2026 · 3 min read · 516 words";
+  protected readonly date = "May 24, 2026";
+  protected readonly datetime = "2026-05-24";
+  protected readonly metaRest = " · 3 min read · 516 words";
   protected readonly kicker = "self-love";
   protected readonly imageAlt = "A face reflected in dark glass, matching an essay on self-love and negative self-talk.";
   protected readonly related: WgRelated[] = [{"slug":"stop-the-pain","title":"How to stop the pain","dek":"The pain you have been outrunning has not moved. It is exactly where you left it, waiting to be heard.","meta":"May 2026 · 5 min · Shared: mental health"},{"slug":"stop-chasing-purpose","title":"Stop chasing purpose","dek":"The search for purpose is a trap most people walk into willingly. It ends only when they notice the search is the problem.","meta":"May 2026 · 2 min · Shared: identity"},{"slug":"corruption","title":"How fear turns the good in us into corruption","dek":"Corruption rarely starts with a bad person. It starts with a good one who has too much to lose.","meta":"May 2026 · 3 min · Shared: identity"}];
   protected readonly prev: WgLink | null = {"slug":"whom-to-listen-to","title":"The one you should have listened to"};
-  protected readonly next: WgLink | null = null;
+  protected readonly next: WgLink | null = {"slug":"slaughterhouse","title":"How we choose the slaughterhouse"};
   protected readonly hero: string | null = "/assets/articles/wtf-is-self-love.jpg";
   protected readonly body = inject(DomSanitizer).bypassSecurityTrustHtml(HTML);
 }

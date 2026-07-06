@@ -21,7 +21,7 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
           <div class="wg-hero__head">
             <h1 class="wg-article__title">{{ title }}</h1>
             @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
-            <p class="wg-article__meta wg-meta">{{ meta }}</p>
+            <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
           </div>
         </div>
       </header>
@@ -31,7 +31,7 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
         <a class="wg-back" routerLink="/">← Essays</a>
         <h1 class="wg-article__title">{{ title }}</h1>
         @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
-        <p class="wg-article__meta wg-meta">{{ meta }}</p>
+        <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
       }
       <div class="wg-prose" [innerHTML]="body"></div>
       <p class="wg-finis" aria-hidden="true">§</p>
@@ -80,11 +80,13 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
 export class ArticleWhomToListenToComponent {
   protected readonly title = "The one you should have listened to";
   protected readonly dek = "When a hundred people agree about something and one person doesn't, the one person is usually wrong. Until they aren't, and the cost of having dismissed them has already been paid.";
-  protected readonly meta = "May 23, 2026 · 5 min read · 941 words";
+  protected readonly date = "May 23, 2026";
+  protected readonly datetime = "2026-05-23";
+  protected readonly metaRest = " · 5 min read · 941 words";
   protected readonly kicker = "philosophy";
   protected readonly imageAlt = "A microphone on an empty lecture table, matching an essay on consensus and dissent.";
-  protected readonly related: WgRelated[] = [{"slug":"slaughterhouse","title":"How we choose the slaughterhouse","dek":"You think you think for yourself. You don't. You follow, repeat, defend, and never notice the fence.","meta":"May 2026 · 5 min · Shared: consensus"},{"slug":"meant-well","title":"I'm sorry. I meant well.","dek":"The people who hurt you most rarely thought of themselves as the people hurting you.","meta":"May 2026 · 7 min · Shared: contrarian"},{"slug":"stop-chasing-purpose","title":"Stop chasing purpose","dek":"The search for purpose is a trap most people walk into willingly. It ends only when they notice the search is the problem.","meta":"May 2026 · 2 min · Shared: contrarian"}];
-  protected readonly prev: WgLink | null = {"slug":"stop-the-pain","title":"How to stop the pain"};
+  protected readonly related: WgRelated[] = [{"slug":"slaughterhouse","title":"How we choose the slaughterhouse","dek":"You think you think for yourself. You don't. You follow, repeat, defend, and never notice the fence.","meta":"May 2026 · 5 min · Shared: consensus"},{"slug":"stop-chasing-purpose","title":"Stop chasing purpose","dek":"The search for purpose is a trap most people walk into willingly. It ends only when they notice the search is the problem.","meta":"May 2026 · 2 min · Shared: contrarian"},{"slug":"meant-well","title":"I'm sorry. I meant well.","dek":"The people who hurt you most rarely thought of themselves as the people hurting you.","meta":"May 2026 · 7 min · Shared: contrarian"}];
+  protected readonly prev: WgLink | null = {"slug":"meant-well","title":"I'm sorry. I meant well."};
   protected readonly next: WgLink | null = {"slug":"wtf-is-self-love","title":"WTF is self-love?"};
   protected readonly hero: string | null = "/assets/articles/whom-to-listen-to.jpg";
   protected readonly body = inject(DomSanitizer).bypassSecurityTrustHtml(HTML);
