@@ -1,33 +1,17 @@
-// wargr.com global styles — "The Quiet Press": a de-chromed editorial reading space built on
-// cx-framework tokens. Source Serif 4 carries the voice (wordmark, titles, deks, pull-quotes); Inter
-// reads the body; Roboto Mono marks the facts (kickers, meta, folios). Hairlines, whitespace, no
-// primary-colour chrome.
+// wargr.com global styles — "The Quiet Press": a de-chromed editorial reading space built entirely on
+// cx-framework tokens. The framework's display serif (--font-family-fancy) carries the voice (titles,
+// deks, pull-quotes); Inter reads the body; Roboto Mono marks the facts (kickers, meta, folios). The
+// article body itself is the framework's own `.cx-article` editorial type — this layer only adds the
+// site's structural patterns (masthead, feed, hero, pull-quote, what's-next) around it, and every
+// design value inside them is a framework token.
 // Light is the default; the whole palette is token-derived so theme-night works for free.
 @use '@mikaelcedergren/cx-framework/tokens';
+@use '@mikaelcedergren/cx-framework/tokens/breakpoints' as bp;
 @use '@mikaelcedergren/cx-framework/styles/base';
+@use '@mikaelcedergren/cx-framework/styles/article';
 
 :root {
   color-scheme: light;
-
-  // Display serif (the one font we add on top of the framework). Falls back gracefully.
-  --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
-
-  // Reading-specific scale (not in the framework, which targets app UI).
-  --reading-size: 1.2rem;
-  --reading-leading: 1.7;
-  --reading-measure: calc(640px + (var(--space-lg) * 2));
-
-  // Reusable hairlines (the only structural lines on the site).
-  --wg-hair: color-mix(in srgb, var(--ink) 11%, transparent);
-  --wg-hair-soft: color-mix(in srgb, var(--ink) 8%, transparent);
-  --wg-focus: color-mix(in srgb, var(--ink) 44%, transparent);
-  --wg-link-underline-lift: 5px;
-  --wg-link-underline-thickness: 2px;
-
-  // Ink tints, following the existing site convention.
-  --wg-dek: color-mix(in srgb, var(--ink) 64%, transparent);
-  --wg-mute: color-mix(in srgb, var(--ink) 60%, transparent);
-  --wg-faint: color-mix(in srgb, var(--ink) 52%, transparent);
 }
 
 :root.theme-night {
@@ -46,24 +30,16 @@ a:active {
   color: inherit;
 }
 
-// Quiet focus ring (overrides the framework's blue tab outline, same specificity, declared later).
-a:focus-visible,
-button:focus-visible {
-  outline: 2px solid var(--wg-focus);
-  outline-offset: 2px;
-}
-
-// Editorial link treatment: no accent colour, just a slightly detached underline that draws in.
+// Editorial link treatment: no accent colour, just an underline that draws in on hover. Built only
+// from framework tokens (border-width for the rule, motion + ease for the sweep, currentColor ink).
 .wg-entry__title-text,
-.wg-prose a,
 .wg-back,
 .wg-related__title,
 .wg-flip__title {
   background-image: linear-gradient(currentColor, currentColor);
-  background-position: 0 calc(100% - var(--wg-link-underline-lift));
+  background-position: 0 100%;
   background-repeat: no-repeat;
-  background-size: 0 var(--wg-link-underline-thickness);
-  padding-bottom: 0.045em;
+  background-size: 0 var(--border-width);
   text-decoration: none;
   transition:
     background-size var(--motion-base) var(--ease-out),
@@ -72,15 +48,13 @@ button:focus-visible {
 
 .wg-entry:hover .wg-entry__title-text,
 .wg-entry:focus-visible .wg-entry__title-text,
-.wg-prose a:hover,
-.wg-prose a:focus-visible,
 .wg-back:hover,
 .wg-back:focus-visible,
 .wg-related__item:hover .wg-related__title,
 .wg-related__item:focus-visible .wg-related__title,
 .wg-flip__side:hover .wg-flip__title,
 .wg-flip__side:focus-visible .wg-flip__title {
-  background-size: 100% var(--wg-link-underline-thickness);
+  background-size: 100% var(--border-width);
 }
 
 // Visually hidden but available to screen readers (e.g. the logo's accessible name).
@@ -109,35 +83,32 @@ button:focus-visible {
 }
 .wg-container {
   width: 100%;
-  max-width: var(--reading-measure);
+  max-width: var(--measure-md);
   margin-inline: auto;
   padding-inline: var(--space-lg);
 }
 
 // ---- Mono editorial marks (kickers, meta lines, folios) ----
+// Uppercase mono labels. The framework has no letter-spacing (tracking) token, so these track at the
+// font's natural spacing rather than re-declaring a raw em value — the missing tracking scale is a
+// real framework gap the owner should see, not something to hide with a local value.
 .wg-meta,
 .wg-kicker {
   font-family: var(--font-family-mono);
+  font-size: var(--font-size-body-sm);
   text-transform: uppercase;
-  color: var(--wg-faint);
-}
-.wg-meta {
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
+  color: var(--opacity-high);
 }
 .wg-kicker {
   margin: 0 0 var(--space-sm);
-  font-size: 0.72rem;
   font-weight: var(--font-weight-medium);
-  letter-spacing: 0.16em;
-  color: color-mix(in srgb, var(--ink) 50%, transparent);
 }
 
 // ---- Masthead ----
 .wg-masthead {
   text-align: center;
   padding: var(--space-xl) var(--space-lg) var(--space-lg);
-  border-bottom: var(--border-width) solid var(--wg-hair);
+  border-bottom: var(--line);
 }
 .wg-masthead__title {
   margin: 0;
@@ -168,10 +139,9 @@ button:focus-visible {
 .wg-masthead__byline {
   margin: var(--space-sm) 0 0;
   font-family: var(--font-family-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
+  font-size: var(--font-size-body-sm);
   text-transform: uppercase;
-  color: var(--wg-faint);
+  color: var(--opacity-high);
 }
 
 // ---- Home feed ----
@@ -184,7 +154,7 @@ button:focus-visible {
   align-items: center;
   gap: var(--space-md);
   padding: var(--space-lg) 0;
-  border-bottom: var(--border-width) solid var(--wg-hair-soft);
+  border-bottom: var(--line-discreet);
   color: inherit;
   text-decoration: none;
 }
@@ -199,8 +169,10 @@ button:focus-visible {
   order: 2;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  border-radius: 6px;
-  background: #0d0d12;
+  border-radius: var(--radius-md);
+  // Neutral backing shown only while the photo decodes (the opaque image then covers it). Token-driven
+  // surface rather than a raw hex — it reads as a plain framework surface in light, darker in night.
+  background: var(--surface-high);
   text-decoration: none;
 }
 .wg-entry__media img {
@@ -208,31 +180,27 @@ button:focus-visible {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition:
-    transform var(--motion-base) var(--ease-out),
-    opacity var(--motion-base) var(--ease-out);
+  transition: opacity var(--motion-base) var(--ease-out);
 }
 .wg-entry:hover .wg-entry__media img,
 .wg-entry:focus-visible .wg-entry__media img {
-  opacity: 0.88;
-  transform: scale(1.035);
+  opacity: var(--opacity-disabled);
 }
 .wg-entry__title {
   margin: 0 0 var(--space-xs);
-  font-family: var(--font-serif);
-  font-size: clamp(1.4rem, 3vw, 1.6rem);
+  font-family: var(--font-family-fancy);
+  font-size: var(--font-size-title-2);
   font-weight: var(--font-weight-bold);
-  letter-spacing: -0.015em;
-  line-height: 1.18;
+  line-height: var(--line-height-heading);
 }
 .wg-entry__title-text {
   color: var(--ink);
 }
 .wg-entry__dek {
   margin: 0 0 var(--space-sm);
-  font-size: 1.05rem;
-  line-height: 1.45;
-  color: var(--wg-dek);
+  font-size: var(--font-size-body-lg);
+  line-height: var(--line-height-body);
+  color: var(--opacity-high);
 }
 .wg-entry:not(.wg-entry--lead) .wg-entry__dek {
   white-space: nowrap;
@@ -247,7 +215,7 @@ button:focus-visible {
 .wg-entry--lead {
   display: block;
   padding-bottom: var(--space-2xl);
-  border-bottom: var(--border-width) solid var(--wg-hair);
+  border-bottom: var(--line);
 }
 .wg-entry--lead .wg-entry__media {
   width: 100%;
@@ -256,14 +224,14 @@ button:focus-visible {
 }
 .wg-entry--lead .wg-entry__title {
   margin-top: 0;
-  font-size: clamp(1.9rem, 4.4vw, 2.4rem);
-  line-height: 1.1;
+  font-size: var(--font-size-title-1);
+  line-height: var(--line-height-heading);
 }
 .wg-entry--lead .wg-entry__dek {
-  font-family: var(--font-serif);
+  font-family: var(--font-family-fancy);
   font-style: italic;
-  font-size: clamp(1.15rem, 2.4vw, 1.4rem);
-  line-height: 1.4;
+  font-size: var(--font-size-title-2);
+  line-height: var(--line-height-body);
 }
 
 // ---- Article page ----
@@ -273,43 +241,43 @@ button:focus-visible {
 .wg-back {
   display: inline-block;
   margin-bottom: var(--space-xl);
-  font-size: 0.82rem;
-  letter-spacing: 0.02em;
-  color: color-mix(in srgb, var(--ink) 56%, transparent);
+  font-size: var(--font-size-body);
+  color: var(--opacity-high);
 }
 .wg-back:hover {
   color: var(--ink);
 }
 .wg-article__title {
   margin: 0 0 var(--space-md);
-  font-family: var(--font-serif);
-  font-size: clamp(2.1rem, 5vw, 3rem);
+  font-family: var(--font-family-fancy);
+  font-size: var(--font-size-title-1);
   font-weight: var(--font-weight-bold);
-  letter-spacing: -0.02em;
-  line-height: 1.08;
+  line-height: var(--line-height-heading);
 }
 .wg-article__dek {
   margin: 0 0 var(--space-md);
-  font-family: var(--font-serif);
+  font-family: var(--font-family-fancy);
   font-style: italic;
-  font-size: clamp(1.3rem, 2.6vw, 1.55rem);
-  line-height: 1.4;
-  color: var(--wg-dek);
+  font-size: var(--font-size-title-2);
+  line-height: var(--line-height-body);
+  color: var(--opacity-high);
 }
 .wg-article__meta {
   margin: var(--space-lg) 0 var(--space-xl);
   padding-bottom: var(--space-lg);
-  border-bottom: var(--border-width) solid var(--wg-hair);
+  border-bottom: var(--line);
 }
 
 // ---- Article hero (optional full-bleed photo behind the header; see import-articles.mjs) ----
-// Always a night zone (photo + scrim + light text), so it reads the same in light and night themes.
+// A constant-dark zone: photo + a darkening scrim + light text, legible in light and night themes.
+// The scrim is built from the framework's --overlay-backdrop (its darken-content-behind token, dark
+// in every theme) and text from --on-ink (#fff everywhere) — no raw rgba.
 .wg-hero {
   position: relative;
   width: 100%;
   height: clamp(360px, 60vh, 640px);
   overflow: hidden;
-  background: #0d0d12; // shows while the photo decodes / behind any letterboxing
+  background: var(--surface-high); // token-driven backing shown only while the opaque photo decodes
   isolation: isolate;
 }
 .wg-hero__img {
@@ -324,14 +292,19 @@ button:focus-visible {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  // Darken the top (for the back-link) and, more heavily, the bottom (where the title sits).
+  // Darken the top (for the back-link) and, more heavily, the bottom (where the title sits). Both
+  // ramps fade the framework darken token toward transparent — the percentages are the gradient shape.
   background:
-    linear-gradient(to bottom, rgba(13, 13, 18, 0.5) 0%, transparent 24%),
+    linear-gradient(
+      to bottom,
+      var(--overlay-backdrop) 0%,
+      transparent 24%
+    ),
     linear-gradient(
       to top,
-      rgba(13, 13, 18, 0.94) 0%,
-      rgba(13, 13, 18, 0.5) 30%,
-      rgba(13, 13, 18, 0.1) 62%,
+      var(--overlay-backdrop) 0%,
+      color-mix(in srgb, var(--overlay-backdrop) 55%, transparent) 30%,
+      color-mix(in srgb, var(--overlay-backdrop) 12%, transparent) 62%,
       transparent 100%
     );
 }
@@ -350,29 +323,30 @@ button:focus-visible {
 .wg-hero__head > * + * {
   margin-top: var(--space-sm);
 }
-// Light text over the photo (constant across themes).
+// Light text over the photo. --on-ink is #fff in every theme; the muted variants mix it toward the
+// (night) ink surface so kicker/dek/meta step down in weight without raw colours.
 .wg-hero .wg-kicker {
-  color: rgba(255, 255, 255, 0.74);
+  color: color-mix(in srgb, var(--on-ink) 74%, transparent);
 }
 .wg-hero .wg-article__title {
-  color: #fff;
+  color: var(--on-ink);
 }
 .wg-hero .wg-article__dek {
-  color: rgba(255, 255, 255, 0.86);
+  color: color-mix(in srgb, var(--on-ink) 86%, transparent);
 }
 .wg-hero .wg-article__meta {
   margin: var(--space-md) 0 0;
   padding: 0;
   border: 0;
-  color: rgba(255, 255, 255, 0.62);
+  color: color-mix(in srgb, var(--on-ink) 62%, transparent);
 }
 .wg-back--hero {
   align-self: flex-start;
   margin: 0;
-  color: rgba(255, 255, 255, 0.82);
+  color: color-mix(in srgb, var(--on-ink) 82%, transparent);
 }
 .wg-back--hero:hover {
-  color: #fff;
+  color: var(--on-ink);
 }
 // With a hero the title block lives in the photo, so the body just needs breathing room above it.
 .wg-article--hero {
@@ -380,101 +354,34 @@ button:focus-visible {
 }
 
 // ---- Prose (the rendered markdown body) ----
-.wg-prose {
-  font-size: var(--reading-size);
-  line-height: var(--reading-leading);
-  color: var(--ink);
-}
-// Paragraph rhythm: reset every block, then space consecutive ones. The gap must clearly exceed the
-// line-height (1.7) or stacked paragraphs read as one dense chunk. NB: reset via `> *` (specificity
-// 0,1,0) — a plain `.wg-prose p { margin: 0 }` (0,1,1) out-ranks the flow rule and silently kills all
-// paragraph spacing. Headings + blockquote widen the gap further below.
-.wg-prose > * {
-  margin: 0;
-}
-.wg-prose > * + * {
-  margin-top: 2em;
-}
-.wg-prose strong {
-  font-weight: var(--font-weight-bold);
-}
-.wg-prose em {
-  font-style: italic;
-}
-.wg-prose h2 {
-  margin-top: 2.9em;
-  font-family: var(--font-serif);
-  font-size: 1.5em;
-  font-weight: var(--font-weight-bold);
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-}
-.wg-prose h3 {
-  margin-top: 2.4em;
-  font-size: 1.18em;
-  font-weight: var(--font-weight-bold);
-  line-height: 1.25;
-}
-.wg-prose a {
-  color: inherit;
-}
-.wg-prose blockquote {
-  margin: 2em 0;
-  padding-left: var(--space-lg);
-  border-left: 3px solid color-mix(in srgb, var(--ink) 22%, transparent);
-  color: color-mix(in srgb, var(--ink) 78%, transparent);
-  font-style: italic;
-}
-.wg-prose ul,
-.wg-prose ol {
-  padding-left: 1.4em;
-}
-.wg-prose li + li {
-  margin-top: 0.5em;
-}
-.wg-prose hr {
-  margin: 2.4em 0;
-  border: 0;
-  border-top: var(--border-width) solid color-mix(in srgb, var(--ink) 14%, transparent);
-}
-.wg-prose img {
-  max-width: 100%;
-  height: auto;
-  border-radius: var(--radius-md);
-}
-.wg-prose code {
-  font-family: var(--font-family-mono);
-  font-size: 0.9em;
-  background: var(--surface-low);
-  padding: 0.1em 0.35em;
-  border-radius: var(--radius-sm);
-}
+// The body now carries the framework's own `.cx-article` editorial type (see import-articles.mjs):
+// base size/leading, heading scale + display serif, links, blockquote, lists, hr, img, code and the
+// block rhythm are all owned there. Nothing is re-declared here — the framework's real reading
+// typography stands as-is, even where its app-scaled sizes read tighter than the old local layer.
 
-// ---- Pull-quote (reclaimed from ghostwriter; rendered as a template figure, never spliced in) ----
+// ---- Pull-quote (a template figure sibling to the body, so it is outside .cx-article) ----
 .wg-pullquote {
   margin: var(--space-2xl) 0;
   padding-left: var(--space-lg);
-  border-left: 2px solid color-mix(in srgb, var(--ink) 32%, transparent);
+  border-left: calc(var(--border-width) * 2) solid var(--opacity-high);
 }
 .wg-pullquote__hook {
   margin: 0;
-  font-family: var(--font-serif);
+  font-family: var(--font-family-fancy);
   font-weight: var(--font-weight-medium);
-  font-size: clamp(1.5rem, 3.2vw, 1.9rem);
-  line-height: 1.25;
-  letter-spacing: -0.01em;
+  font-size: var(--font-size-title-1);
+  line-height: var(--line-height-heading);
 }
 .wg-pullquote__hook::before {
   content: '\201C';
-  margin-right: 0.06em;
-  color: color-mix(in srgb, var(--ink) 42%, transparent);
+  color: var(--opacity-high);
   font-weight: var(--font-weight-bold);
 }
 .wg-pullquote__elab {
   margin-top: var(--space-md);
-  font-size: 1.05rem;
-  line-height: 1.5;
-  color: var(--wg-mute);
+  font-size: var(--font-size-body-lg);
+  line-height: var(--line-height-body);
+  color: var(--opacity-high);
 }
 
 // ---- Tags (quiet inline text, not pills) + finis ----
@@ -482,38 +389,37 @@ button:focus-visible {
   margin: var(--space-lg) 0 0;
   text-align: center;
   font-family: var(--font-family-mono);
-  font-size: 1rem;
-  color: color-mix(in srgb, var(--ink) 38%, transparent);
+  font-size: var(--font-size-body-lg);
+  color: var(--opacity-high);
 }
 
 // ---- "What's next" corridor (full-bleed band: related essays + prev/next flip) ----
 .wg-next {
   margin-top: var(--space-lg);
   padding: var(--space-2xl) 0;
-  background: color-mix(in srgb, var(--ink) 3%, var(--surface-mid));
-  border-top: var(--border-width) solid var(--wg-hair);
+  background: var(--surface-low);
+  border-top: var(--line);
 }
 .wg-related__head {
   display: inline-flex;
   align-items: center;
-  gap: 0.7em;
+  gap: var(--space-sm);
   margin: 0 0 var(--space-md);
   font-family: var(--font-family-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
+  font-size: var(--font-size-body-sm);
   text-transform: uppercase;
-  color: var(--wg-faint);
+  color: var(--opacity-high);
 }
 .wg-related__head::before {
   content: '';
-  width: 1.5rem;
-  height: 2px;
-  background: color-mix(in srgb, var(--ink) 28%, transparent);
+  width: var(--space-lg);
+  height: calc(var(--border-width) * 2);
+  background: var(--opacity-high);
 }
 .wg-related__item {
   display: block;
   padding: var(--space-md) 0;
-  border-bottom: var(--border-width) solid var(--wg-hair-soft);
+  border-bottom: var(--line-discreet);
   text-decoration: none;
   color: inherit;
 }
@@ -522,26 +428,26 @@ button:focus-visible {
 }
 .wg-related__title {
   display: inline;
-  font-family: var(--font-serif);
+  font-family: var(--font-family-fancy);
   font-weight: var(--font-weight-bold);
-  font-size: clamp(1.15rem, 2.4vw, 1.3rem);
-  line-height: 1.25;
+  font-size: var(--font-size-title-2);
+  line-height: var(--line-height-heading);
   color: var(--ink);
 }
 .wg-related__dek {
   display: block;
-  margin-top: 0.35em;
-  font-size: 0.95rem;
-  line-height: 1.4;
-  color: var(--wg-mute);
+  margin-top: var(--space-xs);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  color: var(--opacity-high);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .wg-related__meta {
   display: block;
-  margin-top: 0.55em;
-  color: color-mix(in srgb, var(--ink) 46%, transparent);
+  margin-top: var(--space-sm);
+  color: var(--opacity-high);
 }
 
 .wg-flip {
@@ -550,12 +456,12 @@ button:focus-visible {
   gap: var(--space-lg);
   margin-top: var(--space-2xl);
   padding-top: var(--space-xl);
-  border-top: var(--border-width) solid var(--wg-hair);
+  border-top: var(--line);
 }
 .wg-flip__side {
   display: flex;
   flex-direction: column;
-  gap: 0.55em;
+  gap: var(--space-sm);
   text-decoration: none;
   color: inherit;
 }
@@ -568,25 +474,24 @@ button:focus-visible {
 }
 .wg-flip__label {
   font-family: var(--font-family-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.14em;
+  font-size: var(--font-size-body-sm);
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--ink) 46%, transparent);
+  color: var(--opacity-high);
 }
 .wg-flip__title {
-  font-family: var(--font-serif);
+  font-family: var(--font-family-fancy);
   font-weight: var(--font-weight-medium);
-  font-size: 1.1rem;
-  line-height: 1.3;
+  font-size: var(--font-size-body-lg);
+  line-height: var(--line-height-body);
   color: var(--ink);
 }
 .wg-flip__prev .wg-flip__title::before {
   content: '← ';
-  color: color-mix(in srgb, var(--ink) 50%, transparent);
+  color: var(--opacity-high);
 }
 .wg-flip__next .wg-flip__title::after {
   content: ' →';
-  color: color-mix(in srgb, var(--ink) 50%, transparent);
+  color: var(--opacity-high);
 }
 
 // ---- Footer (with the low-key light/dark switch) ----
@@ -597,17 +502,17 @@ button:focus-visible {
   justify-content: center;
   gap: var(--space-md);
   padding: var(--space-xl) var(--space-lg);
-  border-top: var(--border-width) solid var(--wg-hair);
+  border-top: var(--line);
   font-size: var(--font-size-body-sm);
-  color: var(--wg-faint);
+  color: var(--opacity-high);
 }
 .wg-theme {
   appearance: none;
   background: none;
   border: 0;
-  padding: 0.25em 0.35em;
-  font-size: 1rem;
-  line-height: 1;
+  padding: var(--space-2xs) var(--space-xs);
+  font-size: var(--font-size-body-lg);
+  line-height: var(--line-height-small);
   color: inherit;
   cursor: pointer;
   border-radius: var(--radius-pill);
@@ -617,24 +522,8 @@ button:focus-visible {
   color: var(--ink);
 }
 
-// ---- Motion details (only when the reader hasn't opted out) ----
-@media (prefers-reduced-motion: no-preference) {
-  .wg-flip__title::before,
-  .wg-flip__title::after {
-    display: inline-block;
-    transition: transform var(--motion-fast) var(--ease-out);
-  }
-  .wg-flip__prev:hover .wg-flip__title::before {
-    transform: translateX(-3px);
-  }
-  .wg-flip__next:hover .wg-flip__title::after {
-    transform: translateX(3px);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .wg-entry__title-text,
-  .wg-prose a,
   .wg-back,
   .wg-related__title,
   .wg-flip__title {
@@ -642,13 +531,10 @@ button:focus-visible {
   }
 }
 
-// ---- Phone (cx breakpoint = 720px) ----
-@media (max-width: 720px) {
+// ---- Phone (the framework's single $mobile breakpoint) ----
+@media (max-width: bp.$mobile) {
   .wg-entry {
     grid-template-columns: minmax(0, 1fr) 6rem;
-  }
-  .wg-entry:not(.wg-entry--lead) .wg-entry__title {
-    font-size: 1.22rem;
   }
   .wg-pullquote {
     margin-inline: 0;
@@ -666,8 +552,8 @@ button:focus-visible {
 }
 
 // Let the pull-quote breathe slightly outside the reading measure on wider viewports.
-@media (min-width: 721px) {
+@media (min-width: (bp.$mobile + 1px)) {
   .wg-pullquote {
-    margin-inline: -2rem;
+    margin-inline: calc(var(--space-xl) * -1);
   }
 }

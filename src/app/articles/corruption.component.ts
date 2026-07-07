@@ -33,7 +33,7 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
         @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
         <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
       }
-      <div class="wg-prose" [innerHTML]="body"></div>
+      <div class="wg-prose cx-article" [innerHTML]="body"></div>
       <p class="wg-finis" aria-hidden="true">§</p>
     </article>
     @if (related.length || prev || next) {
