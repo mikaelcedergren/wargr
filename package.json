@@ -21,7 +21,6 @@
     "build": "node scripts/import-articles.mjs && ng build --configuration prod && node scripts/flatten.mjs",
     "build:local": "node scripts/import-articles.mjs && ng build --configuration local && node scripts/flatten.mjs",
     "start": "node server/index.mjs",
-    "serve": "node server/index.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -46,7 +45,6 @@
     "@angular-devkit/build-angular": "^22.0.3",
     "@angular/cli": "^22.0.3",
     "@angular/compiler-cli": "^22.0.2",
-    "@playwright/test": "1.60.0",
     "marked": "^15.0.6",
     "prettier": "^3.8.1",
     "sanitize-html": "^2.17.5",

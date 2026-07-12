@@ -94,18 +94,21 @@ rebuilds when the **published (`☑`) set's signature** changes (names + mtimes 
 draft never triggers a build. The running web service serves `dist/browser` from disk, so a rebuild
 needs **no restart** — new content appears within ~the micro-cache TTL (60s).
 
-## cx-framework
+## Framework integrity
 
-Genuinely consumed: `@use '@mikaelcedergren/cx-framework/tokens'` + `/styles/base` in `src/styles.scss`,
-light theme (`theme-light`, the framework default). Fix design issues in Cortex, package them into
-`cx-framework`, then update this repo.
+Cortex is the source of truth; `cx-framework` is its packaged contract; Wargr is only a consumer.
+`src/styles.scss` consumes framework tokens and base styles; `theme-light` is the default.
 
-This repo sits in the **Cortex -> cx-framework -> projects** loop. Cortex authors reusable
-components, tokens, AI skills, guidelines, and framework decisions; `cx-framework` packages them;
-wargr consumes only `@mikaelcedergren/cx-framework`. Do not reference Cortex directly through
-imports, package deps, scripts, styles, local paths, or copied source. If the reading experience
-reveals a reusable framework gap, fix it in Cortex, package/push `cx-framework`, then update wargr
-from the package.
+- Never modify, reference, fork, or optimise Cortex or `cx-framework` from this repository.
+- Consumers adapt forward. Never preserve an old contract with compatibility layers, aliases,
+  wrappers, redirects, overrides, or temporary framework hacks.
+- If the framework is missing something, document it under **🚨 Cortex Action Required** and stop;
+  never recreate it locally.
+- Prefer simpler architecture and deletion over preserving behaviour. Keep one implementation and
+  remove verified dead, duplicate, obsolete, compatibility, legacy, and deprecated code.
+- Evidence beats assumptions: uncertain removals are reported, not guessed.
+- Add a shared abstraction only when it clearly simplifies today's system. Optimise for five-year
+  maintainability, not today's convenience.
 
 ## Toolchain
 
