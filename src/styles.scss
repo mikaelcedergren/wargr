@@ -19,7 +19,7 @@
 }
 
 body {
-  background: var(--surface-mid);
+  background: var(--surface);
   color: var(--ink);
 }
 
@@ -172,7 +172,7 @@ a:active {
   border-radius: var(--radius-md);
   // Neutral backing shown only while the photo decodes (the opaque image then covers it). Token-driven
   // surface rather than a raw hex — it reads as a plain framework surface in light, darker in night.
-  background: var(--surface-high);
+  background: var(--surface-alt);
   text-decoration: none;
 }
 .wg-entry__media img {
@@ -277,7 +277,7 @@ a:active {
   width: 100%;
   height: clamp(360px, 60vh, 640px);
   overflow: hidden;
-  background: var(--surface-high); // token-driven backing shown only while the opaque photo decodes
+  background: var(--surface-alt); // token-driven backing shown only while the opaque photo decodes
   isolation: isolate;
 }
 .wg-hero__img {
@@ -397,7 +397,7 @@ a:active {
 .wg-next {
   margin-top: var(--space-lg);
   padding: var(--space-2xl) 0;
-  background: var(--surface-low);
+  background: var(--surface-alt);
   border-top: var(--line);
 }
 .wg-related__head {
