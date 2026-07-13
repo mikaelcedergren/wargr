@@ -83,7 +83,6 @@ export class ArticleCorruptionComponent {
   protected readonly date = "May 23, 2026";
   protected readonly datetime = "2026-05-23";
   protected readonly metaRest = " · 4 min read · 776 words";
-  protected readonly kicker = "ethics";
   protected readonly imageAlt = "A solitary figure in a dark room, matching an essay on fear, integrity, and corruption.";
   protected readonly related: WgRelated[] = [{"slug":"meant-well","title":"I'm sorry. I meant well.","dek":"The people who hurt you most rarely thought of themselves as the people hurting you. Their goodness was the alibi.","meta":"May 2026 · 8 min · Shared: ethics"},{"slug":"be-yourself","title":"The real meaning of confidence: being yourself when it costs you","dek":"\"Be yourself\" is useless advice until it names the price: some people only liked the version of you that kept them comfortable.","meta":"July 2026 · 10 min · Shared: courage"},{"slug":"emotional-people","title":"Why people get emotional when you least expect it","dek":"You can tell when you've touched the wrong topic. The reaction arrives before the argument does. That is not a person defending a position. That is a person defending the costume they live in.","meta":"July 2026 · 5 min · Shared: self-deception"}];
   protected readonly prev: WgLink | null = null;

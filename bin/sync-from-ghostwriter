@@ -29,6 +29,5 @@ ts() { date -u +%FT%TZ }
 echo "[$(ts)] published set changed — rebuilding wargr.com"
 node scripts/import-articles.mjs
 ./node_modules/.bin/ng build --configuration prod
-node scripts/flatten.mjs
 echo "$sig" > "$STAMP"
 echo "[$(ts)] wargr.com rebuilt (server serves the updated dist/browser live)"

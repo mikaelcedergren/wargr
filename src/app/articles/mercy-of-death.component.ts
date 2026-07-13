@@ -83,7 +83,6 @@ export class ArticleMercyOfDeathComponent {
   protected readonly date = "July 9, 2026";
   protected readonly datetime = "2026-07-09";
   protected readonly metaRest = " · 6 min read · 1282 words";
-  protected readonly kicker = "death";
   protected readonly imageAlt = "The Strange Mercy of Death, an essay by Michael Wargr.";
   protected readonly related: WgRelated[] = [{"slug":"stop-chasing-purpose","title":"Stop chasing purpose","dek":"The search for purpose is a trap most people walk into willingly. It feels noble, which is how it gets away with stealing years.","meta":"May 2026 · 3 min · Shared: life"},{"slug":"wtf-is-self-love","title":"WTF is self-love?","dek":"Most people are crueller to themselves than they would ever be to the rudest of strangers. They call it standards because cruelty sounds cleaner that way.","meta":"May 2026 · 3 min · Shared: contemplation"},{"slug":"knowing-yourself","title":"The side effect of knowing yourself","dek":"The most confident people I have known never seem particularly interested in the question of how they look. That, it turns out, is the trick.","meta":"July 2026 · 5 min · Shared: acceptance"}];
   protected readonly prev: WgLink | null = {"slug":"knowing-yourself","title":"The side effect of knowing yourself"};

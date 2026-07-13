@@ -83,7 +83,6 @@ export class ArticleWhomToListenToComponent {
   protected readonly date = "May 23, 2026";
   protected readonly datetime = "2026-05-23";
   protected readonly metaRest = " · 4 min read · 855 words";
-  protected readonly kicker = "philosophy";
   protected readonly imageAlt = "A microphone on an empty lecture table, matching an essay on consensus and dissent.";
   protected readonly related: WgRelated[] = [{"slug":"babylons-whore","title":"The Whore of Babylon Was Always Us","dek":"I thought religion was a trick for gullible people. Then the old stories started looking less like superstition and more like a report on the crowd, and on me.","meta":"July 2026 · 8 min · Shared: dissent"},{"slug":"slaughterhouse","title":"How we choose the slaughterhouse","dek":"You think you think for yourself. You don't. You follow, repeat, defend, and call the fence your own judgement.","meta":"May 2026 · 5 min · Shared: consensus"},{"slug":"the-real-world","title":"The world isn't what you think it is","dek":"Most of what you confidently know about the world arrived in your head the same way. Somebody with a budget said it often enough that you stopped checking.","meta":"July 2026 · 6 min · Shared: scepticism"}];
   protected readonly prev: WgLink | null = {"slug":"meant-well","title":"I'm sorry. I meant well."};

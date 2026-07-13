@@ -83,7 +83,6 @@ export class ArticleBeYourselfComponent {
   protected readonly date = "July 9, 2026";
   protected readonly datetime = "2026-07-09";
   protected readonly metaRest = " · 10 min read · 1964 words";
-  protected readonly kicker = "authenticity";
   protected readonly imageAlt = "The real meaning of confidence: being yourself when it costs you, an essay by Michael Wargr.";
   protected readonly related: WgRelated[] = [{"slug":"knowing-yourself","title":"The side effect of knowing yourself","dek":"The most confident people I have known never seem particularly interested in the question of how they look. That, it turns out, is the trick.","meta":"July 2026 · 5 min · Shared: self-knowledge"},{"slug":"wtf-is-self-love","title":"WTF is self-love?","dek":"Most people are crueller to themselves than they would ever be to the rudest of strangers. They call it standards because cruelty sounds cleaner that way.","meta":"May 2026 · 3 min · Shared: loneliness"},{"slug":"babylons-whore","title":"The Whore of Babylon Was Always Us","dek":"I thought religion was a trick for gullible people. Then the old stories started looking less like superstition and more like a report on the crowd, and on me.","meta":"July 2026 · 8 min · Shared: belonging"}];
   protected readonly prev: WgLink | null = {"slug":"babylons-whore","title":"The Whore of Babylon Was Always Us"};

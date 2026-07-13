@@ -83,7 +83,6 @@ export class ArticleSlaughterhouseComponent {
   protected readonly date = "May 24, 2026";
   protected readonly datetime = "2026-05-24";
   protected readonly metaRest = " · 5 min read · 1093 words";
-  protected readonly kicker = "philosophy";
   protected readonly imageAlt = "Meat on a table in a slaughterhouse, matching an essay on conformity and herd mentality.";
   protected readonly related: WgRelated[] = [{"slug":"the-real-world","title":"The world isn't what you think it is","dek":"Most of what you confidently know about the world arrived in your head the same way. Somebody with a budget said it often enough that you stopped checking.","meta":"July 2026 · 6 min · Shared: manipulation"},{"slug":"babylons-whore","title":"The Whore of Babylon Was Always Us","dek":"I thought religion was a trick for gullible people. Then the old stories started looking less like superstition and more like a report on the crowd, and on me.","meta":"July 2026 · 8 min · Shared: conformity"},{"slug":"whom-to-listen-to","title":"The one you should have listened to","dek":"When a hundred people agree about something and one person doesn't, the one person is usually wrong. Until they aren't, and everyone pretends the room had been open-minded all along.","meta":"May 2026 · 4 min · Shared: consensus"}];
   protected readonly prev: WgLink | null = {"slug":"wtf-is-self-love","title":"WTF is self-love?"};

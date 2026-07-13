@@ -83,7 +83,6 @@ export class ArticleBabylonsWhoreComponent {
   protected readonly date = "July 9, 2026";
   protected readonly datetime = "2026-07-09";
   protected readonly metaRest = " · 8 min read · 1677 words";
-  protected readonly kicker = "religion";
   protected readonly imageAlt = "The Whore of Babylon Was Always Us, an essay by Michael Wargr.";
   protected readonly related: WgRelated[] = [{"slug":"the-real-world","title":"The world isn't what you think it is","dek":"Most of what you confidently know about the world arrived in your head the same way. Somebody with a budget said it often enough that you stopped checking.","meta":"July 2026 · 6 min · Shared: scepticism"},{"slug":"slaughterhouse","title":"How we choose the slaughterhouse","dek":"You think you think for yourself. You don't. You follow, repeat, defend, and call the fence your own judgement.","meta":"May 2026 · 5 min · Shared: conformity"},{"slug":"what-curiosity-doesnt-tell-you","title":"What curiosity doesn't tell you","dek":"Curiosity feels like light until it opens a door you cannot close, and leaves you carrying truths no one else wants.","meta":"July 2026 · 3 min · Shared: belief"}];
   protected readonly prev: WgLink | null = {"slug":"stop-the-pain","title":"How to stop the pain"};

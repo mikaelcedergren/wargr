@@ -83,7 +83,6 @@ export class ArticleKnowingYourselfComponent {
   protected readonly date = "July 9, 2026";
   protected readonly datetime = "2026-07-09";
   protected readonly metaRest = " · 5 min read · 1014 words";
-  protected readonly kicker = "self-knowledge";
   protected readonly imageAlt = "The side effect of knowing yourself, an essay by Michael Wargr.";
   protected readonly related: WgRelated[] = [{"slug":"be-yourself","title":"The real meaning of confidence: being yourself when it costs you","dek":"\"Be yourself\" is useless advice until it names the price: some people only liked the version of you that kept them comfortable.","meta":"July 2026 · 10 min · Shared: authenticity"},{"slug":"wtf-is-self-love","title":"WTF is self-love?","dek":"Most people are crueller to themselves than they would ever be to the rudest of strangers. They call it standards because cruelty sounds cleaner that way.","meta":"May 2026 · 3 min · Shared: presence"},{"slug":"emotional-people","title":"Why people get emotional when you least expect it","dek":"You can tell when you've touched the wrong topic. The reaction arrives before the argument does. That is not a person defending a position. That is a person defending the costume they live in.","meta":"July 2026 · 5 min · Shared: ego"}];
   protected readonly prev: WgLink | null = {"slug":"fuck-you-nazi-scum","title":"Fuck you, Nazi scum"};

@@ -83,7 +83,6 @@ export class ArticleEmotionalPeopleComponent {
   protected readonly date = "July 9, 2026";
   protected readonly datetime = "2026-07-09";
   protected readonly metaRest = " · 5 min read · 972 words";
-  protected readonly kicker = "psychology";
   protected readonly imageAlt = "Why people get emotional when you least expect it, an essay by Michael Wargr.";
   protected readonly related: WgRelated[] = [{"slug":"knowing-yourself","title":"The side effect of knowing yourself","dek":"The most confident people I have known never seem particularly interested in the question of how they look. That, it turns out, is the trick.","meta":"July 2026 · 5 min · Shared: ego"},{"slug":"be-yourself","title":"The real meaning of confidence: being yourself when it costs you","dek":"\"Be yourself\" is useless advice until it names the price: some people only liked the version of you that kept them comfortable.","meta":"July 2026 · 10 min · Shared: identity"},{"slug":"raise-others","title":"Raise others to your level","dek":"It is easy to celebrate someone rising until their growth exposes the place in you that has stayed still.","meta":"July 2026 · 3 min · Shared: ego"}];
   protected readonly prev: WgLink | null = {"slug":"be-yourself","title":"The real meaning of confidence: being yourself when it costs you"};

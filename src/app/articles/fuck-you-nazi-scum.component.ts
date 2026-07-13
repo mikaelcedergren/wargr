@@ -83,7 +83,6 @@ export class ArticleFuckYouNaziScumComponent {
   protected readonly date = "July 9, 2026";
   protected readonly datetime = "2026-07-09";
   protected readonly metaRest = " · 21 min read · 4230 words";
-  protected readonly kicker = "nazism";
   protected readonly imageAlt = "Fuck you, Nazi scum, an essay by Michael Wargr.";
   protected readonly related: WgRelated[] = [{"slug":"babylons-whore","title":"The Whore of Babylon Was Always Us","dek":"I thought religion was a trick for gullible people. Then the old stories started looking less like superstition and more like a report on the crowd, and on me.","meta":"July 2026 · 8 min · Shared: religion"},{"slug":"the-real-world","title":"The world isn't what you think it is","dek":"Most of what you confidently know about the world arrived in your head the same way. Somebody with a budget said it often enough that you stopped checking.","meta":"July 2026 · 6 min · Shared: propaganda"},{"slug":"slaughterhouse","title":"How we choose the slaughterhouse","dek":"You think you think for yourself. You don't. You follow, repeat, defend, and call the fence your own judgement.","meta":"May 2026 · 5 min · Shared: propaganda"}];
   protected readonly prev: WgLink | null = {"slug":"emotional-people","title":"Why people get emotional when you least expect it"};

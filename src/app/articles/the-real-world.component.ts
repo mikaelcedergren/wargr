@@ -83,7 +83,6 @@ export class ArticleTheRealWorldComponent {
   protected readonly date = "July 9, 2026";
   protected readonly datetime = "2026-07-09";
   protected readonly metaRest = " · 6 min read · 1250 words";
-  protected readonly kicker = "philosophy";
   protected readonly imageAlt = "The world isn't what you think it is, an essay by Michael Wargr.";
   protected readonly related: WgRelated[] = [{"slug":"slaughterhouse","title":"How we choose the slaughterhouse","dek":"You think you think for yourself. You don't. You follow, repeat, defend, and call the fence your own judgement.","meta":"May 2026 · 5 min · Shared: manipulation"},{"slug":"babylons-whore","title":"The Whore of Babylon Was Always Us","dek":"I thought religion was a trick for gullible people. Then the old stories started looking less like superstition and more like a report on the crowd, and on me.","meta":"July 2026 · 8 min · Shared: conformity"},{"slug":"what-curiosity-doesnt-tell-you","title":"What curiosity doesn't tell you","dek":"Curiosity feels like light until it opens a door you cannot close, and leaves you carrying truths no one else wants.","meta":"July 2026 · 3 min · Shared: perception"}];
   protected readonly prev: WgLink | null = {"slug":"raise-others","title":"Raise others to your level"};

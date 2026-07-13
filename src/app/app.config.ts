@@ -7,8 +7,7 @@ import { SeoTitleStrategy } from './shared/seo';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    // Hydrate (reuse) the prerendered DOM instead of re-rendering it, so the static scripts.js
-    // (accordion, mobile menu, language switcher, sticky header) keeps working on the live nodes.
+    // Reuse the prerendered DOM when the client application starts.
     provideClientHydration(),
     provideRouter(
       routes,

@@ -83,7 +83,6 @@ export class ArticleWhatCuriosityDoesntTellYouComponent {
   protected readonly date = "July 9, 2026";
   protected readonly datetime = "2026-07-09";
   protected readonly metaRest = " · 3 min read · 678 words";
-  protected readonly kicker = "curiosity";
   protected readonly imageAlt = "What curiosity doesn't tell you, an essay by Michael Wargr.";
   protected readonly related: WgRelated[] = [{"slug":"babylons-whore","title":"The Whore of Babylon Was Always Us","dek":"I thought religion was a trick for gullible people. Then the old stories started looking less like superstition and more like a report on the crowd, and on me.","meta":"July 2026 · 8 min · Shared: belief"},{"slug":"wtf-is-self-love","title":"WTF is self-love?","dek":"Most people are crueller to themselves than they would ever be to the rudest of strangers. They call it standards because cruelty sounds cleaner that way.","meta":"May 2026 · 3 min · Shared: loneliness"},{"slug":"be-yourself","title":"The real meaning of confidence: being yourself when it costs you","dek":"\"Be yourself\" is useless advice until it names the price: some people only liked the version of you that kept them comfortable.","meta":"July 2026 · 10 min · Shared: loneliness"}];
   protected readonly prev: WgLink | null = {"slug":"the-real-world","title":"The world isn't what you think it is"};

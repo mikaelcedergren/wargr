@@ -83,7 +83,6 @@ export class ArticleRaiseOthersComponent {
   protected readonly date = "July 9, 2026";
   protected readonly datetime = "2026-07-09";
   protected readonly metaRest = " · 3 min read · 601 words";
-  protected readonly kicker = "envy";
   protected readonly imageAlt = "Raise others to your level, an essay by Michael Wargr.";
   protected readonly related: WgRelated[] = [{"slug":"meant-well","title":"I'm sorry. I meant well.","dek":"The people who hurt you most rarely thought of themselves as the people hurting you. Their goodness was the alibi.","meta":"May 2026 · 8 min · Shared: accountability"},{"slug":"be-yourself","title":"The real meaning of confidence: being yourself when it costs you","dek":"\"Be yourself\" is useless advice until it names the price: some people only liked the version of you that kept them comfortable.","meta":"July 2026 · 10 min · Shared: confidence"},{"slug":"emotional-people","title":"Why people get emotional when you least expect it","dek":"You can tell when you've touched the wrong topic. The reaction arrives before the argument does. That is not a person defending a position. That is a person defending the costume they live in.","meta":"July 2026 · 5 min · Shared: ego"}];
   protected readonly prev: WgLink | null = {"slug":"mercy-of-death","title":"The Strange Mercy of Death"};

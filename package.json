@@ -13,13 +13,13 @@
   "type": "module",
   "packageManager": "pnpm@10.7.1",
   "engines": {
-    "node": "^20.19.0 || ^22.12.0 || >=24.0.0"
+    "node": ">=26 <27"
   },
   "scripts": {
     "import": "node scripts/import-articles.mjs",
     "dev": "node scripts/import-articles.mjs && ng serve --configuration local --host 127.0.0.1 --port 4260",
-    "build": "node scripts/import-articles.mjs && ng build --configuration prod && node scripts/flatten.mjs",
-    "build:local": "node scripts/import-articles.mjs && ng build --configuration local && node scripts/flatten.mjs",
+    "build": "node scripts/import-articles.mjs && ng build --configuration prod",
+    "build:local": "node scripts/import-articles.mjs && ng build --configuration local",
     "start": "node server/index.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
@@ -29,7 +29,6 @@
     "@angular/common": "^22.0.2",
     "@angular/compiler": "^22.0.2",
     "@angular/core": "^22.0.2",
-    "@angular/localize": "^22.0.2",
     "@angular/platform-browser": "^22.0.2",
     "@angular/platform-server": "^22.0.2",
     "@angular/router": "^22.0.2",

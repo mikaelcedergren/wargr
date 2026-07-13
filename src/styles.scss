@@ -1,6 +1,6 @@
 // wargr.com global styles — "The Quiet Press": a de-chromed editorial reading space built entirely on
 // cx-framework tokens. The framework's display serif (--font-family-fancy) carries the voice (titles,
-// deks, pull-quotes); Inter reads the body; Roboto Mono marks the facts (kickers, meta, folios). The
+// deks, pull-quotes); Inter reads the body; Roboto Mono marks the facts (meta, folios). The
 // article body itself is the framework's own `.cx-article` editorial type — this layer only adds the
 // site's structural patterns (masthead, feed, hero, pull-quote, what's-next) around it, and every
 // design value inside them is a framework token.
@@ -88,20 +88,15 @@ a:active {
   padding-inline: var(--space-lg);
 }
 
-// ---- Mono editorial marks (kickers, meta lines, folios) ----
+// ---- Mono editorial marks (meta lines, folios) ----
 // Uppercase mono labels. The framework has no letter-spacing (tracking) token, so these track at the
 // font's natural spacing rather than re-declaring a raw em value — the missing tracking scale is a
 // real framework gap the owner should see, not something to hide with a local value.
-.wg-meta,
-.wg-kicker {
+.wg-meta {
   font-family: var(--font-family-mono);
   font-size: var(--font-size-body-sm);
   text-transform: uppercase;
   color: var(--opacity-high);
-}
-.wg-kicker {
-  margin: 0 0 var(--space-sm);
-  font-weight: var(--font-weight-medium);
 }
 
 // ---- Masthead ----
@@ -324,10 +319,7 @@ a:active {
   margin-top: var(--space-sm);
 }
 // Light text over the photo. --on-ink is #fff in every theme; the muted variants mix it toward the
-// (night) ink surface so kicker/dek/meta step down in weight without raw colours.
-.wg-hero .wg-kicker {
-  color: color-mix(in srgb, var(--on-ink) 74%, transparent);
-}
+// (night) ink surface so dek/meta step down in weight without raw colours.
 .wg-hero .wg-article__title {
   color: var(--on-ink);
 }

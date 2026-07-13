@@ -587,7 +587,6 @@ export class ${cls} {
   protected readonly date = ${JSON.stringify(a.date)};
   protected readonly datetime = ${JSON.stringify(a.iso.slice(0, 10))};
   protected readonly metaRest = ${JSON.stringify(metaRest)};
-  protected readonly kicker = ${JSON.stringify(a.dominantTag)};
   protected readonly imageAlt = ${JSON.stringify(a.imageAlt)};
   protected readonly related: WgRelated[] = ${JSON.stringify(a.related)};
   protected readonly prev: WgLink | null = ${JSON.stringify(a.prev)};

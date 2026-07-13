@@ -83,7 +83,6 @@ export class ArticleStopChasingPurposeComponent {
   protected readonly date = "May 24, 2026";
   protected readonly datetime = "2026-05-24";
   protected readonly metaRest = " · 3 min read · 511 words";
-  protected readonly kicker = "philosophy";
   protected readonly imageAlt = "A quiet path through open landscape, matching an essay on purpose, meaning, and letting go.";
   protected readonly related: WgRelated[] = [{"slug":"mercy-of-death","title":"The Strange Mercy of Death","dek":"Most people treat death as a distant abstraction. I met it at fifteen, and it never went back to being an idea.","meta":"July 2026 · 6 min · Shared: peace"},{"slug":"knowing-yourself","title":"The side effect of knowing yourself","dek":"The most confident people I have known never seem particularly interested in the question of how they look. That, it turns out, is the trick.","meta":"July 2026 · 5 min · Shared: identity"},{"slug":"stop-the-pain","title":"How to stop the pain","dek":"The pain you have been outrunning has not moved. It is exactly where you left it, waiting for you to stop calling avoidance strength.","meta":"May 2026 · 5 min · Shared: self-help-critique"}];
   protected readonly prev: WgLink | null = {"slug":"slaughterhouse","title":"How we choose the slaughterhouse"};

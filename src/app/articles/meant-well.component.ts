@@ -83,7 +83,6 @@ export class ArticleMeantWellComponent {
   protected readonly date = "May 23, 2026";
   protected readonly datetime = "2026-05-23";
   protected readonly metaRest = " · 8 min read · 1517 words";
-  protected readonly kicker = "philosophy";
   protected readonly imageAlt = "A tense human scene matching an essay on good intentions, harm, and accountability.";
   protected readonly related: WgRelated[] = [{"slug":"raise-others","title":"Raise others to your level","dek":"It is easy to celebrate someone rising until their growth exposes the place in you that has stayed still.","meta":"July 2026 · 3 min · Shared: accountability"},{"slug":"corruption","title":"How fear turns the good in us into corruption","dek":"Corruption rarely starts with a bad person. It starts with a good one who learns to use goodness as an alibi.","meta":"May 2026 · 4 min · Shared: ethics"},{"slug":"be-yourself","title":"The real meaning of confidence: being yourself when it costs you","dek":"\"Be yourself\" is useless advice until it names the price: some people only liked the version of you that kept them comfortable.","meta":"July 2026 · 10 min · Shared: relationships"}];
   protected readonly prev: WgLink | null = {"slug":"corruption","title":"How fear turns the good in us into corruption"};

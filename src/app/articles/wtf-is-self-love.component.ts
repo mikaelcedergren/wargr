@@ -83,7 +83,6 @@ export class ArticleWtfIsSelfLoveComponent {
   protected readonly date = "May 24, 2026";
   protected readonly datetime = "2026-05-24";
   protected readonly metaRest = " · 3 min read · 550 words";
-  protected readonly kicker = "self-love";
   protected readonly imageAlt = "A face reflected in dark glass, matching an essay on self-love and negative self-talk.";
   protected readonly related: WgRelated[] = [{"slug":"knowing-yourself","title":"The side effect of knowing yourself","dek":"The most confident people I have known never seem particularly interested in the question of how they look. That, it turns out, is the trick.","meta":"July 2026 · 5 min · Shared: presence"},{"slug":"be-yourself","title":"The real meaning of confidence: being yourself when it costs you","dek":"\"Be yourself\" is useless advice until it names the price: some people only liked the version of you that kept them comfortable.","meta":"July 2026 · 10 min · Shared: loneliness"},{"slug":"what-curiosity-doesnt-tell-you","title":"What curiosity doesn't tell you","dek":"Curiosity feels like light until it opens a door you cannot close, and leaves you carrying truths no one else wants.","meta":"July 2026 · 3 min · Shared: loneliness"}];
   protected readonly prev: WgLink | null = {"slug":"whom-to-listen-to","title":"The one you should have listened to"};
