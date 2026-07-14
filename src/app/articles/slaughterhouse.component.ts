@@ -12,27 +12,19 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
   selector: 'wg-a-slaughterhouse',
   imports: [RouterLink],
   template: `
-    @if (hero) {
-      <header class="wg-hero">
-        <img class="wg-hero__img" [src]="hero" [alt]="imageAlt" fetchpriority="high" />
-        <div class="wg-hero__scrim" aria-hidden="true"></div>
-        <div class="wg-hero__inner wg-container">
-          <a class="wg-back wg-back--hero" routerLink="/">← Essays</a>
-          <div class="wg-hero__head">
-            <h1 class="wg-article__title">{{ title }}</h1>
-            @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
-            <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
-          </div>
+    <header class="wg-hero">
+      <img class="wg-hero__img" [src]="hero" [alt]="imageAlt" fetchpriority="high" />
+      <div class="wg-hero__scrim" aria-hidden="true"></div>
+      <div class="wg-hero__inner wg-container">
+        <a class="wg-back wg-back--hero" routerLink="/">← Essays</a>
+        <div class="wg-hero__head">
+          <h1 class="wg-article__title">{{ title }}</h1>
+          @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
+          <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
         </div>
-      </header>
-    }
-    <article class="wg-container wg-article" [class.wg-article--hero]="!!hero">
-      @if (!hero) {
-        <a class="wg-back" routerLink="/">← Essays</a>
-        <h1 class="wg-article__title">{{ title }}</h1>
-        @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
-        <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
-      }
+      </div>
+    </header>
+    <article class="wg-container wg-article wg-article--hero">
       <div class="wg-prose cx-article" [innerHTML]="body"></div>
       <p class="wg-finis" aria-hidden="true">§</p>
     </article>
@@ -84,9 +76,9 @@ export class ArticleSlaughterhouseComponent {
   protected readonly datetime = "2026-05-24";
   protected readonly metaRest = " · 5 min read · 1093 words";
   protected readonly imageAlt = "Meat on a table in a slaughterhouse, matching an essay on conformity and herd mentality.";
-  protected readonly related: WgRelated[] = [{"slug":"the-real-world","title":"The world isn't what you think it is","dek":"Most of what you confidently know about the world arrived in your head the same way. Somebody with a budget said it often enough that you stopped checking.","meta":"July 2026 · 6 min · Shared: manipulation"},{"slug":"babylons-whore","title":"The Whore of Babylon Was Always Us","dek":"I thought religion was a trick for gullible people. Then the old stories started looking less like superstition and more like a report on the crowd, and on me.","meta":"July 2026 · 8 min · Shared: conformity"},{"slug":"whom-to-listen-to","title":"The one you should have listened to","dek":"When a hundred people agree about something and one person doesn't, the one person is usually wrong. Until they aren't, and everyone pretends the room had been open-minded all along.","meta":"May 2026 · 4 min · Shared: consensus"}];
-  protected readonly prev: WgLink | null = {"slug":"wtf-is-self-love","title":"WTF is self-love?"};
-  protected readonly next: WgLink | null = {"slug":"stop-chasing-purpose","title":"Stop chasing purpose"};
-  protected readonly hero: string | null = "/assets/articles/slaughterhouse.jpg";
+  protected readonly related: WgRelated[] = [{"slug":"babylons-whore","title":"The Whore of Babylon Was Always Us","dek":"I thought religion was a trick for gullible people. Then the old stories started looking less like superstition and more like a report on the crowd, and on me.","meta":"July 2026 · 8 min · Shared: conformity"},{"slug":"corruption","title":"How fear turns the good in us into corruption","dek":"Corruption rarely starts with a bad person. It starts with a good one who learns to use goodness as an alibi.","meta":"May 2026 · 4 min · Shared: courage"},{"slug":"knowing-yourself","title":"The side effect of knowing yourself","dek":"The most confident people I have known never seem particularly interested in the question of how they look. That, it turns out, is the trick.","meta":"July 2026 · 5 min"}];
+  protected readonly prev: WgLink | null = {"slug":"corruption","title":"How fear turns the good in us into corruption"};
+  protected readonly next: WgLink | null = {"slug":"babylons-whore","title":"The Whore of Babylon Was Always Us"};
+  protected readonly hero = "/assets/articles/slaughterhouse.jpg";
   protected readonly body = inject(DomSanitizer).bypassSecurityTrustHtml(HTML);
 }

@@ -12,27 +12,19 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
   selector: 'wg-a-babylons-whore',
   imports: [RouterLink],
   template: `
-    @if (hero) {
-      <header class="wg-hero">
-        <img class="wg-hero__img" [src]="hero" [alt]="imageAlt" fetchpriority="high" />
-        <div class="wg-hero__scrim" aria-hidden="true"></div>
-        <div class="wg-hero__inner wg-container">
-          <a class="wg-back wg-back--hero" routerLink="/">← Essays</a>
-          <div class="wg-hero__head">
-            <h1 class="wg-article__title">{{ title }}</h1>
-            @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
-            <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
-          </div>
+    <header class="wg-hero">
+      <img class="wg-hero__img" [src]="hero" [alt]="imageAlt" fetchpriority="high" />
+      <div class="wg-hero__scrim" aria-hidden="true"></div>
+      <div class="wg-hero__inner wg-container">
+        <a class="wg-back wg-back--hero" routerLink="/">← Essays</a>
+        <div class="wg-hero__head">
+          <h1 class="wg-article__title">{{ title }}</h1>
+          @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
+          <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
         </div>
-      </header>
-    }
-    <article class="wg-container wg-article" [class.wg-article--hero]="!!hero">
-      @if (!hero) {
-        <a class="wg-back" routerLink="/">← Essays</a>
-        <h1 class="wg-article__title">{{ title }}</h1>
-        @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
-        <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
-      }
+      </div>
+    </header>
+    <article class="wg-container wg-article wg-article--hero">
       <div class="wg-prose cx-article" [innerHTML]="body"></div>
       <p class="wg-finis" aria-hidden="true">§</p>
     </article>
@@ -84,9 +76,9 @@ export class ArticleBabylonsWhoreComponent {
   protected readonly datetime = "2026-07-09";
   protected readonly metaRest = " · 8 min read · 1677 words";
   protected readonly imageAlt = "The Whore of Babylon Was Always Us, an essay by Michael Wargr.";
-  protected readonly related: WgRelated[] = [{"slug":"the-real-world","title":"The world isn't what you think it is","dek":"Most of what you confidently know about the world arrived in your head the same way. Somebody with a budget said it often enough that you stopped checking.","meta":"July 2026 · 6 min · Shared: scepticism"},{"slug":"slaughterhouse","title":"How we choose the slaughterhouse","dek":"You think you think for yourself. You don't. You follow, repeat, defend, and call the fence your own judgement.","meta":"May 2026 · 5 min · Shared: conformity"},{"slug":"what-curiosity-doesnt-tell-you","title":"What curiosity doesn't tell you","dek":"Curiosity feels like light until it opens a door you cannot close, and leaves you carrying truths no one else wants.","meta":"July 2026 · 3 min · Shared: belief"}];
-  protected readonly prev: WgLink | null = {"slug":"stop-the-pain","title":"How to stop the pain"};
-  protected readonly next: WgLink | null = {"slug":"be-yourself","title":"The real meaning of confidence: being yourself when it costs you"};
-  protected readonly hero: string | null = null;
+  protected readonly related: WgRelated[] = [{"slug":"slaughterhouse","title":"How we choose the slaughterhouse","dek":"You think you think for yourself. You don't. You follow, repeat, defend, and call the fence your own judgement.","meta":"May 2026 · 5 min · Shared: conformity"},{"slug":"knowing-yourself","title":"The side effect of knowing yourself","dek":"The most confident people I have known never seem particularly interested in the question of how they look. That, it turns out, is the trick.","meta":"July 2026 · 5 min · Shared: psychology"},{"slug":"mercy-of-death","title":"The Strange Mercy of Death","dek":"Most people treat death as a distant abstraction. I met it at fifteen, and it never went back to being an idea.","meta":"July 2026 · 6 min"}];
+  protected readonly prev: WgLink | null = {"slug":"slaughterhouse","title":"How we choose the slaughterhouse"};
+  protected readonly next: WgLink | null = {"slug":"knowing-yourself","title":"The side effect of knowing yourself"};
+  protected readonly hero = "/assets/articles/babylons-whore.jpg";
   protected readonly body = inject(DomSanitizer).bypassSecurityTrustHtml(HTML);
 }

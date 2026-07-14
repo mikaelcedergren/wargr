@@ -12,27 +12,19 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
   selector: 'wg-a-corruption',
   imports: [RouterLink],
   template: `
-    @if (hero) {
-      <header class="wg-hero">
-        <img class="wg-hero__img" [src]="hero" [alt]="imageAlt" fetchpriority="high" />
-        <div class="wg-hero__scrim" aria-hidden="true"></div>
-        <div class="wg-hero__inner wg-container">
-          <a class="wg-back wg-back--hero" routerLink="/">← Essays</a>
-          <div class="wg-hero__head">
-            <h1 class="wg-article__title">{{ title }}</h1>
-            @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
-            <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
-          </div>
+    <header class="wg-hero">
+      <img class="wg-hero__img" [src]="hero" [alt]="imageAlt" fetchpriority="high" />
+      <div class="wg-hero__scrim" aria-hidden="true"></div>
+      <div class="wg-hero__inner wg-container">
+        <a class="wg-back wg-back--hero" routerLink="/">← Essays</a>
+        <div class="wg-hero__head">
+          <h1 class="wg-article__title">{{ title }}</h1>
+          @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
+          <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
         </div>
-      </header>
-    }
-    <article class="wg-container wg-article" [class.wg-article--hero]="!!hero">
-      @if (!hero) {
-        <a class="wg-back" routerLink="/">← Essays</a>
-        <h1 class="wg-article__title">{{ title }}</h1>
-        @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
-        <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
-      }
+      </div>
+    </header>
+    <article class="wg-container wg-article wg-article--hero">
       <div class="wg-prose cx-article" [innerHTML]="body"></div>
       <p class="wg-finis" aria-hidden="true">§</p>
     </article>
@@ -84,9 +76,9 @@ export class ArticleCorruptionComponent {
   protected readonly datetime = "2026-05-23";
   protected readonly metaRest = " · 4 min read · 776 words";
   protected readonly imageAlt = "A solitary figure in a dark room, matching an essay on fear, integrity, and corruption.";
-  protected readonly related: WgRelated[] = [{"slug":"meant-well","title":"I'm sorry. I meant well.","dek":"The people who hurt you most rarely thought of themselves as the people hurting you. Their goodness was the alibi.","meta":"May 2026 · 8 min · Shared: ethics"},{"slug":"be-yourself","title":"The real meaning of confidence: being yourself when it costs you","dek":"\"Be yourself\" is useless advice until it names the price: some people only liked the version of you that kept them comfortable.","meta":"July 2026 · 10 min · Shared: courage"},{"slug":"emotional-people","title":"Why people get emotional when you least expect it","dek":"You can tell when you've touched the wrong topic. The reaction arrives before the argument does. That is not a person defending a position. That is a person defending the costume they live in.","meta":"July 2026 · 5 min · Shared: self-deception"}];
+  protected readonly related: WgRelated[] = [{"slug":"knowing-yourself","title":"The side effect of knowing yourself","dek":"The most confident people I have known never seem particularly interested in the question of how they look. That, it turns out, is the trick.","meta":"July 2026 · 5 min · Shared: identity"},{"slug":"slaughterhouse","title":"How we choose the slaughterhouse","dek":"You think you think for yourself. You don't. You follow, repeat, defend, and call the fence your own judgement.","meta":"May 2026 · 5 min · Shared: courage"},{"slug":"babylons-whore","title":"The Whore of Babylon Was Always Us","dek":"I thought religion was a trick for gullible people. Then the old stories started looking less like superstition and more like a report on the crowd, and on me.","meta":"July 2026 · 8 min"}];
   protected readonly prev: WgLink | null = null;
-  protected readonly next: WgLink | null = {"slug":"meant-well","title":"I'm sorry. I meant well."};
-  protected readonly hero: string | null = "/assets/articles/corruption.jpg";
+  protected readonly next: WgLink | null = {"slug":"slaughterhouse","title":"How we choose the slaughterhouse"};
+  protected readonly hero = "/assets/articles/corruption.jpg";
   protected readonly body = inject(DomSanitizer).bypassSecurityTrustHtml(HTML);
 }

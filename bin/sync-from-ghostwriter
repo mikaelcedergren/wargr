@@ -3,8 +3,8 @@
 # ../ghostwriter/wargr, plus a periodic safety poll. The running web service serves dist/browser
 # straight from disk, so a rebuild needs no service restart (and no root).
 #
-# Guard: only rebuild when the PUBLISHED set actually changed — the signature is over the ☑-marked
-# files' names + mtimes + sizes, so editing a draft (no ☑) never triggers a build.
+# Guard: only rebuild when the PUBLISHED set or a canonical article image changed. The signature is
+# over ☑-marked essays and article-images/*.png, so editing a draft never triggers a build.
 set -eu
 export PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin
 
@@ -13,20 +13,27 @@ export PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin
 # signature paths identical to the previous hardcoded form on production.
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$(cd "$REPO/../ghostwriter/wargr" && pwd)"
+IMAGES="$REPO/article-images"
 STAMP="$REPO/.run/ghostwriter.stamp"
 cd "$REPO"
 # .run/ may not exist on a fresh checkout; without it the stamp write below fails after a
 # successful build, and every later poll rebuilds again.
 mkdir -p "$REPO/.run"
 
-sig=$(find "$SRC" -maxdepth 1 -name '☑*.md' -exec stat -f '%N %m %z' {} \; 2>/dev/null | sort | shasum | awk '{print $1}')
+sig=$(
+  {
+    find "$SRC" -maxdepth 1 -name '☑*.md' -exec stat -f '%N %m %z' {} \; 2>/dev/null
+    find "$IMAGES" -maxdepth 1 -name '*.png' -exec stat -f '%N %m %z' {} \; 2>/dev/null
+  } | sort | shasum | awk '{print $1}'
+)
 
 if [[ -f "$STAMP" && "$(cat "$STAMP")" == "$sig" ]]; then
   exit 0   # published set unchanged — nothing to do
 fi
 
 ts() { date -u +%FT%TZ }
-echo "[$(ts)] published set changed — rebuilding wargr.com"
+echo "[$(ts)] published essays or article images changed — rebuilding wargr.com"
+node scripts/prepare-article-images.mjs
 node scripts/import-articles.mjs
 ./node_modules/.bin/ng build --configuration prod
 echo "$sig" > "$STAMP"

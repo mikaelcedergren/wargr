@@ -12,27 +12,19 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
   selector: 'wg-a-mercy-of-death',
   imports: [RouterLink],
   template: `
-    @if (hero) {
-      <header class="wg-hero">
-        <img class="wg-hero__img" [src]="hero" [alt]="imageAlt" fetchpriority="high" />
-        <div class="wg-hero__scrim" aria-hidden="true"></div>
-        <div class="wg-hero__inner wg-container">
-          <a class="wg-back wg-back--hero" routerLink="/">← Essays</a>
-          <div class="wg-hero__head">
-            <h1 class="wg-article__title">{{ title }}</h1>
-            @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
-            <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
-          </div>
+    <header class="wg-hero">
+      <img class="wg-hero__img" [src]="hero" [alt]="imageAlt" fetchpriority="high" />
+      <div class="wg-hero__scrim" aria-hidden="true"></div>
+      <div class="wg-hero__inner wg-container">
+        <a class="wg-back wg-back--hero" routerLink="/">← Essays</a>
+        <div class="wg-hero__head">
+          <h1 class="wg-article__title">{{ title }}</h1>
+          @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
+          <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
         </div>
-      </header>
-    }
-    <article class="wg-container wg-article" [class.wg-article--hero]="!!hero">
-      @if (!hero) {
-        <a class="wg-back" routerLink="/">← Essays</a>
-        <h1 class="wg-article__title">{{ title }}</h1>
-        @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
-        <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
-      }
+      </div>
+    </header>
+    <article class="wg-container wg-article wg-article--hero">
       <div class="wg-prose cx-article" [innerHTML]="body"></div>
       <p class="wg-finis" aria-hidden="true">§</p>
     </article>
@@ -84,9 +76,9 @@ export class ArticleMercyOfDeathComponent {
   protected readonly datetime = "2026-07-09";
   protected readonly metaRest = " · 6 min read · 1282 words";
   protected readonly imageAlt = "The Strange Mercy of Death, an essay by Michael Wargr.";
-  protected readonly related: WgRelated[] = [{"slug":"stop-chasing-purpose","title":"Stop chasing purpose","dek":"The search for purpose is a trap most people walk into willingly. It feels noble, which is how it gets away with stealing years.","meta":"May 2026 · 3 min · Shared: life"},{"slug":"wtf-is-self-love","title":"WTF is self-love?","dek":"Most people are crueller to themselves than they would ever be to the rudest of strangers. They call it standards because cruelty sounds cleaner that way.","meta":"May 2026 · 3 min · Shared: contemplation"},{"slug":"knowing-yourself","title":"The side effect of knowing yourself","dek":"The most confident people I have known never seem particularly interested in the question of how they look. That, it turns out, is the trick.","meta":"July 2026 · 5 min · Shared: acceptance"}];
+  protected readonly related: WgRelated[] = [{"slug":"knowing-yourself","title":"The side effect of knowing yourself","dek":"The most confident people I have known never seem particularly interested in the question of how they look. That, it turns out, is the trick.","meta":"July 2026 · 5 min · Shared: acceptance"},{"slug":"babylons-whore","title":"The Whore of Babylon Was Always Us","dek":"I thought religion was a trick for gullible people. Then the old stories started looking less like superstition and more like a report on the crowd, and on me.","meta":"July 2026 · 8 min"},{"slug":"slaughterhouse","title":"How we choose the slaughterhouse","dek":"You think you think for yourself. You don't. You follow, repeat, defend, and call the fence your own judgement.","meta":"May 2026 · 5 min"}];
   protected readonly prev: WgLink | null = {"slug":"knowing-yourself","title":"The side effect of knowing yourself"};
-  protected readonly next: WgLink | null = {"slug":"raise-others","title":"Raise others to your level"};
-  protected readonly hero: string | null = null;
+  protected readonly next: WgLink | null = null;
+  protected readonly hero = "/assets/articles/mercy-of-death.jpg";
   protected readonly body = inject(DomSanitizer).bypassSecurityTrustHtml(HTML);
 }

@@ -16,10 +16,11 @@
     "node": ">=26 <27"
   },
   "scripts": {
-    "import": "node scripts/import-articles.mjs",
-    "dev": "node scripts/import-articles.mjs && ng serve --configuration local --host 127.0.0.1 --port 4260",
-    "build": "node scripts/import-articles.mjs && ng build --configuration prod",
-    "build:local": "node scripts/import-articles.mjs && ng build --configuration local",
+    "images": "node scripts/prepare-article-images.mjs",
+    "import": "pnpm run images && node scripts/import-articles.mjs",
+    "dev": "pnpm run import && ng serve --configuration local --host 127.0.0.1 --port 4260",
+    "build": "pnpm run import && ng build --configuration prod",
+    "build:local": "pnpm run import && ng build --configuration local",
     "start": "node server/index.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

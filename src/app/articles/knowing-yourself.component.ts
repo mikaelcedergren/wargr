@@ -12,27 +12,19 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
   selector: 'wg-a-knowing-yourself',
   imports: [RouterLink],
   template: `
-    @if (hero) {
-      <header class="wg-hero">
-        <img class="wg-hero__img" [src]="hero" [alt]="imageAlt" fetchpriority="high" />
-        <div class="wg-hero__scrim" aria-hidden="true"></div>
-        <div class="wg-hero__inner wg-container">
-          <a class="wg-back wg-back--hero" routerLink="/">← Essays</a>
-          <div class="wg-hero__head">
-            <h1 class="wg-article__title">{{ title }}</h1>
-            @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
-            <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
-          </div>
+    <header class="wg-hero">
+      <img class="wg-hero__img" [src]="hero" [alt]="imageAlt" fetchpriority="high" />
+      <div class="wg-hero__scrim" aria-hidden="true"></div>
+      <div class="wg-hero__inner wg-container">
+        <a class="wg-back wg-back--hero" routerLink="/">← Essays</a>
+        <div class="wg-hero__head">
+          <h1 class="wg-article__title">{{ title }}</h1>
+          @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
+          <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
         </div>
-      </header>
-    }
-    <article class="wg-container wg-article" [class.wg-article--hero]="!!hero">
-      @if (!hero) {
-        <a class="wg-back" routerLink="/">← Essays</a>
-        <h1 class="wg-article__title">{{ title }}</h1>
-        @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
-        <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
-      }
+      </div>
+    </header>
+    <article class="wg-container wg-article wg-article--hero">
       <div class="wg-prose cx-article" [innerHTML]="body"></div>
       <p class="wg-finis" aria-hidden="true">§</p>
     </article>
@@ -84,9 +76,9 @@ export class ArticleKnowingYourselfComponent {
   protected readonly datetime = "2026-07-09";
   protected readonly metaRest = " · 5 min read · 1014 words";
   protected readonly imageAlt = "The side effect of knowing yourself, an essay by Michael Wargr.";
-  protected readonly related: WgRelated[] = [{"slug":"be-yourself","title":"The real meaning of confidence: being yourself when it costs you","dek":"\"Be yourself\" is useless advice until it names the price: some people only liked the version of you that kept them comfortable.","meta":"July 2026 · 10 min · Shared: authenticity"},{"slug":"wtf-is-self-love","title":"WTF is self-love?","dek":"Most people are crueller to themselves than they would ever be to the rudest of strangers. They call it standards because cruelty sounds cleaner that way.","meta":"May 2026 · 3 min · Shared: presence"},{"slug":"emotional-people","title":"Why people get emotional when you least expect it","dek":"You can tell when you've touched the wrong topic. The reaction arrives before the argument does. That is not a person defending a position. That is a person defending the costume they live in.","meta":"July 2026 · 5 min · Shared: ego"}];
-  protected readonly prev: WgLink | null = {"slug":"fuck-you-nazi-scum","title":"Fuck you, Nazi scum"};
+  protected readonly related: WgRelated[] = [{"slug":"babylons-whore","title":"The Whore of Babylon Was Always Us","dek":"I thought religion was a trick for gullible people. Then the old stories started looking less like superstition and more like a report on the crowd, and on me.","meta":"July 2026 · 8 min · Shared: psychology"},{"slug":"mercy-of-death","title":"The Strange Mercy of Death","dek":"Most people treat death as a distant abstraction. I met it at fifteen, and it never went back to being an idea.","meta":"July 2026 · 6 min · Shared: acceptance"},{"slug":"corruption","title":"How fear turns the good in us into corruption","dek":"Corruption rarely starts with a bad person. It starts with a good one who learns to use goodness as an alibi.","meta":"May 2026 · 4 min · Shared: identity"}];
+  protected readonly prev: WgLink | null = {"slug":"babylons-whore","title":"The Whore of Babylon Was Always Us"};
   protected readonly next: WgLink | null = {"slug":"mercy-of-death","title":"The Strange Mercy of Death"};
-  protected readonly hero: string | null = null;
+  protected readonly hero = "/assets/articles/knowing-yourself.jpg";
   protected readonly body = inject(DomSanitizer).bypassSecurityTrustHtml(HTML);
 }
