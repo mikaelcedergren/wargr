@@ -76,9 +76,9 @@ export class ArticleKnowingYourselfComponent {
   protected readonly datetime = "2026-07-09";
   protected readonly metaRest = " · 5 min read · 1014 words";
   protected readonly imageAlt = "The side effect of knowing yourself, an essay by Michael Wargr.";
-  protected readonly related: WgRelated[] = [{"slug":"babylons-whore","title":"The Whore of Babylon Was Always Us","dek":"I thought religion was a trick for gullible people. Then the old stories started looking less like superstition and more like a report on the crowd, and on me.","meta":"July 2026 · 8 min · Shared: psychology"},{"slug":"mercy-of-death","title":"The Strange Mercy of Death","dek":"Most people treat death as a distant abstraction. I met it at fifteen, and it never went back to being an idea.","meta":"July 2026 · 6 min · Shared: acceptance"},{"slug":"corruption","title":"How fear turns the good in us into corruption","dek":"Corruption rarely starts with a bad person. It starts with a good one who learns to use goodness as an alibi.","meta":"May 2026 · 4 min · Shared: identity"}];
-  protected readonly prev: WgLink | null = {"slug":"babylons-whore","title":"The Whore of Babylon Was Always Us"};
-  protected readonly next: WgLink | null = {"slug":"mercy-of-death","title":"The Strange Mercy of Death"};
+  protected readonly related: WgRelated[] = [{"slug":"babylons-whore","title":"The whore of Babylon was always us","dek":"I thought religion was a trick for gullible people. Then the old stories started looking less like superstition and more like a report on the crowd, and on me.","meta":"July 2026 · 8 min · Shared: psychology"},{"slug":"mercy-of-death","title":"The strange mercy of death","dek":"I was fifteen when death moved out of the distance and into the bed beside me, and it took years before I stopped seeing it as an enemy.","meta":"July 2026 · 13 min · Shared: acceptance"},{"slug":"corruption","title":"How fear turns the good in us into corruption","dek":"Corruption rarely starts with a bad person. It starts with a good one who learns to use goodness as an alibi.","meta":"May 2026 · 4 min · Shared: identity"}];
+  protected readonly prev: WgLink | null = {"slug":"slaughterhouse","title":"How we choose the slaughterhouse"};
+  protected readonly next: WgLink | null = {"slug":"babylons-whore","title":"The whore of Babylon was always us"};
   protected readonly hero = "/assets/articles/knowing-yourself.jpg";
   protected readonly body = inject(DomSanitizer).bypassSecurityTrustHtml(HTML);
 }

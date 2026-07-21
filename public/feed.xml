@@ -6,14 +6,22 @@
     <atom:link href="https://wargr.com/feed.xml" rel="self" type="application/rss+xml" />
     <description>Essays by Michael Wargr on philosophy, ethics, fear, self-deception, conformity, purpose, pain, and human nature.</description>
     <language>en-us</language>
-    <lastBuildDate>Sun, 12 Jul 2026 17:56:17 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 21 Jul 2026 13:55:02 GMT</lastBuildDate>
     <item>
-      <title>The Strange Mercy of Death</title>
+      <title>The strange mercy of death</title>
       <link>https://wargr.com/mercy-of-death/</link>
       <guid isPermaLink="true">https://wargr.com/mercy-of-death/</guid>
       <pubDate>Thu, 09 Jul 2026 12:00:00 GMT</pubDate>
-      <description>Most people treat death as a distant abstraction. I met it at fifteen, and it never went back to being an idea.</description>
+      <description>I was fifteen when death moved out of the distance and into the bed beside me, and it took years before I stopped seeing it as an enemy.</description>
       <category>death</category><category>mortality</category><category>acceptance</category><category>cancer</category><category>philosophy</category><category>memoir</category><category>fear</category><category>peace</category><category>existential</category><category>life</category><category>illness</category><category>family</category><category>loss</category><category>contemplation</category><category>grief</category>
+    </item>
+    <item>
+      <title>The whore of Babylon was always us</title>
+      <link>https://wargr.com/babylons-whore/</link>
+      <guid isPermaLink="true">https://wargr.com/babylons-whore/</guid>
+      <pubDate>Thu, 09 Jul 2026 12:00:00 GMT</pubDate>
+      <description>I thought religion was a trick for gullible people. Then the old stories started looking less like superstition and more like a report on the crowd, and on me.</description>
+      <category>religion</category><category>whore of babylon</category><category>babylon</category><category>demons</category><category>conformity</category><category>belonging</category><category>human nature</category><category>psychology</category><category>groupthink</category><category>truth</category><category>belief</category><category>propaganda</category><category>authority</category><category>dissent</category><category>scepticism</category><category>revelation</category><category>crowd psychology</category>
     </item>
     <item>
       <title>The side effect of knowing yourself</title>
@@ -22,14 +30,6 @@
       <pubDate>Thu, 09 Jul 2026 12:00:00 GMT</pubDate>
       <description>The most confident people I have known never seem particularly interested in the question of how they look. That, it turns out, is the trick.</description>
       <category>self-knowledge</category><category>confidence</category><category>identity</category><category>self-image</category><category>authenticity</category><category>philosophy</category><category>psychology</category><category>projection</category><category>acceptance</category><category>human nature</category><category>ego</category><category>critique</category><category>freedom</category><category>observation</category><category>presence</category>
-    </item>
-    <item>
-      <title>The Whore of Babylon Was Always Us</title>
-      <link>https://wargr.com/babylons-whore/</link>
-      <guid isPermaLink="true">https://wargr.com/babylons-whore/</guid>
-      <pubDate>Thu, 09 Jul 2026 12:00:00 GMT</pubDate>
-      <description>I thought religion was a trick for gullible people. Then the old stories started looking less like superstition and more like a report on the crowd, and on me.</description>
-      <category>religion</category><category>whore of babylon</category><category>babylon</category><category>demons</category><category>conformity</category><category>belonging</category><category>human nature</category><category>psychology</category><category>groupthink</category><category>truth</category><category>belief</category><category>propaganda</category><category>authority</category><category>dissent</category><category>scepticism</category><category>revelation</category><category>crowd psychology</category>
     </item>
     <item>
       <title>How we choose the slaughterhouse</title>

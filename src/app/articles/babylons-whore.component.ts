@@ -70,15 +70,15 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ArticleBabylonsWhoreComponent {
-  protected readonly title = "The Whore of Babylon Was Always Us";
+  protected readonly title = "The whore of Babylon was always us";
   protected readonly dek = "I thought religion was a trick for gullible people. Then the old stories started looking less like superstition and more like a report on the crowd, and on me.";
   protected readonly date = "July 9, 2026";
   protected readonly datetime = "2026-07-09";
   protected readonly metaRest = " · 8 min read · 1677 words";
-  protected readonly imageAlt = "The Whore of Babylon Was Always Us, an essay by Michael Wargr.";
-  protected readonly related: WgRelated[] = [{"slug":"slaughterhouse","title":"How we choose the slaughterhouse","dek":"You think you think for yourself. You don't. You follow, repeat, defend, and call the fence your own judgement.","meta":"May 2026 · 5 min · Shared: conformity"},{"slug":"knowing-yourself","title":"The side effect of knowing yourself","dek":"The most confident people I have known never seem particularly interested in the question of how they look. That, it turns out, is the trick.","meta":"July 2026 · 5 min · Shared: psychology"},{"slug":"mercy-of-death","title":"The Strange Mercy of Death","dek":"Most people treat death as a distant abstraction. I met it at fifteen, and it never went back to being an idea.","meta":"July 2026 · 6 min"}];
-  protected readonly prev: WgLink | null = {"slug":"slaughterhouse","title":"How we choose the slaughterhouse"};
-  protected readonly next: WgLink | null = {"slug":"knowing-yourself","title":"The side effect of knowing yourself"};
+  protected readonly imageAlt = "The whore of Babylon was always us, an essay by Michael Wargr.";
+  protected readonly related: WgRelated[] = [{"slug":"slaughterhouse","title":"How we choose the slaughterhouse","dek":"You think you think for yourself. You don't. You follow, repeat, defend, and call the fence your own judgement.","meta":"May 2026 · 5 min · Shared: conformity"},{"slug":"knowing-yourself","title":"The side effect of knowing yourself","dek":"The most confident people I have known never seem particularly interested in the question of how they look. That, it turns out, is the trick.","meta":"July 2026 · 5 min · Shared: psychology"},{"slug":"mercy-of-death","title":"The strange mercy of death","dek":"I was fifteen when death moved out of the distance and into the bed beside me, and it took years before I stopped seeing it as an enemy.","meta":"July 2026 · 13 min"}];
+  protected readonly prev: WgLink | null = {"slug":"knowing-yourself","title":"The side effect of knowing yourself"};
+  protected readonly next: WgLink | null = {"slug":"mercy-of-death","title":"The strange mercy of death"};
   protected readonly hero = "/assets/articles/babylons-whore.jpg";
   protected readonly body = inject(DomSanitizer).bypassSecurityTrustHtml(HTML);
 }
