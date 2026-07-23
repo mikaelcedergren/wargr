@@ -498,22 +498,6 @@ a:active {
   font-size: var(--font-size-body-sm);
   color: var(--opacity-high);
 }
-.wg-theme {
-  appearance: none;
-  background: none;
-  border: 0;
-  padding: var(--space-2xs) var(--space-xs);
-  font-size: var(--font-size-body-lg);
-  line-height: var(--line-height-small);
-  color: inherit;
-  cursor: pointer;
-  border-radius: var(--radius-pill);
-  transition: color var(--motion-fast) var(--ease-out);
-}
-.wg-theme:hover {
-  color: var(--ink);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .wg-entry__title-text,
   .wg-back,
