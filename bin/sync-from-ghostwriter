@@ -1,7 +1,7 @@
 #!/bin/zsh
 # Rebuild wargr.com from the ghostwriter essays. Triggered by launchd (com.wargr.sync) on changes to
-# ../ghostwriter/wargr, plus a periodic safety poll. The running web service serves dist/browser
-# straight from disk, so a rebuild needs no service restart (and no root).
+# ../ghostwriter/wargr, plus a periodic safety poll. The shared release command builds away from
+# the live output and atomically activates the completed release without a service restart.
 #
 # Guard: only rebuild when the PUBLISHED set or a canonical article image changed. The signature is
 # over ☑-marked essays and article-images/*.png, so editing a draft never triggers a build.
@@ -33,8 +33,6 @@ fi
 
 ts() { date -u +%FT%TZ }
 echo "[$(ts)] published essays or article images changed — rebuilding wargr.com"
-node scripts/prepare-article-images.mjs
-node scripts/import-articles.mjs
-./node_modules/.bin/ng build --configuration prod
+node "$REPO/../server-ops/bin/site-release.mjs" --site wargr --apply
 echo "$sig" > "$STAMP"
-echo "[$(ts)] wargr.com rebuilt (server serves the updated dist/browser live)"
+echo "[$(ts)] wargr.com release built and activated"

@@ -1,11 +1,14 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { ChangeDetectionStrategy, Component, PLATFORM_ID, inject, signal } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
-import { CxIconButtonComponent } from '@mikaelcedergren/cx-framework';
+import {
+  CxIconButtonComponent,
+  CxNavigationRecoveryComponent,
+} from '@mikaelcedergren/cx-framework';
 
 @Component({
   selector: 'wg-root',
-  imports: [RouterOutlet, RouterLink, CxIconButtonComponent],
+  imports: [RouterOutlet, RouterLink, CxIconButtonComponent, CxNavigationRecoveryComponent],
   templateUrl: './app.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

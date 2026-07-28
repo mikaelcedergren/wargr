@@ -7,6 +7,7 @@
 // Light is the default; the whole palette is token-derived so theme-night works for free.
 @use '@mikaelcedergren/cx-framework/tokens';
 @use '@mikaelcedergren/cx-framework/tokens/breakpoints' as bp;
+@use '@mikaelcedergren/cx-framework/styles/fonts';
 @use '@mikaelcedergren/cx-framework/styles/base';
 @use '@mikaelcedergren/cx-framework/styles/article';
 
@@ -290,11 +291,7 @@ a:active {
   // Darken the top (for the back-link) and, more heavily, the bottom (where the title sits). Both
   // ramps fade the framework darken token toward transparent — the percentages are the gradient shape.
   background:
-    linear-gradient(
-      to bottom,
-      var(--overlay-backdrop) 0%,
-      transparent 24%
-    ),
+    linear-gradient(to bottom, var(--overlay-backdrop) 0%, transparent 24%),
     linear-gradient(
       to top,
       var(--overlay-backdrop) 0%,
