@@ -7,6 +7,7 @@ import { RouterLink } from '@angular/router';
   imports: [RouterLink],
   template: `
     <section class="wg-container wg-feed">
+      <h1 class="wg-sr-only">Wargr — essays by Michael Wargr</h1>
       @for (a of articles; track a.slug; let first = $first) {
         <a class="wg-entry" [class.wg-entry--lead]="first" [routerLink]="['/', a.slug]" [attr.aria-label]="'Read ' + a.title">
           <span class="wg-entry__media">

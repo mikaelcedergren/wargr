@@ -2,7 +2,7 @@
 
 <div class="wg-shell">
   <header class="wg-masthead">
-    <h1 class="wg-masthead__title">
+    <div class="wg-masthead__mark">
       <a routerLink="/" class="wg-logo">
         <img
           class="wg-logo__img wg-logo__img--light"
@@ -20,11 +20,13 @@
         />
         <span class="wg-sr-only">Wargr — essays by Michael Wargr</span>
       </a>
-    </h1>
+    </div>
     <p class="wg-masthead__byline">MICHAEL WARGR</p>
   </header>
 
-  <router-outlet />
+  <main class="wg-main">
+    <router-outlet />
+  </main>
 
   <footer class="wg-footer">
     <cx-icon-button

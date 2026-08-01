@@ -77,9 +77,9 @@ a:active {
   flex-direction: column;
   min-height: 100dvh;
 }
-// The routed page component (a custom element) sits between the masthead and footer; make it a
+// The routed page component is inserted as a custom element inside the main landmark; make it a
 // full-width block so the article page's full-bleed "what's next" band can span the viewport.
-.wg-shell > :not(.wg-masthead):not(.wg-footer):not(router-outlet) {
+.wg-main > :not(router-outlet) {
   display: block;
 }
 .wg-container {
@@ -106,7 +106,7 @@ a:active {
   padding: var(--space-xl) var(--space-lg) var(--space-lg);
   border-bottom: var(--line);
 }
-.wg-masthead__title {
+.wg-masthead__mark {
   margin: 0;
   line-height: 0; // the mark is an image; kill inline-box leading so it centres cleanly
 }
