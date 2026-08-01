@@ -10,6 +10,7 @@
 @use '@mikaelcedergren/cx-framework/styles/fonts';
 @use '@mikaelcedergren/cx-framework/styles/base';
 @use '@mikaelcedergren/cx-framework/styles/article';
+@use '@mikaelcedergren/cx-framework/styles/utilities';
 
 :root {
   color-scheme: light;
@@ -185,8 +186,10 @@ a:active {
 .wg-entry__title {
   margin: 0 0 var(--space-xs);
   font-family: var(--font-family-fancy);
-  font-size: var(--font-size-title-2);
   font-weight: var(--font-weight-bold);
+}
+.wg-entry:not(.wg-entry--lead) .wg-entry__title {
+  font-size: var(--font-size-title-2);
   line-height: var(--line-height-heading);
 }
 .wg-entry__title-text {
@@ -219,9 +222,7 @@ a:active {
   margin-bottom: var(--space-md);
 }
 .wg-entry--lead .wg-entry__title {
-  margin-top: 0;
-  font-size: var(--font-size-title-1);
-  line-height: var(--line-height-heading);
+  margin: 0 0 var(--space-xs);
 }
 .wg-entry--lead .wg-entry__dek {
   font-family: var(--font-family-fancy);
@@ -253,7 +254,6 @@ a:active {
 .wg-article__dek {
   margin: 0 0 var(--space-md);
   font-family: var(--font-family-fancy);
-  font-style: italic;
   font-size: var(--font-size-title-2);
   line-height: var(--line-height-body);
   color: var(--opacity-high);

@@ -18,7 +18,9 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
       <div class="wg-hero__inner wg-container">
         <a class="wg-back wg-back--hero" routerLink="/">← Essays</a>
         <div class="wg-hero__head">
-          <h1 class="wg-article__title">{{ title }}</h1>
+          <div class="wg-hero__title-type cx-article cx-article--lg cx-article--start">
+            <h1 class="wg-article__title">{{ title }}</h1>
+          </div>
           @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
           <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
         </div>

@@ -523,7 +523,9 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
       <div class="wg-hero__inner wg-container">
         <a class="wg-back wg-back--hero" routerLink="/">← Essays</a>
         <div class="wg-hero__head">
-          <h1 class="wg-article__title">{{ title }}</h1>
+          <div class="wg-hero__title-type cx-article cx-article--lg cx-article--start">
+            <h1 class="wg-article__title">{{ title }}</h1>
+          </div>
           @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
           <p class="wg-article__meta wg-meta"><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
         </div>
@@ -625,7 +627,7 @@ import { RouterLink } from '@angular/router';
             />
           </span>
           <div class="wg-entry__body">
-            <h2 class="wg-entry__title"><span class="wg-entry__title-text">{{ a.title }}</span></h2>
+            <h2 class="wg-entry__title" [class.cx-text-display]="first"><span class="wg-entry__title-text">{{ a.title }}</span></h2>
             @if (a.dek) { <p class="wg-entry__dek">{{ a.dek }}</p> }
             <p class="wg-meta wg-entry__meta"><time [attr.datetime]="a.monthDatetime">{{ a.monthYear }}</time>{{ a.metaRest }}</p>
           </div>

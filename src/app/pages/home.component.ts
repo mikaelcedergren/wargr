@@ -19,7 +19,7 @@ import { RouterLink } from '@angular/router';
             />
           </span>
           <div class="wg-entry__body">
-            <h2 class="wg-entry__title"><span class="wg-entry__title-text">{{ a.title }}</span></h2>
+            <h2 class="wg-entry__title" [class.cx-text-display]="first"><span class="wg-entry__title-text">{{ a.title }}</span></h2>
             @if (a.dek) { <p class="wg-entry__dek">{{ a.dek }}</p> }
             <p class="wg-meta wg-entry__meta"><time [attr.datetime]="a.monthDatetime">{{ a.monthYear }}</time>{{ a.metaRest }}</p>
           </div>
