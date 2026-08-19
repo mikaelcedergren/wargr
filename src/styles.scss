@@ -1,5 +1,5 @@
 // wargr.com global styles — "The Quiet Press": a de-chromed editorial reading space built entirely on
-// cx-framework tokens. The framework's display serif (--font-family-fancy) carries the voice (titles,
+// cx-framework tokens. The framework's display serif (--font-family-heading) carries the voice (titles,
 // deks, pull-quotes); Inter reads the body; Roboto Mono marks the facts (meta, folios). The
 // article body itself is the framework's own `.cx-article` editorial type — this layer only adds the
 // site's structural patterns (masthead, feed, hero, pull-quote, what's-next) around it, and every
@@ -185,7 +185,7 @@ a:active {
 }
 .wg-entry__title {
   margin: 0 0 var(--space-xs);
-  font-family: var(--font-family-fancy);
+  font-family: var(--font-family-heading);
   font-weight: var(--font-weight-bold);
 }
 .wg-entry:not(.wg-entry--lead) .wg-entry__title {
@@ -225,7 +225,7 @@ a:active {
   margin: 0 0 var(--space-xs);
 }
 .wg-entry--lead .wg-entry__dek {
-  font-family: var(--font-family-fancy);
+  font-family: var(--font-family-heading);
   font-style: italic;
   font-size: var(--font-size-title-2);
   line-height: var(--line-height-body);
@@ -246,14 +246,14 @@ a:active {
 }
 .wg-article__title {
   margin: 0 0 var(--space-md);
-  font-family: var(--font-family-fancy);
+  font-family: var(--font-family-heading);
   font-size: var(--font-size-title-1);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-heading);
 }
 .wg-article__dek {
   margin: 0 0 var(--space-md);
-  font-family: var(--font-family-fancy);
+  font-family: var(--font-family-heading);
   font-size: var(--font-size-title-2);
   line-height: var(--line-height-body);
   color: var(--opacity-high);
@@ -356,7 +356,7 @@ a:active {
 }
 .wg-pullquote__hook {
   margin: 0;
-  font-family: var(--font-family-fancy);
+  font-family: var(--font-family-heading);
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-title-1);
   line-height: var(--line-height-heading);
@@ -417,7 +417,7 @@ a:active {
 }
 .wg-related__title {
   display: inline;
-  font-family: var(--font-family-fancy);
+  font-family: var(--font-family-heading);
   font-weight: var(--font-weight-bold);
   font-size: var(--font-size-title-2);
   line-height: var(--line-height-heading);
@@ -468,7 +468,7 @@ a:active {
   color: var(--opacity-high);
 }
 .wg-flip__title {
-  font-family: var(--font-family-fancy);
+  font-family: var(--font-family-heading);
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-body-lg);
   line-height: var(--line-height-body);
