@@ -1,0 +1,26 @@
+#!/bin/zsh
+# Manual generated-snapshot entrypoint. It shares the scheduled publisher's kernel lock so a local
+# regeneration and a WatchPaths invocation can never mutate the tracked snapshot concurrently.
+set -eu
+umask 077
+
+NODE=/opt/homebrew/bin/node
+REPO="$(cd "$(dirname "$0")/.." && pwd)"
+RUN_ROOT="$REPO/.run"
+LOCK="$RUN_ROOT/ghostwriter-sync.lock"
+
+if [[ ! -e "$RUN_ROOT" ]]; then
+  /bin/mkdir -m 700 "$RUN_ROOT"
+elif [[ ! -d "$RUN_ROOT" || -L "$RUN_ROOT" ]]; then
+  echo "Wargr runtime root is unsafe: $RUN_ROOT" >&2
+  exit 70
+fi
+
+exec 9>"$LOCK"
+if ! /usr/bin/lockf -s -t 0 9; then
+  echo "ghostwriter synchronization is already locked: $LOCK" >&2
+  exit 75
+fi
+
+cd "$REPO"
+exec "$NODE" "$REPO/scripts/generated-content-transaction.mjs" generate

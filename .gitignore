@@ -154,6 +154,11 @@ vendor/bundle/
 out-tsc/
 *.tsbuildinfo
 
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+
 # launchd service logs/runtime state
 .run/
 

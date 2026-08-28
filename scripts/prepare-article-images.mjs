@@ -3,14 +3,28 @@
 // Every published essay must have article-images/<slug>.png; a missing or undersized master is a
 // publishing error, not an optional presentation state.
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readdirSync, renameSync, rmSync, statSync } from 'node:fs';
+import { existsSync, mkdirSync, renameSync, rmSync, statSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { preflightPublishedEssayInventory } from './article-slugs.mjs';
 
-const REPO = resolve(fileURLToPath(new URL('.', import.meta.url)), '..');
-const GHOSTWRITER_DIR = resolve(REPO, '..', 'ghostwriter', 'wargr');
+const TOOL_REPO = resolve(fileURLToPath(new URL('.', import.meta.url)), '..');
+const REPO = resolve(process.env.WARGR_REPO_ROOT ?? TOOL_REPO);
+const GHOSTWRITER_DIR = resolve(
+  process.env.WARGR_GHOSTWRITER_ROOT ?? resolve(REPO, '..', 'ghostwriter'),
+  'wargr',
+);
 const MASTER_DIR = join(REPO, 'article-images');
-const OUTPUT_DIR = join(REPO, 'public', 'assets', 'articles');
+if (!process.env.WARGR_GENERATED_OUTPUT_ROOT) {
+  throw new Error(
+    'prepare-article-images.mjs is a staging-only generator; use the generated-content transaction.',
+  );
+}
+const OUTPUT_ROOT = resolve(process.env.WARGR_GENERATED_OUTPUT_ROOT);
+if (OUTPUT_ROOT === REPO) {
+  throw new Error('Article-image staging output must not be the mutable Wargr checkout root.');
+}
+const OUTPUT_DIR = join(OUTPUT_ROOT, 'public', 'assets', 'articles');
 const SIPS = '/usr/bin/sips';
 
 const HERO = { suffix: '', ratioWidth: 16, ratioHeight: 9, maxWidth: 1920, quality: 82 };
@@ -22,16 +36,6 @@ const SOCIAL = {
   height: 630,
   quality: 86,
 };
-
-function slugify(filename) {
-  return filename
-    .normalize('NFKD')
-    .replace(/[☀-➿️]/g, '')
-    .toLowerCase()
-    .replace(/\.md$/, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
 
 function dimensions(path) {
   const output = execFileSync(SIPS, ['-g', 'pixelWidth', '-g', 'pixelHeight', path], {
@@ -113,34 +117,22 @@ function render(master, slug, specification) {
   }
 }
 
-if (!existsSync(GHOSTWRITER_DIR)) {
+if (!existsSync(GHOSTWRITER_DIR))
   throw new Error(`Ghostwriter source not found: ${GHOSTWRITER_DIR}`);
-}
+
+// Slug identity and the complete essay/master inventory are proved before the first directory
+// creation, stale-output deletion, or image render. Import and route generation consume this same
+// authority, so two filenames can never silently address one deployed URL or image pair.
+const inventory = preflightPublishedEssayInventory({
+  essaysRoot: GHOSTWRITER_DIR,
+  imagesRoot: MASTER_DIR,
+});
 if (!existsSync(SIPS)) throw new Error(`Required macOS image tool not found: ${SIPS}`);
 
-const slugs = readdirSync(GHOSTWRITER_DIR)
-  .filter((name) => name.endsWith('.md') && name.trimStart().startsWith('☑'))
-  .map(slugify)
-  .sort();
-
-const missing = slugs.filter((slug) => !existsSync(join(MASTER_DIR, `${slug}.png`)));
-if (missing.length) {
-  throw new Error(
-    `Published essays are missing canonical image masters:\n${missing.map((slug) => `  - article-images/${slug}.png`).join('\n')}`,
-  );
-}
-
 mkdirSync(OUTPUT_DIR, { recursive: true });
-const expected = new Set(slugs.flatMap((slug) => [`${slug}.jpg`, `${slug}-og.jpg`]));
-for (const filename of readdirSync(OUTPUT_DIR)) {
-  if (/\.jpe?g$/i.test(filename) && !expected.has(filename)) {
-    rmSync(join(OUTPUT_DIR, filename));
-  }
-}
 
-console.log(`[images] preparing ${slugs.length} published essay images`);
-for (const slug of slugs) {
-  const master = join(MASTER_DIR, `${slug}.png`);
+console.log(`[images] preparing ${inventory.length} published essay images`);
+for (const { slug, masterPath: master } of inventory) {
   const hero = render(master, slug, HERO);
   const social = render(master, slug, SOCIAL);
   console.log(

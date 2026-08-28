@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "exactPaths": [
+    "public/feed.xml",
+    "public/robots.txt",
+    "public/sitemap.xml",
+    "src/app/app.routes.ts",
+    "src/app/pages/home.component.ts",
+    "src/app/pages/not-found.component.ts"
+  ],
+  "pathPatterns": [
+    "^public/assets/articles/[a-z0-9]+(?:-[a-z0-9]+)*(?:-og)?\\.jpg$",
+    "^src/app/articles/[a-z0-9]+(?:-[a-z0-9]+)*\\.component\\.ts$"
+  ]
+}

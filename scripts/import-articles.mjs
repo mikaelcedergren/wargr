@@ -35,11 +35,22 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { marked } from 'marked';
 import sanitizeHtml from 'sanitize-html';
+import { preflightPublishedEssayInventory } from './article-slugs.mjs';
 
-const REPO = resolve(fileURLToPath(new URL('.', import.meta.url)), '..');
-const GHOST = resolve(REPO, '..', 'ghostwriter');
+const TOOL_REPO = resolve(fileURLToPath(new URL('.', import.meta.url)), '..');
+const REPO = resolve(process.env.WARGR_REPO_ROOT ?? TOOL_REPO);
+if (!process.env.WARGR_GENERATED_OUTPUT_ROOT) {
+  throw new Error(
+    'import-articles.mjs is a staging-only generator; use the generated-content transaction.',
+  );
+}
+const OUTPUT_ROOT = resolve(process.env.WARGR_GENERATED_OUTPUT_ROOT);
+if (OUTPUT_ROOT === REPO) {
+  throw new Error('Article import staging output must not be the mutable Wargr checkout root.');
+}
+const GHOST = resolve(process.env.WARGR_GHOSTWRITER_ROOT ?? resolve(REPO, '..', 'ghostwriter'));
 const SRC = join(GHOST, 'wargr');
-const APP = join(REPO, 'src', 'app');
+const APP = join(OUTPUT_ROOT, 'src', 'app');
 const ARTICLES_DIR = join(APP, 'articles');
 const PAGES_DIR = join(APP, 'pages');
 const SITE_ORIGIN = 'https://wargr.com';
@@ -188,7 +199,7 @@ const SEO_BY_SLUG = {
 //   <slug>.jpg     -> full-bleed hero photo behind the article header
 //   <slug>-og.jpg  -> 1200x630 social card for that essay
 // Source masters (full-res, pre-optimisation) live in article-images and are NOT deployed.
-const ARTICLE_IMG_DIR = join(REPO, 'public', 'assets', 'articles');
+const ARTICLE_IMG_DIR = join(OUTPUT_ROOT, 'public', 'assets', 'articles');
 const articleImages = existsSync(ARTICLE_IMG_DIR) ? readdirSync(ARTICLE_IMG_DIR) : [];
 function requireArticleImage(slug, suffix = '') {
   const filename = `${slug}${suffix}.jpg`;
@@ -240,15 +251,6 @@ const SANITIZE_OPTIONS = {
   textFilter: (text) => text.replace(/"/g, '&quot;').replace(/'/g, '&#39;'),
 };
 
-function slugify(name) {
-  return name
-    .normalize('NFKD')
-    .replace(/[☀-➿️]/g, '') // strip the ☑ and any symbols
-    .toLowerCase()
-    .replace(/\.md$/, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
 function pascal(slug) {
   return slug
     .split('-')
@@ -375,9 +377,8 @@ function parsePullQuotes(trailing) {
     .map((it) => ({ hook: it.hook, elab: it.rest.join('\n').trim() }));
 }
 
-function parse(filename) {
+function parse(filename, slug) {
   const raw = readFileSync(join(SRC, filename), 'utf8').replace(/\r\n/g, '\n');
-  const slug = slugify(filename);
   const titleMatch = raw.match(/^#\s+(.+?)\s*$/m);
   const topicMatch = raw.match(/^##\s+Topic:\s*(.+?)\s*$/m);
   const publishedMatch = raw.match(/^##\s+Published:\s*(.+?)\s*$/m);
@@ -752,8 +753,8 @@ ${items}
   </channel>
 </rss>
 `;
-  mkdirSync(join(REPO, 'public'), { recursive: true });
-  writeFileSync(join(REPO, 'public', 'feed.xml'), xml);
+  mkdirSync(join(OUTPUT_ROOT, 'public'), { recursive: true });
+  writeFileSync(join(OUTPUT_ROOT, 'public', 'feed.xml'), xml);
 }
 
 function writeSitemapAndRobots(articles) {
@@ -796,10 +797,10 @@ function writeSitemapAndRobots(articles) {
     })
     .join('\n');
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n${body}\n</urlset>\n`;
-  mkdirSync(join(REPO, 'public'), { recursive: true });
-  writeFileSync(join(REPO, 'public', 'sitemap.xml'), sitemap);
+  mkdirSync(join(OUTPUT_ROOT, 'public'), { recursive: true });
+  writeFileSync(join(OUTPUT_ROOT, 'public', 'sitemap.xml'), sitemap);
   writeFileSync(
-    join(REPO, 'public', 'robots.txt'),
+    join(OUTPUT_ROOT, 'public', 'robots.txt'),
     `User-agent: *\nAllow: /\nSitemap: ${SITE_ORIGIN}/sitemap.xml\n`,
   );
 }
@@ -809,9 +810,15 @@ if (!existsSync(SRC)) {
   console.error(`[import] ghostwriter source not found: ${SRC}`);
   process.exit(1);
 }
-const published = readdirSync(SRC)
-  .filter((f) => f.endsWith('.md') && f.trimStart().startsWith('☑'))
-  .map(parse)
+// Re-prove the same complete slug/master inventory used by image preparation before parsing or
+// writing. Routes, components, image names, feeds, and canonical URLs therefore share one exact
+// non-empty and collision-free identity set.
+const inventory = preflightPublishedEssayInventory({
+  essaysRoot: SRC,
+  imagesRoot: join(REPO, 'article-images'),
+});
+const published = inventory
+  .map(({ filename, slug }) => parse(filename, slug))
   // Newest first by publish date; ties break by modified date, then slug, so the
   // feed/prev/next order is identical on every machine.
   .sort(

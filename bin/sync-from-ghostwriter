@@ -3,36 +3,38 @@
 # ../ghostwriter/wargr, plus a periodic safety poll. The shared release command builds away from
 # the live output and atomically activates the completed release without a service restart.
 #
-# Guard: only rebuild when the PUBLISHED set or a canonical article image changed. The signature is
-# over ☑-marked essays and article-images/*.png, so editing a draft never triggers a build.
+# Guard: only rebuild when the published input closure changes. The content digest covers ☑ essays,
+# their exact relevant Git history, and canonical article-image bytes; draft-only edits remain out.
+# This entrypoint owns only root selection and the persistent command-form kernel lock. The locked
+# worker owns the complete recover/generate/prove/commit/release transaction.
 set -eu
+umask 077
 export PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin
 
-# Resolve the repo from this script's own location and ghostwriter as its sibling, so the same
-# script works on the production Mac mini and on a development mirror. cd-normalising keeps the
-# signature paths identical to the previous hardcoded form on production.
-REPO="$(cd "$(dirname "$0")/.." && pwd)"
-SRC="$(cd "$REPO/../ghostwriter/wargr" && pwd)"
-IMAGES="$REPO/article-images"
-STAMP="$REPO/.run/ghostwriter.stamp"
+# The immutable scheduled release sets all three roots explicitly. A deliberate manual checkout
+# invocation retains the same sibling discovery without making the scheduled job trust mutable
+# tool bytes from either Wargr or server-ops.
+TOOL_REPO="${WARGR_PUBLISHER_TOOL_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
+REPO="${WARGR_REPO_ROOT:-$TOOL_REPO}"
+GHOSTWRITER_ROOT="${WARGR_GHOSTWRITER_ROOT:-$(cd "$REPO/../ghostwriter" && pwd)}"
+OPS_TOOL_ROOT="${WARGR_SERVER_OPS_TOOL_ROOT:-$(cd "$REPO/../server-ops" && pwd)}"
+export WARGR_PUBLISHER_TOOL_ROOT="$TOOL_REPO"
+export WARGR_REPO_ROOT="$REPO"
+export WARGR_GHOSTWRITER_ROOT="$GHOSTWRITER_ROOT"
+export WARGR_SERVER_OPS_TOOL_ROOT="$OPS_TOOL_ROOT"
+LOCK="$REPO/.run/ghostwriter-sync.lock"
+LOCKED_TRANSACTION="$TOOL_REPO/bin/sync-from-ghostwriter-transaction"
 cd "$REPO"
 # .run/ may not exist on a fresh checkout; without it the stamp write below fails after a
 # successful build, and every later poll rebuilds again.
-mkdir -p "$REPO/.run"
-
-sig=$(
-  {
-    find "$SRC" -maxdepth 1 -name '☑*.md' -exec stat -f '%N %m %z' {} \; 2>/dev/null
-    find "$IMAGES" -maxdepth 1 -name '*.png' -exec stat -f '%N %m %z' {} \; 2>/dev/null
-  } | sort | shasum | awk '{print $1}'
-)
-
-if [[ -f "$STAMP" && "$(cat "$STAMP")" == "$sig" ]]; then
-  exit 0   # published set unchanged — nothing to do
+if [[ ! -e "$REPO/.run" ]]; then
+  mkdir -m 700 "$REPO/.run"
+elif [[ ! -d "$REPO/.run" || -L "$REPO/.run" ]]; then
+  echo "Wargr runtime root is unsafe: $REPO/.run" >&2
+  exit 70
 fi
 
-ts() { date -u +%FT%TZ }
-echo "[$(ts)] published essays or article images changed — rebuilding wargr.com"
-node "$REPO/../server-ops/bin/site-release.mjs" --site wargr --apply
-echo "$sig" > "$STAMP"
-echo "[$(ts)] wargr.com release built and activated"
+# launchd serialises a job's own invocations, but this kernel-owned lock also makes manual and
+# scheduled runs mutually exclusive. Command form keeps lockf alive around the complete worker; -k
+# preserves one inode forever, and the kernel drops the lock after a whole-process crash.
+exec /usr/bin/lockf -t 0 -k "$LOCK" /bin/zsh "$LOCKED_TRANSACTION"

@@ -12,14 +12,26 @@
 
     <key>ProgramArguments</key>
     <array>
-      <string>/Users/cortex/Development/wargr/bin/sync-from-ghostwriter</string>
+      <string>__NODE_BINARY__</string>
+      <string>__WARGR_PUBLISHER_RELEASE__/server-ops/bin/scheduled-publisher-launcher.mjs</string>
+      <string>--digest</string>
+      <string>__WARGR_PUBLISHER_DIGEST__</string>
     </array>
+
+    <key>WorkingDirectory</key>
+    <string>__WARGR_WORKING_ROOT__</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+      <key>HOME</key><string>/Users/cortex</string>
+      <key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+      <key>CX_DEVELOPMENT_ROOT</key><string>__CX_DEVELOPMENT_ROOT__</string>
+    </dict>
 
     <!-- Fire instantly when essays or canonical article images change… -->
     <key>WatchPaths</key>
     <array>
-      <string>/Users/cortex/Development/ghostwriter/wargr</string>
-      <string>/Users/cortex/Development/wargr/article-images</string>
+      <string>__WARGR_WATCH_ESSAYS__</string>
+      <string>__WARGR_WATCH_IMAGES__</string>
     </array>
     <!-- …and poll hourly as a safety net for in-place edits. The signature guard makes a
          no-change run a cheap no-op; only ☑ essays and canonical PNG masters affect it. -->
@@ -37,9 +49,14 @@
     <key>LowPriorityIO</key>
     <true/>
 
+    <key>SoftResourceLimits</key>
+    <dict><key>NumberOfFiles</key><integer>8192</integer></dict>
+    <key>HardResourceLimits</key>
+    <dict><key>NumberOfFiles</key><integer>16384</integer></dict>
+
     <key>StandardOutPath</key>
-    <string>/Users/cortex/Development/wargr/.run/sync.out.log</string>
+    <string>__WARGR_SYNC_STDOUT__</string>
     <key>StandardErrorPath</key>
-    <string>/Users/cortex/Development/wargr/.run/sync.err.log</string>
+    <string>__WARGR_SYNC_STDERR__</string>
   </dict>
 </plist>

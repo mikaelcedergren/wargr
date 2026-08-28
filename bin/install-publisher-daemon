@@ -1,0 +1,16 @@
+#!/bin/zsh
+set -eu
+
+export PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin
+
+REPO="$(cd "$(dirname "$0")/.." && pwd)"
+OPS_ROOT="$(cd "$REPO/../server-ops" && pwd)"
+MODE="${1:---check}"
+if [[ "$#" -gt 1 || ( "$MODE" != "--check" && "$MODE" != "--apply" ) ]]; then
+  echo "Usage: $0 [--check|--apply]" >&2
+  exit 64
+fi
+
+exec /opt/homebrew/bin/node "$OPS_ROOT/bin/install-scheduled-publisher.mjs" \
+  --publisher wargr \
+  "$MODE"
