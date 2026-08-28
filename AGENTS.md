@@ -43,9 +43,7 @@ compiled to JavaScript — no SSR, TypeScript runner, or sibling runtime import 
 `cx-product.json` owns the manifest-derived application identity. The compiled entrypoint pins that
 manifest from the sealed artifact through `import.meta.url`; `process.cwd()` remains the separate
 operational browser-release root. cx-framework also provides the design language (tokens, colours,
-type, spacing); `src/styles.scss` adds a long-form reading layer on top. This describes the target
-artifact; the exact selected legacy wrapper retained below remains the runtime until authorised
-cutover.
+type, spacing); `src/styles.scss` adds a long-form reading layer on top.
 
 ```
 src/
@@ -68,7 +66,6 @@ scripts/generated-content-transaction.mjs bounded sibling staging, exact-output 
 scripts/prepare-article-images.mjs staging image generator that validates required masters and generates optimized hero/OG JPEGs with macOS sips
 scripts/import-articles.mjs staging importer that parses the preflighted ☑ inventory and generates pages, routes, feeds, and metadata
 server/package.json         isolated server workspace and production dependency boundary
-server/index.mjs            exact selected legacy wrapper; retained until compiled-server cutover
 server/index.ts             typed static-runtime composition (port 3060, SAMEORIGIN, artifact manifest + operational root)
 server/tsconfig.json        strict NodeNext compiler -> ignored server/dist/index.js
 tests/server-contract.test.mjs isolated compiled-server contract with synthetic release identity
@@ -177,17 +174,9 @@ replace the dependency with a local path, tarball, sibling import, or compatibil
 root [`WEB-ARCHITECTURE-MIGRATION.md`](../WEB-ARCHITECTURE-MIGRATION.md) owns mutable rollout
 versions, commit identities, and exact operational evidence.
 
-The currently installed LaunchDaemon still starts the baseline `server/index.mjs` wrapper from this
-checkout. Keep that file byte-for-byte intact; `pnpm test:selected-runtime` pins it so a reboot
-cannot lose the selected service before cutover. It is the one temporary selected-runtime exception
-to the target package boundary, not a second architecture. Remove the wrapper and its contract only
-in the same authorised operation that selects and finalizes the source-identical browser/server
-pair.
-
-The tracked web LaunchDaemon template describes the future atomic `current-server` artifact and
-identity paths. It is intentionally inactive: do not install or restart it until source-identical
-browser/server candidate preparation, paired selection, and separately authorised bootstrap are
-complete. The production gate is owned by the root migration ledger and server standard.
+The first paired web cutover is complete. The installed LaunchDaemon and tracked web template
+execute the selected atomic `current-server` artifact and its matching identity. Exact operational
+evidence is owned by the root migration ledger and server standard.
 `bin/install-server-daemon` is its check-first, definition-only web installer; it never owns
 `com.wargr.sync`, and the plist must never be copied into `/Library/LaunchDaemons` by hand.
 

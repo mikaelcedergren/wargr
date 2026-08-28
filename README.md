@@ -57,9 +57,8 @@ packages from entering the deployable server artifact.
 
 The package comes from GitHub `main`, while `pnpm-lock.yaml` records the exact immutable resolution
 and the root [`WEB-ARCHITECTURE-MIGRATION.md`](../WEB-ARCHITECTURE-MIGRATION.md) owns mutable rollout
-versions, commit identities, and exact evidence. The tracked LaunchDaemon template points at the
-future atomic `current-server` artifact; it must not be installed or bootstrapped before
-source-identical candidates are selected through the authorised paired cutover.
+versions, commit identities, and exact evidence. The installed LaunchDaemon and tracked web
+template execute the selected atomic `current-server` artifact and its matching identity.
 
 `bin/install-server-daemon` is the check-first web-definition installer. Its default/`--check` mode
 is non-mutating; after the authorised first selection, `--apply` validates the selected artifact and
@@ -75,7 +74,3 @@ publishes the immutable release and delegates only the exact definition write to
 installer. It never loads, unloads, bootstraps, kickstarts, or restarts the job.
 Installed publisher closures retain the selected digest plus at most two authenticated predecessors
 under hard count and byte ceilings; older closures are identity-checked again before removal.
-
-Until the authorised cutover, the installed service still requires the exact baseline
-`server/index.mjs` wrapper. `pnpm test:selected-runtime` prevents its premature removal or
-modification.
