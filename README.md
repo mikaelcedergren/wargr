@@ -55,12 +55,11 @@ The production server is a strict NodeNext TypeScript composition of the publish
 `server/dist/index.js`. Its isolated `server/` workspace prevents Angular and other browser-only
 packages from entering the deployable server artifact.
 
-The lock and physical browser/server installations resolve published framework `0.9.5` at GitHub
-commit `ce40d80dd055ad5de53e5779393993b1fc82db42`, and the clean source and hermetic E2E gates pass.
-The root [`WEB-ARCHITECTURE-MIGRATION.md`](../WEB-ARCHITECTURE-MIGRATION.md) owns exact rollout
-evidence. The tracked LaunchDaemon template points at the future atomic `current-server` artifact;
-it must not be installed or bootstrapped before source-identical candidates are selected through
-the authorised paired cutover.
+The package comes from GitHub `main`, while `pnpm-lock.yaml` records the exact immutable resolution
+and the root [`WEB-ARCHITECTURE-MIGRATION.md`](../WEB-ARCHITECTURE-MIGRATION.md) owns mutable rollout
+versions, commit identities, and exact evidence. The tracked LaunchDaemon template points at the
+future atomic `current-server` artifact; it must not be installed or bootstrapped before
+source-identical candidates are selected through the authorised paired cutover.
 
 `bin/install-server-daemon` is the check-first web-definition installer. Its default/`--check` mode
 is non-mutating; after the authorised first selection, `--apply` validates the selected artifact and
