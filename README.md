@@ -45,9 +45,10 @@ tree must still match the exact last successful attestation. When an existing at
 different HEAD, scheduled adoption additionally accepts only explicit `src/`, `public/`, brand, and
 article-image presentation paths; package, lock, workspace/configuration, server, launchd, publisher,
 and tooling changes require operator review instead of being smuggled into a browser-only release.
-This automated path is explicitly browser-only; a change that can affect the server uses the paired transaction. The input signature
-is recorded only after the command succeeds, so failed builds are retried. The shared release and
-rollback contract is documented in
+This automated path is explicitly browser-only. Publish a change proved server-only through the
+shared server-release flow; anything that can affect both closures, or whose scope is uncertain,
+uses the paired transaction. The input signature is recorded only after the command succeeds, so
+failed builds are retried. The shared classification, release, and rollback contract is documented in
 [`../SERVER-STANDARD.md`](../SERVER-STANDARD.md).
 
 The production server is a strict NodeNext TypeScript composition of the published
@@ -57,8 +58,9 @@ packages from entering the deployable server artifact.
 
 The package comes from GitHub `main`, while `pnpm-lock.yaml` records the exact immutable resolution
 and the root [`WEB-ARCHITECTURE-MIGRATION.md`](../WEB-ARCHITECTURE-MIGRATION.md) owns mutable rollout
-versions, commit identities, and exact evidence. The installed LaunchDaemon and tracked web
-template execute the selected atomic `current-server` artifact and its matching identity.
+versions, commit identities, and exact evidence. The tracked web LaunchDaemon template executes
+only the selected atomic `current-server` artifact and its matching identity; mutable installation,
+selection, and running state is not repeated here.
 
 `bin/install-server-daemon` is the check-first web-definition installer. Its default/`--check` mode
 is non-mutating; after the authorised first selection, `--apply` validates the selected artifact and
@@ -68,9 +70,9 @@ It never owns or changes the separate `com.wargr.sync` publisher definition and 
 restarts either job.
 
 `bin/install-publisher-daemon` is the separate check-first publisher installer. `--check` builds and
-verifies the sealed closure without persistent changes. After an authorised maintenance window has
-left `com.wargr.sync` exactly unloaded and removed its legacy mutable-checkout definition, `--apply`
-publishes the immutable release and delegates only the exact definition write to the shared
-installer. It never loads, unloads, bootstraps, kickstarts, or restarts the job.
+verifies the sealed closure without persistent changes. During an authorised maintenance window
+with `com.wargr.sync` exactly unloaded and its conventional definition absent, `--apply` publishes
+the immutable release and delegates only the exact definition write to the shared installer. It
+never loads, unloads, bootstraps, kickstarts, or restarts the job.
 Installed publisher closures retain the selected digest plus at most two authenticated predecessors
 under hard count and byte ceilings; older closures are identity-checked again before removal.

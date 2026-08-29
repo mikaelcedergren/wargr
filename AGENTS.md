@@ -174,21 +174,21 @@ replace the dependency with a local path, tarball, sibling import, or compatibil
 root [`WEB-ARCHITECTURE-MIGRATION.md`](../WEB-ARCHITECTURE-MIGRATION.md) owns mutable rollout
 versions, commit identities, and exact operational evidence.
 
-The first paired web cutover is complete. The installed LaunchDaemon and tracked web template
-execute the selected atomic `current-server` artifact and its matching identity. Exact operational
-evidence is owned by the root migration ledger and server standard.
+The tracked web LaunchDaemon template executes only the selected atomic `current-server` artifact
+and its matching identity. Whether the definition is installed, which release is selected, and
+what is currently running are mutable facts owned only by the root migration ledger.
 `bin/install-server-daemon` is its check-first, definition-only web installer; it never owns
 `com.wargr.sync`, and the plist must never be copied into `/Library/LaunchDaemons` by hand.
 
-The separate `com.wargr.sync` template is also intentionally inactive until its mutable-checkout
-legacy definition is removed during an authorised unloaded maintenance window. Build and validate
-its sealed publisher closure with `bin/install-publisher-daemon --check`; after that window,
-`--apply` may publish the immutable release and delegate only the exact definition write to the
-shared installer. It never loads, bootstraps, kickstarts, or restarts the job. The installed plist
-names the release digest directly, so neither a mutable `current` link nor mutable Wargr/server-ops
-tool code participates in a scheduled run. Applied publisher releases are count- and byte-bounded;
-the selected digest and two newest authenticated predecessors are retained, and older exact
-releases are identity-revalidated before pruning.
+The separate `com.wargr.sync` publisher is outside the web service's release and installer
+boundary. Build and validate its sealed closure with `bin/install-publisher-daemon --check`; an
+authorised unloaded maintenance window may use `--apply` only for the exact definition write. The
+installer never loads, bootstraps, kickstarts, or restarts the job. When installed, its plist names
+the release digest directly, so neither a mutable `current` link nor mutable Wargr/server-ops tool
+code participates in a scheduled run. Applied publisher releases are count- and byte-bounded; the
+selected digest and two newest authenticated predecessors are retained, and older exact releases
+are identity-revalidated before pruning. Its mutable installed/running state belongs only in the
+root migration ledger.
 
 The server has its own pnpm workspace while the browser stays at the repository root.
 `build:server:release` deploys only the `wargr-server` workspace's declared compiled output and
