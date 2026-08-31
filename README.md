@@ -42,13 +42,13 @@ The installed target definition selects a digest-qualified sealed publisher clos
 generator, source guard, release tooling, configuration, and Node package closure before execution.
 The source guard permits a clean post-commit/pull/rebase HEAD to become the new authority; a dirty
 tree must still match the exact last successful attestation. When an existing attestation names a
-different HEAD, scheduled adoption additionally accepts only explicit `src/`, `public/`, brand, and
+different HEAD, scheduled acceptance additionally permits only explicit `src/`, `public/`, brand, and
 article-image presentation paths; package, lock, workspace/configuration, server, launchd, publisher,
 and tooling changes require operator review instead of being smuggled into a browser-only release.
 This automated path is explicitly browser-only. Publish a change proved server-only through the
 shared server-release flow; anything that can affect both closures, or whose scope is uncertain,
 uses the paired transaction. The input signature is recorded only after the command succeeds, so
-failed builds are retried. The shared classification, release, and rollback contract is documented in
+failed builds are retried. The shared classification, release, and current recovery contract is documented in
 [`../SERVER-STANDARD.md`](../SERVER-STANDARD.md).
 
 The production server is a strict NodeNext TypeScript composition of the published
@@ -56,11 +56,9 @@ The production server is a strict NodeNext TypeScript composition of the publish
 `server/dist/index.js`. Its isolated `server/` workspace prevents Angular and other browser-only
 packages from entering the deployable server artifact.
 
-The package comes from GitHub `main`, while `pnpm-lock.yaml` records the exact immutable resolution
-and the root [`WEB-ARCHITECTURE-MIGRATION.md`](../WEB-ARCHITECTURE-MIGRATION.md) owns mutable rollout
-versions, commit identities, and exact evidence. The tracked web LaunchDaemon template executes
-only the selected atomic `current-server` artifact and its matching identity; mutable installation,
-selection, and running state is not repeated here.
+The package comes from GitHub `main`, while `pnpm-lock.yaml` records the exact immutable resolution.
+The tracked web LaunchDaemon template executes only the selected atomic `current-server` artifact
+and its matching identity; installation, selection, and running state are verified operationally.
 
 `bin/install-server-daemon` is the check-first web-definition installer. Its default/`--check` mode
 is non-mutating; after the authorised first selection, `--apply` validates the selected artifact and

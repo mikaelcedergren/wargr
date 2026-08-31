@@ -142,12 +142,12 @@ does the sealed server-ops publisher activate the browser-only release. The
 input stamp is recorded last, so a failed publication is retried. Normal
 `pnpm build`, CI, and E2E never inspect or mutate Ghostwriter.
 
-An existing attestation may adopt a different clean HEAD only when the bounded NUL-safe Git delta
+An existing attestation may accept a different clean HEAD only when the bounded NUL-safe Git delta
 contains explicit browser-presentation paths beneath `src/`, `public/`, `brand/`, or
 `article-images/`. Package, lock, workspace/configuration, server, launchd, `bin/`, `scripts/`, and
 all other architecture changes fail closed for operator review; the scheduled browser publisher
 must never classify them by implication.
-The shared release and rollback behavior is owned by the root
+The shared release and current recovery behavior is owned by the root
 [`SERVER-STANDARD.md`](../SERVER-STANDARD.md).
 
 ## Framework integrity
@@ -166,17 +166,16 @@ Cortex is the source of truth; `cx-framework` is its packaged contract; Wargr is
 - Add a shared abstraction only when it clearly simplifies today's system. Optimise for five-year
   maintainability, not today's convenience.
 
-## Published framework and cutover state
+## Published framework and release contract
 
-The source migration consumes `@mikaelcedergren/cx-framework/server/static-site`. The package comes
+The server consumes `@mikaelcedergren/cx-framework/server/static-site`. The package comes
 from GitHub `main`, and `pnpm-lock.yaml` records the repository's exact immutable resolution. Never
 replace the dependency with a local path, tarball, sibling import, or compatibility wrapper. The
-root [`WEB-ARCHITECTURE-MIGRATION.md`](../WEB-ARCHITECTURE-MIGRATION.md) owns mutable rollout
-versions, commit identities, and exact operational evidence.
+root [`SERVER-STANDARD.md`](../SERVER-STANDARD.md) owns mutable release and operational evidence.
 
 The tracked web LaunchDaemon template executes only the selected atomic `current-server` artifact
-and its matching identity. Whether the definition is installed, which release is selected, and
-what is currently running are mutable facts owned only by the root migration ledger.
+and its matching identity. Installation, selection, and running state are operational facts, never
+source documentation.
 `bin/install-server-daemon` is its check-first, definition-only web installer; it never owns
 `com.wargr.sync`, and the plist must never be copied into `/Library/LaunchDaemons` by hand.
 
@@ -187,8 +186,7 @@ installer never loads, bootstraps, kickstarts, or restarts the job. When install
 the release digest directly, so neither a mutable `current` link nor mutable Wargr/server-ops tool
 code participates in a scheduled run. Applied publisher releases are count- and byte-bounded; the
 selected digest and two newest authenticated predecessors are retained, and older exact releases
-are identity-revalidated before pruning. Its mutable installed/running state belongs only in the
-root migration ledger.
+are identity-revalidated before pruning. Its installed and running state is verified operationally.
 
 The server has its own pnpm workspace while the browser stays at the repository root.
 `build:server:release` deploys only the `wargr-server` workspace's declared compiled output and
