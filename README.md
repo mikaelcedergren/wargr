@@ -30,8 +30,8 @@ whole-process death releases the lock. Recovery writes a durable restored checkp
 removing its backup tree, so another crash during cleanup is retryable. The next attempt removes
 only structurally exact bounded pre-journal staging residue before retrying.
 
-The launchd sync job detects changed essays or image masters and publishes the regenerated snapshot
-through the shared atomic browser-release command:
+When installed, the optional launchd sync job detects changed essays or image masters and publishes
+the regenerated snapshot through the shared atomic browser-release command:
 
 ```bash
 node ../server-ops/bin/site-release.mjs --site wargr --browser-only --apply
@@ -74,3 +74,6 @@ the immutable release and delegates only the exact definition write to the share
 never loads, unloads, bootstraps, kickstarts, or restarts the job.
 Installed publisher closures retain the selected digest plus at most two authenticated predecessors
 under hard count and byte ceilings; older closures are identity-checked again before removal.
+The bounded `publisher-contract.json` file is Wargr's sole declaration of the generator sources,
+Ghostwriter/image inputs, and log paths that belong in that closure. Shared sealing, verification,
+retention, and definition installation remain owned by `server-ops`.

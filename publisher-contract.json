@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "kind": "wargr-scheduled-publisher",
+  "publisher": "wargr",
+  "repository": "wargr",
+  "entrypoint": "bin/sync-from-ghostwriter",
+  "sourceFiles": [
+    "bin/sync-from-ghostwriter",
+    "bin/sync-from-ghostwriter-transaction",
+    "scripts/article-slugs.mjs",
+    "scripts/generated-content-transaction.mjs",
+    "scripts/ghostwriter-generated-source.json",
+    "scripts/ghostwriter-input-state.mjs",
+    "scripts/import-articles.mjs",
+    "scripts/prepare-article-images.mjs"
+  ],
+  "inputs": {
+    "ghostwriterRepository": "ghostwriter",
+    "essays": "ghostwriter/wargr",
+    "images": "wargr/article-images"
+  },
+  "logs": {
+    "stdout": "wargr/.run/sync.out.log",
+    "stderr": "wargr/.run/sync.err.log"
+  }
+}

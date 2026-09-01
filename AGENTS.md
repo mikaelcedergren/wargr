@@ -73,8 +73,9 @@ bin/sync-from-ghostwriter   immutable-release publisher entrypoint (input/source
 bin/sync-from-ghostwriter-transaction internal publisher worker, invoked only beneath the scheduled command-form kernel lock
 bin/sync-content            manual transaction entrypoint sharing the scheduled publisher's crash-releasing kernel lock
 bin/install-publisher-daemon check-first immutable publisher-release and definition installer; never starts the job
+publisher-contract.json    bounded product-owned publisher source/input/log contract consumed by server-ops
 launchd/com.wargr.server.plist   web service (port 3060)
-launchd/com.wargr.sync.plist     future WatchPaths/hourly definition selecting a digest-qualified sealed publisher launcher
+launchd/com.wargr.sync.plist     optional WatchPaths/hourly definition selecting a digest-qualified sealed publisher launcher
 ```
 
 ### Article parsing
@@ -114,8 +115,8 @@ deployed image is removed or replaced until the complete image-and-article snaps
 
 ## Auto-sync from ghostwriter
 
-`com.wargr.sync` watches `../ghostwriter/wargr` and `article-images` (instant on add/remove/rename)
-plus an hourly safety poll for in-place edits. Its target definition never executes a mutable
+When installed, `com.wargr.sync` watches `../ghostwriter/wargr` and `article-images` (instant on
+add/remove/rename) plus an hourly safety poll for in-place edits. Its target definition never executes a mutable
 checkout or sibling server-ops script: it selects one digest-qualified, sealed publisher release.
 The self-verifying launcher authenticates the complete Wargr generator, shared source guard,
 browser-release tool, configuration, cx-framework server runtime, and third-party parser closure
@@ -184,7 +185,9 @@ boundary. Build and validate its sealed closure with `bin/install-publisher-daem
 authorised unloaded maintenance window may use `--apply` only for the exact definition write. The
 installer never loads, bootstraps, kickstarts, or restarts the job. When installed, its plist names
 the release digest directly, so neither a mutable `current` link nor mutable Wargr/server-ops tool
-code participates in a scheduled run. Applied publisher releases are count- and byte-bounded; the
+code participates in a scheduled run. `publisher-contract.json` is the sole product-owned list of
+Wargr generator sources, input owners, and log paths; server-ops owns only the generic sealed host
+execution and definition-install machinery. Applied publisher releases are count- and byte-bounded; the
 selected digest and two newest authenticated predecessors are retained, and older exact releases
 are identity-revalidated before pruning. Its installed and running state is verified operationally.
 
