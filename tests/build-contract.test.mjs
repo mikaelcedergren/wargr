@@ -10,14 +10,19 @@ test('clean development and production builds compile the tracked presentation s
   const packageJson = JSON.parse(await readFile(path.join(repoRoot, 'package.json'), 'utf8'));
   const scripts = packageJson.scripts;
 
-  assert.equal(scripts.dev, 'ng serve --configuration local --host 127.0.0.1 --port 4260');
+  assert.equal(
+    scripts.dev,
+    'pnpm favicon:check && ng serve --configuration local --host 127.0.0.1 --port 4260',
+  );
   assert.equal(scripts.build, 'pnpm run build:browser && pnpm run build:server');
   assert.equal(scripts['build:browser'], 'ng build --configuration prod');
   assert.equal(
     scripts['build:release'],
     'ng build --configuration prod --output-path "$SITE_RELEASE_DIR"',
   );
-  assert.equal(scripts['build:local'], 'ng build --configuration local');
+  assert.equal(scripts['build:local'], 'pnpm favicon:check && ng build --configuration local');
+  assert.equal(scripts['favicon:generate'], 'cx-development-favicon --apply');
+  assert.equal(scripts['favicon:check'], 'cx-development-favicon');
   assert.equal(scripts['sync:content'], 'bin/sync-content');
   assert.equal(scripts.images, 'pnpm run sync:content');
   assert.equal(scripts.e2e, 'node scripts/run-e2e.mjs');

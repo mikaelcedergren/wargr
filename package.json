@@ -18,13 +18,13 @@
   "scripts": {
     "images": "pnpm run sync:content",
     "sync:content": "bin/sync-content",
-    "dev": "ng serve --configuration local --host 127.0.0.1 --port 4260",
+    "dev": "pnpm favicon:check && ng serve --configuration local --host 127.0.0.1 --port 4260",
     "build": "pnpm run build:browser && pnpm run build:server",
     "build:browser": "ng build --configuration prod",
     "build:server": "pnpm --dir server build",
     "build:server:release": "cx-server-artifact --package wargr-server",
     "build:release": "ng build --configuration prod --output-path \"$SITE_RELEASE_DIR\"",
-    "build:local": "ng build --configuration local",
+    "build:local": "pnpm favicon:check && ng build --configuration local",
     "start": "node server/dist/index.js",
     "typecheck": "pnpm run typecheck:app && pnpm run typecheck:server",
     "typecheck:app": "tsc -p tsconfig.app.json --noEmit",
@@ -36,8 +36,10 @@
     "e2e:install": "playwright install chromium",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "favicon:generate": "cx-development-favicon --apply",
+    "favicon:check": "cx-development-favicon",
     "platform:check": "cx-platform-check --root .",
-    "check": "pnpm format:check && pnpm platform:check && pnpm typecheck && pnpm test && pnpm build"
+    "check": "pnpm format:check && pnpm favicon:check && pnpm platform:check && pnpm typecheck && pnpm test && pnpm build"
   },
   "dependencies": {
     "@angular/cdk": "^22.0.6",

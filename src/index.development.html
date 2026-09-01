@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" class="theme-light">
+  <head>
+    <meta charset="utf-8" />
+    <base href="/" />
+    <meta name="cx-build-id" content="__CX_BUILD_ID__" />
+    <title>Wargr</title>
+    <meta name="author" content="Michael Wargr" />
+    <meta
+      name="description"
+      content="Essays by Michael Wargr on philosophy, ethics, fear, self-deception, conformity, purpose, pain, and human nature."
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon-development.svg" />
+    <link rel="mask-icon" href="/assets/favicon-development-mask.svg" color="#ff980a" />
+    <link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="Wargr — essays by Michael Wargr"
+      href="/feed.xml"
+    />
+    <!-- Apply the reader's saved theme before first paint so the page never flashes. Light is the default. -->
+    <script>
+      try {
+        var savedTheme = localStorage.getItem('wg-theme');
+        if (savedTheme === 'night' || savedTheme === 'dark') {
+          document.documentElement.classList.remove('theme-light');
+          document.documentElement.classList.remove('theme-dark');
+          document.documentElement.classList.add('theme-night');
+          if (savedTheme === 'dark') localStorage.setItem('wg-theme', 'night');
+        }
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <wg-root></wg-root>
+  </body>
+</html>
