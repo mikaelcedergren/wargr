@@ -29,6 +29,14 @@
       <string>3060</string>
       <key>NODE_ENV</key>
       <string>production</string>
+      <key>APP_BASE_URL</key>
+      <string>https://wargr.com</string>
+      <key>DATA_DIR</key>
+      <string>data</string>
+      <key>DB_PATH</key>
+      <string>data/wargr.db</string>
+      <key>ARTICLE_POLISH_ENABLED</key>
+      <string>1</string>
       <key>CX_SERVER_RELEASE_IDENTITY_FILE</key>
       <string>/Users/cortex/Development/wargr/.run/site-releases/server/current-server/server-release.json</string>
     </dict>

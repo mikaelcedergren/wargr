@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>com.wargr.jobs</string>
+
+    <key>UserName</key>
+    <string>cortex</string>
+    <key>GroupName</key>
+    <string>staff</string>
+
+    <key>ProgramArguments</key>
+    <array>
+      <string>/opt/homebrew/bin/node</string>
+      <string>/Users/cortex/Development/wargr/.run/site-releases/server/current-server/artifact/server/dist/worker.js</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/cortex/Development/wargr</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+      <key>PATH</key>
+      <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+      <key>NODE_ENV</key>
+      <string>production</string>
+      <key>APP_BASE_URL</key>
+      <string>https://wargr.com</string>
+      <key>DATA_DIR</key>
+      <string>data</string>
+      <key>DB_PATH</key>
+      <string>data/wargr.db</string>
+      <key>ARTICLE_POLISH_ENABLED</key>
+      <string>1</string>
+      <key>WARGR_OPENAI_MODEL</key>
+      <string>gpt-5.6-sol</string>
+      <key>CX_SERVER_RELEASE_IDENTITY_FILE</key>
+      <string>/Users/cortex/Development/wargr/.run/site-releases/server/current-server/server-release.json</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <dict>
+      <key>SuccessfulExit</key>
+      <false/>
+    </dict>
+
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+
+    <key>SoftResourceLimits</key>
+    <dict>
+      <key>NumberOfFiles</key>
+      <integer>8192</integer>
+    </dict>
+    <key>HardResourceLimits</key>
+    <dict>
+      <key>NumberOfFiles</key>
+      <integer>16384</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/cortex/Development/wargr/.run/jobs.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/cortex/Development/wargr/.run/jobs.err.log</string>
+  </dict>
+</plist>

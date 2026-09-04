@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { DatabaseSync } from 'node:sqlite';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -40,7 +42,7 @@ test('every generated-output mutation boundary restores the exact pre-state', (t
     );
     assert.deepEqual(captureOutputRoots(fixture.repo), before, boundary);
     assert.equal(
-      fs.existsSync(path.join(fixture.repo, '.run/ghostwriter-generated-content-transaction.json')),
+      fs.existsSync(path.join(fixture.repo, '.run/wargr-generated-content-transaction.json')),
       false,
     );
   }
@@ -154,7 +156,7 @@ test('pre-journal renderer crash residue is bounded, removed, and does not block
   const before = captureOutputRoots(fixture.repo);
   const journalResidue = path.join(
     fixture.repo,
-    '.run/ghostwriter-generated-content-transaction.json.00000000-0000-0000-0000-000000000000.tmp',
+    '.run/wargr-generated-content-transaction.json.00000000-0000-0000-0000-000000000000.tmp',
   );
   fs.writeFileSync(journalResidue, 'partial journal', { mode: 0o600 });
   assert.deepEqual(recoverGeneratedContentTransaction({ repoRoot: fixture.repo }), {
@@ -325,26 +327,26 @@ test('invalid slug inventories perform zero mutation and start no generator', (t
         generateGeneratedContent({
           repoRoot: fixture.repo,
           toolRoot: path.resolve(new URL('..', import.meta.url).pathname),
-          ghostwriterRoot: fixture.ghostwriter,
+          databasePath: fixture.databasePath,
           spawn() {
             spawnCalls += 1;
             throw new Error('renderer must not start');
           },
         }),
       kind === 'empty'
-        ? /at least one ☑ essay/
+        ? /at least one published essay/
         : kind === 'empty-slug'
-          ? /empty or unsafe slug/
+          ? /invalid or reserved/
           : kind === 'collision'
             ? /slug collision/
-            : /reserved platform slug/,
+            : /invalid or reserved/,
     );
     assert.equal(spawnCalls, 0);
     assert.deepEqual(captureOutputRoots(fixture.repo), before);
     assert.deepEqual(
       fs
         .readdirSync(path.join(fixture.repo, '.run'))
-        .filter((name) => name.startsWith('ghostwriter-generated-content.')),
+        .filter((name) => name.startsWith('wargr-generated-content.')),
       [],
     );
   }
@@ -359,7 +361,7 @@ test('a renderer failure leaves the complete generated snapshot untouched and re
       generateGeneratedContent({
         repoRoot: fixture.repo,
         toolRoot: path.resolve(new URL('..', import.meta.url).pathname),
-        ghostwriterRoot: fixture.ghostwriter,
+        databasePath: fixture.databasePath,
         spawn() {
           spawnCalls += 1;
           return { status: 1, signal: null, error: null, stdout: '', stderr: 'synthetic failure' };
@@ -372,7 +374,7 @@ test('a renderer failure leaves the complete generated snapshot untouched and re
   assert.deepEqual(
     fs
       .readdirSync(path.join(fixture.repo, '.run'))
-      .filter((name) => name.startsWith('ghostwriter-generated-content.')),
+      .filter((name) => name.startsWith('wargr-generated-content.')),
     [],
   );
 });
@@ -386,7 +388,7 @@ function createTransactionFixture(t, suffix) {
   writeSnapshot(root, 'original');
   const { transaction, stage } = createStage(root, 'generated');
   const sourceGuard = path.join(root, 'tools/generated-source-guard.mjs');
-  const allowlist = path.join(root, 'tools/ghostwriter-generated-source.json');
+  const allowlist = path.join(root, 'tools/wargr-generated-source.json');
   fs.mkdirSync(path.dirname(sourceGuard), { recursive: true });
   fs.writeFileSync(sourceGuard, '// synthetic source guard\n');
   fs.writeFileSync(allowlist, '{}\n');
@@ -394,7 +396,7 @@ function createTransactionFixture(t, suffix) {
 }
 
 function createStage(repo, marker) {
-  const transaction = fs.mkdtempSync(path.join(repo, '.run', 'ghostwriter-generated-content.'));
+  const transaction = fs.mkdtempSync(path.join(repo, '.run', 'wargr-generated-content.'));
   fs.chmodSync(transaction, 0o700);
   const stage = path.join(transaction, 'snapshot');
   fs.mkdirSync(stage, { mode: 0o700 });
@@ -406,25 +408,87 @@ function createGenerationFixture(t, kind) {
   const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), `wargr-generation-${kind}-`)));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const repo = path.join(root, 'wargr');
-  const ghostwriter = path.join(root, 'ghostwriter');
   fs.mkdirSync(path.join(repo, '.run'), { recursive: true, mode: 0o700 });
   fs.mkdirSync(path.join(repo, 'article-images'), { recursive: true });
-  fs.mkdirSync(path.join(ghostwriter, 'wargr'), { recursive: true });
+  fs.mkdirSync(path.join(repo, 'data'), { recursive: true, mode: 0o700 });
   writeSnapshot(repo, 'original');
+  const rows = [];
   if (kind === 'valid') {
-    fs.writeFileSync(path.join(ghostwriter, 'wargr/☑ essay.md'), '# Essay\n');
+    rows.push(publishedRow('essay'));
     fs.writeFileSync(path.join(repo, 'article-images/essay.png'), 'png');
   } else if (kind === 'empty-slug') {
-    fs.writeFileSync(path.join(ghostwriter, 'wargr/☑ !!!.md'), '# Empty slug\n');
+    rows.push(publishedRow('!!!'));
   } else if (kind === 'collision') {
-    fs.writeFileSync(path.join(ghostwriter, 'wargr/☑ Same.md'), '# One\n');
-    fs.writeFileSync(path.join(ghostwriter, 'wargr/☑ same!.md'), '# Two\n');
+    rows.push(publishedRow('same'), publishedRow('same'));
     fs.writeFileSync(path.join(repo, 'article-images/same.png'), 'png');
   } else if (kind === 'reserved') {
-    fs.writeFileSync(path.join(ghostwriter, 'wargr/☑ healthz.md'), '# Reserved\n');
+    rows.push(publishedRow('healthz'));
     fs.writeFileSync(path.join(repo, 'article-images/healthz.png'), 'png');
   }
-  return { repo, ghostwriter };
+  const databasePath = writeFixtureDatabase(path.join(repo, 'data', 'wargr.db'), rows);
+  return { repo, databasePath };
+}
+
+function publishedRow(slug) {
+  const record = {
+    body: 'A body honest enough to publish.',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    id: '00000000-0000-4000-8000-000000000000',
+    imagePrompts: ['Create a photograph.', 'Create a second photograph.', 'Create a third one.'],
+    ingress: 'An ingress that creates tension without revealing the conclusion of anything at all.',
+    publishedAt: '2026-01-02',
+    pullQuotes: [{ expansion: 'An expansion.', hook: 'A hook.' }],
+    revision: 1,
+    slug,
+    socialPosts: ['One.', 'Two.', 'Three.'],
+    state: 'published',
+    tags: ['one', 'two'],
+    title: 'Essay',
+    topic: 'What the essay is really about.',
+    updatedAt: '2026-01-03T00:00:00.000Z',
+  };
+  const bytes = Buffer.from(JSON.stringify(record), 'utf8');
+  return {
+    published_at: record.publishedAt,
+    record_json: bytes,
+    record_sha256: createHash('sha256').update(bytes).digest('hex'),
+    slug,
+    state: 'published',
+    updated_at: record.updatedAt,
+  };
+}
+
+function writeFixtureDatabase(databasePath, rows) {
+  const database = new DatabaseSync(databasePath);
+  try {
+    database.exec(
+      `CREATE TABLE articles (
+         slug TEXT NOT NULL,
+         state TEXT NOT NULL,
+         published_at TEXT,
+         updated_at TEXT NOT NULL,
+         record_sha256 TEXT NOT NULL,
+         record_json BLOB NOT NULL
+       )`,
+    );
+    const insert = database.prepare(
+      `INSERT INTO articles (slug, state, published_at, updated_at, record_sha256, record_json)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    );
+    for (const row of rows) {
+      insert.run(
+        row.slug,
+        row.state,
+        row.published_at,
+        row.updated_at,
+        row.record_sha256,
+        row.record_json,
+      );
+    }
+  } finally {
+    database.close();
+  }
+  return databasePath;
 }
 
 function writeSnapshot(root, marker) {
@@ -460,7 +524,7 @@ function captureOutputRoots(repo) {
 }
 
 function capturePublisherState(repo) {
-  const attestationPath = path.join(repo, '.run/ghostwriter-source.json');
+  const attestationPath = path.join(repo, '.run/generated-source.json');
   const attestation = fs.existsSync(attestationPath)
     ? {
         ino: fs.lstatSync(attestationPath, { bigint: true }).ino.toString(),
@@ -498,7 +562,7 @@ function writeAttestation(
   repo,
   revision,
   fingerprint,
-  target = path.join(repo, '.run/ghostwriter-source.json'),
+  target = path.join(repo, '.run/generated-source.json'),
 ) {
   fs.mkdirSync(path.dirname(target), { recursive: true, mode: 0o700 });
   fs.writeFileSync(
@@ -511,11 +575,11 @@ function writeAttestation(
 }
 
 function readAttestation(repo) {
-  return JSON.parse(fs.readFileSync(path.join(repo, '.run/ghostwriter-source.json'), 'utf8'));
+  return JSON.parse(fs.readFileSync(path.join(repo, '.run/generated-source.json'), 'utf8'));
 }
 
 function readTransactionJournal(repo) {
-  const journalPath = path.join(repo, '.run/ghostwriter-generated-content-transaction.json');
+  const journalPath = path.join(repo, '.run/wargr-generated-content-transaction.json');
   return fs.existsSync(journalPath) ? JSON.parse(fs.readFileSync(journalPath, 'utf8')) : null;
 }
 

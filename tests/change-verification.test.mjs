@@ -67,7 +67,7 @@ test('documentation, interface, E2E, and high-risk paths select their owning pro
     'visual',
   ]);
   assert.deepEqual(article.routes, ['/corruption/']);
-  assert.deepEqual(classifyChanges(['scripts/ghostwriter-generated-source.json']).checks, [
+  assert.deepEqual(classifyChanges(['scripts/wargr-generated-source.json']).checks, [
     'format',
     'typecheck',
     'test-content',
@@ -78,10 +78,10 @@ test('documentation, interface, E2E, and high-risk paths select their owning pro
   for (const file of [
     'AGENTS.md',
     'package.json',
-    'server/index.ts',
-    'launchd/com.wargr.sync.plist',
-    'bin/sync-content',
-    'scripts/import-articles.mjs',
+    'server/src/index.ts',
+    'launchd/com.wargr.publisher.plist',
+    'bin/generate-content',
+    'scripts/generate-articles.mjs',
     'article-images/corruption.png',
     'scripts/verify-change.mjs',
     'tests/change-verification.test.mjs',
@@ -93,7 +93,7 @@ test('documentation, interface, E2E, and high-risk paths select their owning pro
     ['full', 'visual'],
   );
   assert.deepEqual(
-    classifyChanges(['package.json', 'scripts/ghostwriter-generated-source.json']).checks,
+    classifyChanges(['package.json', 'scripts/wargr-generated-source.json']).checks,
     ['full', 'visual'],
   );
 });
@@ -115,6 +115,7 @@ test('route mapping is bounded and product-owned', () => {
     '/mercy-of-death/',
   );
   assert.equal(routeForSourcePath('src/app/pages/home.component.ts'), '/');
+  assert.equal(routeForSourcePath('src/app/studio/studio.component.ts'), '/studio');
   assert.equal(routeForSourcePath('src/styles.scss'), '/');
   assert.equal(safeEvidenceName('/mercy-of-death/'), 'mercy-of-death');
 });

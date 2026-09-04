@@ -1,0 +1,254 @@
+@use '@mikaelcedergren/cx-framework/tokens';
+@use '@mikaelcedergren/cx-framework/tokens/breakpoints-scale' as bp;
+@use '@mikaelcedergren/cx-framework/styles/page';
+
+// The global stylesheet already carries the framework fonts, base reset and tokens for the public
+// reading skin. This layer adds only Studio's page composition — the application shell and column
+// placement. Every visual decision below reads a token; no component internals are reached into.
+
+wg-studio {
+  display: block;
+  min-height: 100dvh;
+}
+
+/* Sign in */
+
+.wg-studio-login {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  padding: var(--space-lg);
+  background:
+    radial-gradient(circle at 50% 0%, var(--primary-opacity), transparent 34rem), var(--surface);
+}
+
+.wg-studio-login__panel {
+  width: min(100%, var(--measure-sm));
+}
+
+.wg-studio-login__submit {
+  // The button exposes its own width custom property for full-width form submits.
+  --cx-button-width: 100%;
+
+  width: 100%;
+}
+
+/* Application shell */
+
+.wg-studio-workspace {
+  display: grid;
+  width: 100%;
+  height: 100dvh;
+  grid-template-columns: 232px minmax(0, 1fr);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.wg-studio-workspace__nav {
+  position: relative;
+  z-index: var(--z-index-nav-overlay);
+  width: 232px;
+  height: 100dvh;
+  min-height: 0;
+}
+
+.wg-studio-workspace__nav cx-side-nav {
+  height: 100%;
+}
+
+.wg-studio-brand {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-inline: var(--space-xs);
+  color: var(--ink);
+  font-size: var(--font-size-title-3);
+  font-weight: var(--font-weight-bold);
+}
+
+.wg-studio-brand__close {
+  margin-left: auto;
+}
+
+.wg-studio-workspace__main {
+  --cx-page-measure: var(--measure-xl);
+
+  height: 100dvh;
+  min-height: 0;
+  overflow: auto;
+  background: var(--surface);
+  overscroll-behavior: contain;
+}
+
+.wg-studio-workspace__scrim {
+  display: none;
+}
+
+/* The top bar's trailing control cluster. One wrapper keeps conditional actions projectable. */
+
+.wg-studio-top-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* Text roles */
+
+.wg-studio-prose {
+  margin: 0;
+  max-width: var(--measure-md);
+  color: var(--opacity-high);
+  line-height: var(--line-height-body-relaxed);
+}
+
+.wg-studio-meta {
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+}
+
+.wg-studio-field-label {
+  color: var(--ink);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Sections */
+
+.wg-studio-section {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-md);
+  // Grid items default to min-width:auto, which stops long rows from shrinking.
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.wg-studio-section > h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--font-size-title-2);
+  font-weight: var(--font-weight-bold);
+}
+
+.wg-studio-problems {
+  margin: var(--space-xs) 0 0;
+  padding-left: var(--space-lg);
+  display: grid;
+  gap: var(--space-2xs);
+}
+
+/* Editor: the essay column plus the sticky ghostwriter rail on the right. The rail follows the
+   author down the piece; when it outgrows the viewport it scrolls inside its own sticky box. */
+
+.wg-studio-editor {
+  display: grid;
+  align-items: start;
+  gap: var(--space-lg);
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+
+.wg-studio-editor__main {
+  min-width: 0;
+}
+
+.wg-studio-editor__side {
+  position: sticky;
+  top: var(--space-lg);
+  display: grid;
+  gap: var(--space-md);
+  max-height: calc(100dvh - var(--space-lg) * 2);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.wg-studio-run {
+  // The button exposes its own width custom property for full-width rail actions.
+  --cx-button-width: 100%;
+
+  width: 100%;
+}
+
+/* Body editor: a bordered writing surface carrying the editorial document scale. */
+
+.wg-studio-body-field {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.wg-studio-body-editor {
+  min-height: 20rem;
+  padding: var(--space-lg);
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+}
+
+.wg-studio-body-editor--busy {
+  opacity: var(--opacity-disabled, 0.5);
+}
+
+/* One list entry and its remove control. */
+
+.wg-studio-list-block {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.wg-studio-list-row {
+  display: grid;
+  align-items: start;
+  gap: var(--space-sm);
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+@media (max-width: #{bp.$mobile - 1px}) {
+  .wg-studio-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .wg-studio-workspace__nav {
+    position: fixed;
+    inset: 0 auto 0 0;
+    transform: translateX(-100%);
+    transition: transform var(--motion-slow) var(--ease-out-strong);
+  }
+
+  .wg-studio-workspace__nav--visible {
+    transform: translateX(0);
+  }
+
+  .wg-studio-workspace__scrim {
+    position: fixed;
+    z-index: var(--z-index-nav-overlay-backdrop);
+    inset: 0;
+    display: block;
+    padding: 0;
+    border: 0;
+    background: var(--overlay-backdrop);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--motion-base) ease;
+  }
+
+  .wg-studio-workspace__scrim--visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .wg-studio-login {
+    align-items: start;
+    padding: var(--space-md);
+  }
+
+  .wg-studio-editor {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .wg-studio-editor__side {
+    position: static;
+    order: -1;
+    max-height: none;
+    overflow: visible;
+  }
+}

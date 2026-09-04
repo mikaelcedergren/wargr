@@ -1,161 +1,190 @@
 # wargr.com
 
-Michael Wargr's essays — an **Angular 22 SSG site built on `@mikaelcedergren/cx-framework`** (light
-theme default), prerendered to static HTML and served by a strict TypeScript composition of the
-published shared Express runtime, the **same architecture as the other static sites**. Substack-like
-reading design. **No CodeKit.**
+Michael Wargr's essays — an **Angular 22 SSG site plus the private Studio**, built on
+`@mikaelcedergren/cx-framework` and served by one compiled TypeScript/Express web process on the
+Mac mini. A separate listener-free worker owns durable AI polish work. Substack-like reading
+design on the public side; the Studio at `/studio` is the owner's writing room. **No CodeKit.**
 
-The articles are NOT authored here. `pnpm sync:content` pulls them from the **ghostwriter** repo
-(`../ghostwriter/wargr/*.md`) into a tracked generated snapshot. Normal development, test, and
-production builds compile that snapshot without requiring Ghostwriter. This repo is the
-presentation layer only.
+Articles are authored in the Studio and stored in the article database (`data/wargr.db`), which
+replaced the retired ghostwriter repository as the one authoring source. The public site remains
+fully prerendered: the sealed publisher regenerates the tracked presentation snapshot from the
+database's published closure and releases it atomically. Drafts and their complete round history
+never leave the database.
 
-## Publishing rule (important)
+Root standards remain authoritative for shared architecture, releases, operations, ports, and
+toolchain policy:
 
-A ghostwriter essay is **published only if its filename starts with `☑`** (e.g. `☑ corruption.md`).
-Every other file is a draft and is skipped. To publish a piece, add `☑ ` to its filename in
-ghostwriter; to unpublish, remove it. This is handled automatically (see Auto-sync).
+- [Web architecture](../WEB-ARCHITECTURE.md)
+- [Server standard](../SERVER-STANDARD.md)
+- [Server inventory](../SERVER-INVENTORY.md)
+- [Ports](../PORTS.md)
+- [Go-live](../GO-LIVE.md)
+
+This file owns only Wargr-specific product and implementation rules.
 
 ## Run
 
 ```bash
 pnpm install
-pnpm sync:content   # explicitly regenerate images/pages from ../ghostwriter (☑-marked essays)
-pnpm dev        # serve the tracked snapshot at http://127.0.0.1:4260
-pnpm build      # standalone prerender + compiled production server
-pnpm build:release  # browser-only staged build used by the shared release command
+pnpm dev              # Angular on 127.0.0.1:4260, API + worker on 127.0.0.1:4261
+pnpm build            # standalone prerender + compiled production web/worker
+pnpm build:release    # browser-only staged build used by the shared release command
 pnpm build:server:release # internal self-contained server-artifact build
-pnpm start      # compiled server at http://127.0.0.1:3060 (HOST/PORT env; health: /healthz)
-pnpm typecheck  # strict application and NodeNext server TypeScript verification
-pnpm test       # isolated Node tests for build and production-server contracts
-pnpm e2e        # Chromium smoke tests on a runner-owned loopback port
-pnpm format:check  # formatting verification
-pnpm platform:check # shared manifest, dependency, script, and entrypoint validation
-pnpm verify:change # change-aware local proof; see DEVELOPMENT-VERIFICATION.md
-pnpm check      # canonical platform, format, typecheck, test, and production-build gate
+pnpm start:web        # compiled web process at http://127.0.0.1:3060 (health: /healthz)
+pnpm start:worker     # compiled listener-free polish worker
+pnpm generate:content # regenerate the tracked snapshot from the article database (locked transaction)
+pnpm images           # alias for the complete generate:content transaction
+pnpm studio:password-hash # interactive scrypt hash generator for .env.web
+pnpm typecheck        # strict application and NodeNext server TypeScript verification
+pnpm test             # isolated Node tests for build, publisher, and server contracts
+pnpm e2e              # Chromium smoke tests on a runner-owned loopback port
+pnpm format:check     # formatting verification
+pnpm platform:check   # shared manifest, dependency, script, and entrypoint validation
+pnpm verify:change    # change-aware local proof; see DEVELOPMENT-VERIFICATION.md
+pnpm check            # canonical platform, format, typecheck, test, and production-build gate
 ```
 
-## Architecture
+## Current architecture
 
-Angular 22 standalone, prerendered to static HTML (`outputMode: static`, every route
-`RenderMode.Prerender`), served as plain files by the published
-`@mikaelcedergren/cx-framework/server/static-site` runtime composed in strict TypeScript and
-compiled to JavaScript — no SSR, TypeScript runner, or sibling runtime import in production.
-`cx-product.json` owns the manifest-derived application identity. The compiled entrypoint pins that
+`cx-product.json` declares the hybrid-site profile: owner authentication, structured records,
+durable background work, and the `ai` external effect. The compiled web entrypoint pins the
 manifest from the sealed artifact through `import.meta.url`; `process.cwd()` remains the separate
-operational browser-release root. cx-framework also provides the design language (tokens, colours,
-type, spacing); `src/styles.scss` adds a long-form reading layer on top.
+operational root.
 
-```
+```text
 src/
-  index.html                <html class="theme-light">; Inter + Source Serif 4 + Roboto Mono; no-flash theme script; PNG favicons (light/dark) + apple-touch-icon; <wg-root>
-  styles.scss               cx-framework tokens + base + the "Quiet Press" wg- reading layer (serif display, single --brand=--primary accent)
+  index.html                <html class="theme-light">; no-flash theme script; <wg-root>
+  styles.scss               cx-framework tokens + base + the "Quiet Press" wg- reading layer
   app/
-    app.component.*          masthead (MW monogram logo, theme-swapped) + <router-outlet> + footer (light/dark switch, persisted to localStorage)
-    app.routes.ts            GENERATED by scripts/import-articles.mjs (home + one route per essay + 404; per-route SEO incl. reading-time/related/prev-next)
-    pages/home.component.ts  GENERATED feed: lead essay + rest, each with kicker (dominant tag) + dek + date · reading-time
+    app.component.*          masthead + <router-outlet> + footer; routes flagged chrome:'bare' (Studio) render without public chrome
+    app.routes.ts            GENERATED by scripts/generate-articles.mjs (home + studio + one route per essay + 404)
+    pages/home.component.ts  GENERATED feed
     pages/not-found.component.ts
-    articles/<slug>.component.ts  GENERATED per essay; body via [innerHTML] + kicker, drop cap, pull-quote coda, related + prev/next nav, required full-bleed hero photo
-    shared/seo.ts            SeoTitleStrategy: title/desc/canonical/OG/Twitter (per-essay or default 1200×630 card)/JSON-LD (BlogPosting + BreadcrumbList + home ItemList), rel=prev/next
-brand/                      image MASTERS — source of truth, NOT deployed: the 2048² MW monograms (light/dark) + the designed wargr-og-image.png (1731×909 social card)
-article-images/             per-essay hero MASTERS (full-res, pre-optimisation) — NOT deployed; one required <slug>.png per published essay
-public/assets/brand/        DEPLOYED brand assets: mark-light/dark (masthead), favicon(+dark), apple-touch-icon, og-default.jpg (1200×630 default social card)
-public/assets/articles/     DEPLOYED per-essay imagery (slug convention): <slug>.jpg = full-bleed hero, <slug>-og.jpg = 1200×630 social card overriding the default for that essay
-public/{robots.txt,sitemap.xml,feed.xml}  GENERATED by the importer (feed.xml is RSS 2.0; the three + assets/** are in angular.json's assets allow-list)
-scripts/article-slugs.mjs one exact non-empty/collision-free, platform-reserved slug and essay/master inventory authority
-scripts/generated-content-transaction.mjs bounded sibling staging, exact-output swap, rollback, and crash recovery for the complete generated snapshot
-scripts/prepare-article-images.mjs staging image generator that validates required masters and generates optimized hero/OG JPEGs with macOS sips
-scripts/import-articles.mjs staging importer that parses the preflighted ☑ inventory and generates pages, routes, feeds, and metadata
-server/package.json         isolated server workspace and production dependency boundary
-server/index.ts             typed static-runtime composition (port 3060, SAMEORIGIN, artifact manifest + operational root)
-server/tsconfig.json        strict NodeNext compiler -> ignored server/dist/index.js
-tests/server-contract.test.mjs isolated compiled-server contract with synthetic release identity
-bin/sync-from-ghostwriter   immutable-release publisher entrypoint (input/source guards + recoverable generation + browser release)
-bin/sync-from-ghostwriter-transaction internal publisher worker, invoked only beneath the scheduled command-form kernel lock
-bin/sync-content            manual transaction entrypoint sharing the scheduled publisher's crash-releasing kernel lock
-bin/install-publisher-daemon check-first immutable publisher-release and definition installer; never starts the job
-publisher-contract.json    bounded product-owned publisher source/input/log contract consumed by server-ops
+    articles/<slug>.component.ts  GENERATED per published essay
+    studio/studio.component.*     the private Studio: login, essay list, editor, ghostwriter rounds, publish
+    shared/seo.ts            SeoTitleStrategy (title/canonical/OG/JSON-LD)
+server/src/
+  index.ts / worker.ts       role entrypoints; each loads only its own private env file
+  runtime.ts / worker-runtime.ts  web and worker lifecycle composition
+  app.ts                     Express composition; /api/studio owns the typed HTTP contract
+  auth-service.ts            owner session auth (scrypt password hash, signed session cookies, login throttling)
+  password-hash.ts           scrypt$N$r$p$salt$hash storage format shared with studio:password-hash
+  article-schema.ts          the structured essay record + the mechanical publish-format contract
+  article-repository.ts      SQLite persistence: articles, bounded version rounds, polish runs, provider effects, owner sessions
+  article-service.ts / polish-service.ts  HTTP-facing services (CAS revisions, publish gate, polish admission)
+  polish-jobs.ts / polish-handlers.ts / polish-worker.ts  durable polish job contract, handler, worker loop
+  openai-provider.ts         bounded OpenAI Responses provider with idempotent paid-effect receipts
+  voice-contract.ts          the Michael Wargr voice contract (ported from the retired ghostwriter repo) + the four rewrite modes
+  polish-content.ts          the structured generation spec: schema, instructions, validation
+  database.ts                migrations, capacity/revision guards, and the exact schema proof
+data/wargr.db                sole authoring authority (articles, rounds, runs, sessions, jobs); registered backup
+article-images/              per-essay hero MASTERS — one required <slug>.png per published essay
+brand/                      image masters — source of truth, NOT deployed
+public/                     generated feeds/robots/sitemap + deployed assets
+scripts/generate-articles.mjs      staging generator: database records -> pages, routes, feeds, metadata
+scripts/prepare-article-images.mjs staging image generator (macOS sips) from the same inventory
+scripts/article-slugs.mjs          the one slug/inventory authority over the published closure
+scripts/published-input-state.mjs  publication input digest: published records + image master bytes
+scripts/generated-content-transaction.mjs bounded staging, exact-output swap, rollback, crash recovery
+scripts/import-ghostwriter-articles.mjs  the one-time content migration from the retired ghostwriter repo
+scripts/dev.mjs             development launcher: web + worker + Angular with the dev database
+bin/generate-content        manual transaction entrypoint sharing the publisher's kernel lock
+bin/publish-content         scheduled publisher entrypoint (input guard + generation + browser release)
+bin/publish-content-transaction internal locked publisher worker
+bin/install-publisher-daemon check-first sealed publisher-release and definition installer
+bin/install-server-daemon   check-first web + jobs LaunchDaemon definition installer
+publisher-contract.json     bounded product-owned publisher source/input/log contract
 launchd/com.wargr.server.plist   web service (port 3060)
-launchd/com.wargr.sync.plist     optional WatchPaths/hourly definition selecting a digest-qualified sealed publisher launcher
+launchd/com.wargr.jobs.plist     listener-free polish worker
+launchd/com.wargr.publisher.plist WatchPaths/hourly definition selecting the sealed publisher release
 ```
 
-### Article parsing
+## The Studio
 
-Each ghostwriter file: `# Title` / `## Topic:` (internal, ignored) / `## Published:` (publish date of
-record) / `---` / `**ingress**` + body / `---` / tags + pull-quotes + thumbnail prompts. The importer
-takes the **title**, the **ingress** (the bold line — used as the reader-facing dek + meta/OG
-description), the **body** (markdown between the two `---`, rendered to HTML), the **tags** (→
-keywords + the kicker uses `tags[0]`), and the **dates**: `## Published:` (date-only or full ISO) is
-the stable publish date of record; ghostwriter git history supplies the modified date and is the
-published fallback for essays without the line. Slug = filename minus `☑` and `.md`. URLs: home `/`,
-each essay `/<slug>/`.
+The private Studio at `/studio` (noindexed, owner-only) is where essays are written. The workflow
+is the ghostwriting loop the retired ghostwriter repository documented, now built in:
 
-It then derives, at build time: **reading-time** (`ceil`-ish of body words / 200); the **pull-quotes**
-from the trailing block (the numbered hooks that do NOT start with "Create a" — the "Create a…" ones are
-thumbnail prompts; the last quote is shown as the end-of-essay coda figure); **related essays** by
-weighted shared-tag overlap (tags appearing in >50% of the corpus carry no weight; ties break by
-recency; thin matches backfill by recency so the block is never empty); and chronological **prev/next**
-neighbours. All of it is baked into the generated components and routes — nothing is fetched at runtime,
-so every page is fully prerendered. The importer also emits **public/feed.xml** (RSS 2.0).
+1. Create an essay with a working title; write rough notes in the editor.
+2. Pick a rewrite intensity — rough material, treat as reference, developed draft, or final
+   polish — optionally add a round instruction, and run the ghostwriter. The durable worker sends
+   the whole document plus the voice contract to OpenAI and replaces the essay with the result.
+3. Edit. Your edits are meaning, not wording. Run the next round. Every round is kept as a bounded
+   version history you can reload.
+4. Publish. The mechanical format gate (ingress 80–200 characters, 10–20 tags, three social posts,
+   two or three pull quotes, three image prompts, hero master present) must pass; voice, truth,
+   and the decision that an essay is finished remain the author's.
 
-### Per-essay images (hero + social card)
+Four rules are non-negotiable:
 
-Required, by **slug convention** — no ghostwriter changes are needed because image masters live in
-this presentation repo. Every published essay must have `article-images/<slug>.png`; publishing fails
-loudly if its master is absent. `pnpm images` is an alias for the complete `pnpm sync:content`
-transaction (images are never regenerated as a partial checkout mutation) and uses the host Mac's
-standard image tool:
+- The typed `/api/studio` HTTP contract owns reads and mutations. Mutations require an allowed
+  origin, revisions use compare-and-swap, and API paths are registered before browser fallback.
+- Every Studio route is authenticated and non-indexable. Keep `public/robots.txt`, the route's
+  `noindex`, and `PRIVATE_NOINDEX_PATHS` aligned for any new private route.
+- A paid provider result that survives a local failure stays attached to its original run/effect
+  identity and may use only the one durable application-recovery handoff; it must never trigger a
+  second provider create. A polish landing after the author kept editing fails with
+  `article_revision_conflict` instead of overwriting the edit.
+- All collections have explicit hard bounds. Capacity is refused visibly. The per-essay round
+  history is a designed bounded ring; everything else never silently evicts.
 
-- `<slug>.jpg` → a centre-cropped **16:9 full-bleed hero**, capped at 1920px wide, JPEG quality 82.
-- `<slug>-og.jpg` → a centre-cropped **1200×630 social card**, JPEG quality 86.
+The voice contract in `server/src/voice-contract.ts` is the authoritative instruction set for
+polish rounds. Editing the voice is editing the product; treat it with the same care as prose.
 
-The PNG master is the source of truth and is never deployed. The preparation script uses the standard
-macOS image tool already present on both development and production Macs, never upscales, and rejects
-missing or undersized masters. It writes only into the transaction's bounded sibling stage; no
-deployed image is removed or replaced until the complete image-and-article snapshot passes preflight.
+## Publishing
 
-## Auto-sync from ghostwriter
+Publishing an essay in the Studio flips its state in the database. The site itself changes only
+through the sealed publisher:
 
-When installed, `com.wargr.sync` watches `../ghostwriter/wargr` and `article-images` (instant on
-add/remove/rename) plus an hourly safety poll for in-place edits. Its target definition never executes a mutable
-checkout or sibling server-ops script: it selects one digest-qualified, sealed publisher release.
-The self-verifying launcher authenticates the complete Wargr generator, shared source guard,
-browser-release tool, configuration, cx-framework server runtime, and third-party parser closure
-before running anything.
+- `com.wargr.publisher` (when installed) watches `data/` and `article-images/` plus an hourly
+  poll. The input digest covers exactly the published closure — each published record's
+  content-derived hash and publish date — and the canonical PNG master bytes. Draft edits, polish
+  rounds, and session writes never trigger a rebuild.
+- The locked transaction regenerates the tracked snapshot in bounded staging, proves the exact
+  allowlisted output set (`scripts/wargr-generated-source.json`), commits it with the
+  generated-source guard's attestation, then activates a browser-only release and records the
+  input stamp last so a failed publication is retried.
+- `pnpm generate:content` is the manual generation path under the same kernel lock
+  (`.run/content-publish.lock`); it never commits or releases.
 
-The publisher acts only when the **published (`☑`) input closure or canonical PNG masters**
-change. That digest covers exact bytes, mtimes used by the date fallback, relevant Git history, and
-the complete file inventory; draft-only edits remain out. Before rendering, one shared slug
-authority requires a non-empty inventory and rejects normalized collisions and reserved platform
-routes across images, imports, components, and routes. Images and every generated source file are
-built in one bounded sibling stage. The complete allowlisted snapshot is proved before a
-recoverable journal moves any output. Scheduled generation leaves that journal open through the
-second input proof and source capture; transaction authorization then records the exact attestation
-as its durable commit boundary. Any earlier failure restores the old output inodes and exact prior
-attestation, while a later build/publication failure leaves an attested state the next invocation
-can retry. The scheduled entrypoint uses persistent command-form `lockf -k`, so the lock-owning
-process remains alive around the complete multi-command worker; the manual entrypoint acquires the
-same inode by descriptor and transfers that descriptor to its one Node transaction with `exec`.
-Neither path unlinks the file, and whole-process death releases the kernel lock. Recovery durably
-checkpoints the exact restored source state before deleting its backup tree, so a second crash
-anywhere in cleanup remains retryable. Bounded pre-journal renderer residue is removed before retry,
-while any orphan containing a non-empty backup fails closed. Only then
-does the sealed server-ops publisher activate the browser-only release. The
-input stamp is recorded last, so a failed publication is retried. Normal
-`pnpm build`, CI, and E2E never inspect or mutate Ghostwriter.
+Every published essay must have `article-images/<slug>.png`; publication fails loudly if the
+master is absent. Slugs are immutable while published. Reserved platform routes (`api`, `assets`,
+`healthz`, `studio`) can never become essay slugs.
 
-An existing attestation may accept a different clean HEAD only when the bounded NUL-safe Git delta
-contains explicit browser-presentation paths beneath `src/`, `public/`, `brand/`, or
-`article-images/`. Package, lock, workspace/configuration, server, launchd, `bin/`, `scripts/`, and
-all other architecture changes fail closed for operator review; the scheduled browser publisher
-must never classify them by implication.
-The shared release and current recovery behavior is owned by the root
-[`SERVER-STANDARD.md`](../SERVER-STANDARD.md).
+Classify the complete releasable diff before publication. Use the registered shared browser-only,
+server-only, or paired release flow from [SERVER-STANDARD.md](../SERVER-STANDARD.md); never publish
+one half of an uncertain or full-stack change.
+
+## Authentication and private configuration
+
+The web process loads only owned mode-`0600` `.env.web` values:
+
+- `WARGR_STUDIO_USERNAME`
+- `WARGR_STUDIO_PASSWORD_HASH` (the complete `scrypt$…` output of `pnpm studio:password-hash`;
+  the plaintext never rests in configuration)
+- `WARGR_STUDIO_SESSION_SECRET`
+
+The worker loads only the owned mode-`0600` `.env.worker` value `OPENAI_API_KEY`. Neither role
+reads the other role's file. Non-secret origin, data path, model, and
+`ARTICLE_POLISH_ENABLED=0|1` belong in LaunchDaemon configuration. With polishing disabled, the
+worker proves its identity and readiness but constructs no provider, claims no jobs, and creates
+no paid effect.
+
+## Production roles
+
+- `com.wargr.server`: web listener on `127.0.0.1:3060`
+- `com.wargr.jobs`: listener-free polish worker
+- `com.wargr.publisher`: sealed scheduled publisher (optional; definition-install only)
+- `/healthz`: fast web/database readiness
+- `.run/server.*.log`, `.run/jobs.*.log`, `.run/publish.*.log`: bounded runtime logs
+
+`bin/install-server-daemon --check` validates the web and jobs definitions;
+`bin/install-publisher-daemon --check` builds and validates the sealed publisher closure. Neither
+installer starts, restarts, or loads a service; activation uses the shared narrow service
+administrator after the selected release is fully verified.
 
 ## Framework integrity
 
 Cortex is the source of truth; `cx-framework` is its packaged contract; Wargr is only a consumer.
-`src/styles.scss` consumes framework tokens and base styles; `theme-light` is the default.
 
 - Never modify, reference, fork, or optimise Cortex or `cx-framework` from this repository.
 - Consumers adapt forward. Never preserve an old contract with compatibility layers, aliases,
@@ -164,57 +193,23 @@ Cortex is the source of truth; `cx-framework` is its packaged contract; Wargr is
   never recreate it locally.
 - Prefer simpler architecture and deletion over preserving behaviour. Keep one implementation and
   remove verified dead, duplicate, obsolete, compatibility, legacy, and deprecated code.
-- Evidence beats assumptions: uncertain removals are reported, not guessed.
-- Add a shared abstraction only when it clearly simplifies today's system. Optimise for five-year
-  maintainability, not today's convenience.
 
-## Published framework and release contract
+## Test and data boundaries
 
-The server consumes `@mikaelcedergren/cx-framework/server/static-site`. The package comes
-from GitHub `main`, and `pnpm-lock.yaml` records the repository's exact immutable resolution. Never
-replace the dependency with a local path, tarball, sibling import, or compatibility wrapper. The
-root [`SERVER-STANDARD.md`](../SERVER-STANDARD.md) owns mutable release and operational evidence.
+Tests use only OS-temporary synthetic databases, browser assets, and fixtures. They must refuse
+external fetches and never load the repository's real `.env.web`, `.env.worker`, or
+`data/wargr.db`. E2E uses the shared hermetic runner contract in
+[`WEB-ARCHITECTURE.md`](../WEB-ARCHITECTURE.md#end-to-end-test-isolation).
 
-The tracked web LaunchDaemon template executes only the selected atomic `current-server` artifact
-and its matching identity. Installation, selection, and running state are operational facts, never
-source documentation.
-`bin/install-server-daemon` is its check-first, definition-only web installer; it never owns
-`com.wargr.sync`, and the plist must never be copied into `/Library/LaunchDaemons` by hand.
-
-The separate `com.wargr.sync` publisher is outside the web service's release and installer
-boundary. Build and validate its sealed closure with `bin/install-publisher-daemon --check`; an
-authorised unloaded maintenance window may use `--apply` only for the exact definition write. The
-installer never loads, bootstraps, kickstarts, or restarts the job. When installed, its plist names
-the release digest directly, so neither a mutable `current` link nor mutable Wargr/server-ops tool
-code participates in a scheduled run. `publisher-contract.json` is the sole product-owned list of
-Wargr generator sources, input owners, and log paths; server-ops owns only the generic sealed host
-execution and definition-install machinery. Applied publisher releases are count- and byte-bounded; the
-selected digest and two newest authenticated predecessors are retained, and older exact releases
-are identity-revalidated before pruning. Its installed and running state is verified operationally.
-
-The server has its own pnpm workspace while the browser stays at the repository root.
-`build:server:release` deploys only the `wargr-server` workspace's declared compiled output and
-production dependency closure beneath the staged artifact's `server/` directory, with the immutable
-product manifest at the artifact root. Root `node_modules`, browser dependencies, source
-TypeScript, tests, the Ghostwriter source, image masters, and content-sync tools never enter the
-server release.
-
-## Build invariants
-
-- Normal development, check, CI, E2E, browser-release, and server-artifact builds consume only the
-  tracked presentation snapshot. Only `pnpm sync:content` may read Ghostwriter or invoke macOS image
-  tooling, and it must use the generated-content transaction rather than either generator against
-  the checkout directly.
-- `pnpm-workspace.yaml` must match the canonical
-  [workspace peer-isolation contract](../WEB-ARCHITECTURE.md#workspace-peer-isolation), including
-  all three required settings: `autoInstallPeers`, `resolvePeersFromWorkspaceRoot`, and
-  `dedupePeerDependents` remain `false`. Every framework browser peer belongs directly to this root
-  package; the `server/` workspace declares none.
+Operational article data, secrets, logs, and release state are ignored by Git. Preserve the
+authoritative SQLite database and its registered backup. The tracked presentation snapshot is
+generated output committed by the publisher transaction; edit essays in the Studio, never in the
+generated files.
 
 ## Toolchain
 
 The root web architecture owns the shared [toolchain](../WEB-ARCHITECTURE.md#toolchain) and
 [E2E containment](../WEB-ARCHITECTURE.md#end-to-end-test-isolation) contracts. Wargr adds `marked`
-plus the `sanitize-html` allowlist for explicit content sync. Product ports are dev `4260` and
-production `3060`; E2E uses the shared runner's dynamically owned loopback port. Shared allocations and operating rules remain owned by
-[`PORTS.md`](../PORTS.md) and [`SERVER-STANDARD.md`](../SERVER-STANDARD.md).
+plus the `sanitize-html` allowlist for explicit content generation. Product ports are dev `4260`
+(browser) and `4261` (API/worker), production `3060`. Shared allocations and operating rules
+remain owned by [`PORTS.md`](../PORTS.md) and [`SERVER-STANDARD.md`](../SERVER-STANDARD.md).

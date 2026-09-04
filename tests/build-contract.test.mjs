@@ -10,10 +10,11 @@ test('clean development and production builds compile the tracked presentation s
   const packageJson = JSON.parse(await readFile(path.join(repoRoot, 'package.json'), 'utf8'));
   const scripts = packageJson.scripts;
 
-  assert.equal(
-    scripts.dev,
-    'pnpm favicon:check && ng serve --configuration local --host 127.0.0.1 --port 4260',
-  );
+  assert.equal(scripts.dev, 'pnpm favicon:check && node scripts/dev.mjs');
+  assert.equal(scripts.start, 'pnpm run start:web');
+  assert.equal(scripts['start:web'], 'node server/dist/index.js');
+  assert.equal(scripts['start:worker'], 'node server/dist/worker.js');
+  assert.equal(scripts['studio:password-hash'], 'node scripts/studio-password-hash.mjs');
   assert.equal(scripts.build, 'pnpm run build:browser && pnpm run build:server');
   assert.equal(scripts['build:browser'], 'ng build --configuration prod');
   assert.equal(
@@ -23,8 +24,8 @@ test('clean development and production builds compile the tracked presentation s
   assert.equal(scripts['build:local'], 'pnpm favicon:check && ng build --configuration local');
   assert.equal(scripts['favicon:generate'], 'cx-development-favicon --apply');
   assert.equal(scripts['favicon:check'], 'cx-development-favicon');
-  assert.equal(scripts['sync:content'], 'bin/sync-content');
-  assert.equal(scripts.images, 'pnpm run sync:content');
+  assert.equal(scripts['generate:content'], 'bin/generate-content');
+  assert.equal(scripts.images, 'pnpm run generate:content');
   assert.equal(scripts.e2e, 'node scripts/run-e2e.mjs');
   assert.match(scripts.check, /pnpm build$/);
   assert.doesNotMatch(
@@ -35,7 +36,7 @@ test('clean development and production builds compile the tracked presentation s
       scripts['build:release'],
       scripts['build:local'],
     ].join('\n'),
-    /ghostwriter|import|images|prepare-article|sips|sync:content/,
+    /ghostwriter|import|images|prepare-article|sips|generate:content/,
   );
 
   const e2eServer = await readFile(path.join(repoRoot, 'scripts', 'e2e-server.mjs'), 'utf8');
@@ -47,5 +48,8 @@ test('clean development and production builds compile the tracked presentation s
   );
   assert.match(e2eServer, /\{ targetServer: true \}/);
   assert.doesNotMatch(e2eServer, /\.\.\.process\.env/);
-  assert.doesNotMatch(e2eServer, /ghostwriter|import-articles|prepare-article|sync:content|sips/);
+  assert.doesNotMatch(
+    e2eServer,
+    /ghostwriter|generate-articles|prepare-article|generate:content|sips/,
+  );
 });

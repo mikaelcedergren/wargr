@@ -6,14 +6,11 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, renameSync, rmSync, statSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { preflightPublishedEssayInventory } from './article-slugs.mjs';
+import { preflightPublishedArticleInventory } from './article-slugs.mjs';
 
 const TOOL_REPO = resolve(fileURLToPath(new URL('.', import.meta.url)), '..');
 const REPO = resolve(process.env.WARGR_REPO_ROOT ?? TOOL_REPO);
-const GHOSTWRITER_DIR = resolve(
-  process.env.WARGR_GHOSTWRITER_ROOT ?? resolve(REPO, '..', 'ghostwriter'),
-  'wargr',
-);
+const DB_PATH = resolve(process.env.WARGR_DB_PATH ?? join(REPO, 'data', 'wargr.db'));
 const MASTER_DIR = join(REPO, 'article-images');
 if (!process.env.WARGR_GENERATED_OUTPUT_ROOT) {
   throw new Error(
@@ -117,14 +114,11 @@ function render(master, slug, specification) {
   }
 }
 
-if (!existsSync(GHOSTWRITER_DIR))
-  throw new Error(`Ghostwriter source not found: ${GHOSTWRITER_DIR}`);
-
 // Slug identity and the complete essay/master inventory are proved before the first directory
-// creation, stale-output deletion, or image render. Import and route generation consume this same
-// authority, so two filenames can never silently address one deployed URL or image pair.
-const inventory = preflightPublishedEssayInventory({
-  essaysRoot: GHOSTWRITER_DIR,
+// creation, stale-output deletion, or image render. Article and route generation consume this same
+// authority, so two records can never silently address one deployed URL or image pair.
+const inventory = preflightPublishedArticleInventory({
+  databasePath: DB_PATH,
   imagesRoot: MASTER_DIR,
 });
 if (!existsSync(SIPS)) throw new Error(`Required macOS image tool not found: ${SIPS}`);

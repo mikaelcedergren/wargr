@@ -9,7 +9,7 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 const installer = path.join(repoRoot, 'bin', 'install-server-daemon');
 const label = 'com.wargr.server';
 const template = path.join(repoRoot, 'launchd', `${label}.plist`);
-const publisherLabel = 'com.wargr.sync';
+const publisherLabel = 'com.wargr.publisher';
 const publisherTemplate = path.join(repoRoot, 'launchd', `${publisherLabel}.plist`);
 const publisherInstaller = path.join(repoRoot, 'bin', 'install-publisher-daemon');
 
@@ -30,7 +30,7 @@ test('daemon installer is a thin web-role delegate and never activates the servi
   assert.match(source, /install-site-service-definitions\.mjs/);
   assert.match(source, /--site wargr/);
   assert.match(source, /--repo "\$repo" "\$@"/);
-  assert.doesNotMatch(source, /com\.wargr\.sync/);
+  assert.doesNotMatch(source, /com\.wargr\.(?:sync|publisher)/);
   assert.doesNotMatch(source, /\blaunchctl\b/);
   assert.doesNotMatch(source, /\bsudo\b/);
   assert.doesNotMatch(source, /\.env\.|server\/dist/);
@@ -39,7 +39,7 @@ test('daemon installer is a thin web-role delegate and never activates the servi
     cwd: repoRoot,
     encoding: 'utf8',
   });
-  assert.match(direct, /VALID: wargr 1 registered LaunchDaemon definition\./);
+  assert.match(direct, /VALID: wargr 2 registered LaunchDaemon definitions./);
   assert.match(direct, /No service definition was installed/);
   assert.equal(
     execFileSync(installer, ['--check'], {
@@ -58,7 +58,7 @@ test('scheduled publisher definition selects an immutable digest-qualified tool 
   );
   assert.match(source, /<string>--digest<\/string>\s*<string>__WARGR_PUBLISHER_DIGEST__<\/string>/);
   assert.match(source, /<key>CX_DEVELOPMENT_ROOT<\/key>/);
-  assert.doesNotMatch(source, /Development\/wargr\/bin\/sync-from-ghostwriter/);
+  assert.doesNotMatch(source, /Development\/wargr\/bin\/publish-content/);
   assert.doesNotMatch(source, /Development\/server-ops\/bin\/site-release\.mjs/);
 
   const installerSource = readFileSync(publisherInstaller, 'utf8');

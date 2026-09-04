@@ -97,7 +97,27 @@ test('the server identity endpoint reports the selected synthetic release', asyn
   });
 });
 
-test('the checked-in essay snapshot renders without Ghostwriter', async ({ page }) => {
+test('the Studio stays private: noindexed shell, anonymous session, guarded API', async ({
+  page,
+  request,
+}) => {
+  const shell = await page.goto('/studio');
+  expect(shell?.ok()).toBeTruthy();
+  expect(shell?.headers()['x-robots-tag']).toBe('noindex, nofollow');
+  await expect(page).toHaveTitle('Studio — Wargr');
+  await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
+
+  const session = await request.get('/api/studio/session');
+  expect(session.ok()).toBeTruthy();
+  expect(await session.json()).toEqual({ authenticated: false });
+
+  const articles = await request.get('/api/studio/articles', { failOnStatusCode: false });
+  expect(articles.status()).toBe(401);
+});
+
+test('the checked-in essay snapshot renders from the tracked presentation source alone', async ({
+  page,
+}) => {
   const response = await page.goto('/');
   expect(response?.ok()).toBeTruthy();
   await expect(page).toHaveTitle('Wargr — essays by Michael Wargr');

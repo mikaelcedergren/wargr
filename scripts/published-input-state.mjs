@@ -1,28 +1,30 @@
 #!/usr/bin/env node
+// The publication input digest for the scheduled content publisher. The digest covers the exact
+// published closure of the article database — every published essay's content-derived record hash
+// and publish date — plus the exact bytes of every canonical PNG image master. Draft edits, polish
+// runs, sessions, and other database activity stay outside the digest, so the publisher acts only
+// when the published site inputs actually change.
 import { createHash, randomUUID } from 'node:crypto';
-import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { isDeepStrictEqual } from 'node:util';
 import { fileURLToPath } from 'node:url';
-import { preflightPublishedEssayInventory } from './article-slugs.mjs';
+import { preflightPublishedArticleInventory } from './article-slugs.mjs';
 
 const MAX_INPUT_FILES = 2_048;
 const MAX_INPUT_DIRECTORY_ENTRIES = 16_384;
 const MAX_INPUT_FILE_BYTES = 256 * 1024 * 1024;
 const MAX_INPUT_TOTAL_BYTES = 8 * 1024 * 1024 * 1024;
-const MAX_GIT_OUTPUT_BYTES = 16 * 1024 * 1024;
 const STATE_SCHEMA_VERSION = 1;
 const DIGEST_PATTERN = /^[a-f0-9]{64}$/;
 
 const toolRepoRoot = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
 const repoRoot = path.resolve(process.env.WARGR_REPO_ROOT ?? toolRepoRoot);
-const ghostwriterRoot = path.resolve(
-  process.env.WARGR_GHOSTWRITER_ROOT ?? path.resolve(repoRoot, '..', 'ghostwriter'),
+const databasePath = path.resolve(
+  process.env.WARGR_DB_PATH ?? path.join(repoRoot, 'data', 'wargr.db'),
 );
-const essaysRoot = path.join(ghostwriterRoot, 'wargr');
 const imagesRoot = path.join(repoRoot, 'article-images');
-const statePath = path.join(repoRoot, '.run', 'ghostwriter-input.json');
+const statePath = path.join(repoRoot, '.run', 'published-input.json');
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
@@ -35,12 +37,10 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
 
 export function run(argv) {
   if (!Array.isArray(argv) || argv.some((argument) => typeof argument !== 'string')) {
-    throw new TypeError('Ghostwriter input-state arguments must be strings.');
+    throw new TypeError('Published input-state arguments must be strings.');
   }
   if (argv.length === 1 && argv[0] === 'capture') {
-    process.stdout.write(
-      `${captureGhostwriterInputDigest({ ghostwriterRoot, essaysRoot, imagesRoot })}\n`,
-    );
+    process.stdout.write(`${capturePublishedInputDigest({ databasePath, imagesRoot })}\n`);
     return;
   }
   if (argv.length === 2 && argv[0] === 'matches') {
@@ -52,74 +52,69 @@ export function run(argv) {
     writeRecordedInputDigest({ repoRoot, statePath, digest: argv[1] });
     return;
   }
-  throw new Error(
-    'Usage: ghostwriter-input-state.mjs capture | matches <sha256> | record <sha256>',
-  );
+  throw new Error('Usage: published-input-state.mjs capture | matches <sha256> | record <sha256>');
 }
 
-export function captureGhostwriterInputDigest({ ghostwriterRoot, essaysRoot, imagesRoot }) {
-  const canonicalGhostwriter = requireCanonicalDirectory(ghostwriterRoot, 'Ghostwriter repository');
-  const canonicalEssays = requireCanonicalChildDirectory(
-    canonicalGhostwriter,
-    essaysRoot,
-    'Ghostwriter Wargr essays',
-  );
+export function capturePublishedInputDigest({ databasePath, imagesRoot }) {
   const canonicalImages = requireCanonicalDirectory(imagesRoot, 'Wargr article-image masters');
   // Fail before state comparison or any later publisher mutation when URL/image identity is empty
-  // or ambiguous. Image preparation, article import, and route generation use the same authority.
-  preflightPublishedEssayInventory({
-    essaysRoot: canonicalEssays,
+  // or ambiguous. Image preparation, article generation, and route generation use the same
+  // authority, so the digest and the generated site can never disagree about the closure.
+  const inventory = preflightPublishedArticleInventory({
+    databasePath,
     imagesRoot: canonicalImages,
   });
-  const head = captureGitHead(canonicalGhostwriter);
   const hash = createHash('sha256');
-  hash.update('cx-wargr-input-v1\0');
+  hash.update('cx-wargr-input-v2\0');
+  for (const entry of inventory) {
+    const line = `${entry.slug}\0${entry.recordSha256}\0${entry.record.publishedAt}\0${entry.record.updatedAt}`;
+    hash.update(`${line.length}:`);
+    hash.update(line);
+    hash.update('\0');
+  }
+
   const budget = { files: 0, totalBytes: 0 };
-  const inventories = [
-    inventorySelectedFiles({
-      root: canonicalEssays,
-      label: 'ghostwriter/wargr',
-      include: (name) => name.endsWith('.md') && name.trimStart().startsWith('☑'),
-      budget,
-      history: (name) => capturePublishedHistory(canonicalGhostwriter, head, name),
-    }),
-    inventorySelectedFiles({
-      root: canonicalImages,
-      label: 'article-images',
-      include: (name) => name.endsWith('.png'),
-      budget,
-    }),
-  ];
-  const files = inventories
-    .flatMap((inventory) =>
-      inventory.files.map((file) => ({ ...file, history: inventory.history })),
-    )
-    .sort((left, right) => Buffer.compare(left.sortKey, right.sortKey));
+  const inventoryFiles = inventorySelectedFiles({
+    root: canonicalImages,
+    label: 'article-images',
+    include: (name) => name.endsWith('.png'),
+    budget,
+  });
+  const files = inventoryFiles.files;
   for (const file of files) {
     const digest = hashStableFile(file.absolutePath, file.snapshot, file.relativePath);
-    const mtimeNs = Buffer.from(file.snapshot.mtimeNs.toString());
-    const history = file.history(file.name);
     hash.update(`${file.sortKey.length}:`);
     hash.update(file.sortKey);
     hash.update(`\0${file.size}:`);
     hash.update(digest);
-    hash.update(`\0${mtimeNs.length}:`);
-    hash.update(mtimeNs);
-    hash.update(`\0${history.length}:`);
-    hash.update(history);
     hash.update('\0');
   }
   for (const file of files) {
     assertFileSnapshot(file.absolutePath, file.snapshot, file.relativePath);
   }
-  for (const inventory of inventories) {
-    const namesAfter = selectedNames(inventory.root, inventory.include, inventory.label);
-    if (!bufferArraysEqual(inventory.names, namesAfter)) {
-      throw new Error(`${inventory.label} input inventory changed while it was captured.`);
-    }
+  const namesAfter = selectedNames(
+    inventoryFiles.root,
+    inventoryFiles.include,
+    inventoryFiles.label,
+  );
+  if (!bufferArraysEqual(inventoryFiles.names, namesAfter)) {
+    throw new Error('article-images input inventory changed while it was captured.');
   }
-  if (captureGitHead(canonicalGhostwriter) !== head) {
-    throw new Error('Ghostwriter Git revision changed while publication inputs were captured.');
+  // The published closure is re-read after the image capture so a concurrent Studio publish or
+  // unpublish during capture refuses this digest instead of silently binding a mixed state.
+  const closureAfter = preflightPublishedArticleInventory({
+    databasePath,
+    imagesRoot: canonicalImages,
+  });
+  if (
+    closureAfter.length !== inventory.length ||
+    closureAfter.some(
+      (entry, index) =>
+        entry.slug !== inventory[index].slug ||
+        entry.recordSha256 !== inventory[index].recordSha256,
+    )
+  ) {
+    throw new Error('The published closure changed while publication inputs were captured.');
   }
   return hash.digest('hex');
 }
@@ -129,9 +124,9 @@ export function readRecordedInputDigest({ repoRoot, statePath }) {
   const entry = lstatIfPresent(resolved);
   if (entry === null) return null;
   if (fs.realpathSync(resolved) !== resolved) {
-    throw new Error(`Ghostwriter input state must not traverse symbolic links: ${resolved}.`);
+    throw new Error(`Published input state must not traverse symbolic links: ${resolved}.`);
   }
-  const value = JSON.parse(readStableFile(resolved, 4_096, 'Ghostwriter input state'));
+  const value = JSON.parse(readStableFile(resolved, 4_096, 'Published input state'));
   if (
     !value ||
     typeof value !== 'object' ||
@@ -139,7 +134,7 @@ export function readRecordedInputDigest({ repoRoot, statePath }) {
     !isDeepStrictEqual(Object.keys(value).sort(), ['digest', 'schemaVersion']) ||
     value.schemaVersion !== STATE_SCHEMA_VERSION
   ) {
-    throw new Error('Ghostwriter input state must contain exactly schemaVersion 1 and digest.');
+    throw new Error('Published input state must contain exactly schemaVersion 1 and digest.');
   }
   assertDigest(value.digest);
   return value.digest;
@@ -150,10 +145,10 @@ export function writeRecordedInputDigest({ repoRoot, statePath, digest }) {
   const resolved = resolveStatePath(repoRoot, statePath);
   const existing = lstatIfPresent(resolved);
   if (existing && (!existing.isFile() || existing.isSymbolicLink() || existing.nlink !== 1)) {
-    throw new Error(`Ghostwriter input state must be one regular, unaliased file: ${resolved}.`);
+    throw new Error(`Published input state must be one regular, unaliased file: ${resolved}.`);
   }
   const parent = path.dirname(resolved);
-  const temporary = path.join(parent, `.ghostwriter-input-${randomUUID()}.tmp`);
+  const temporary = path.join(parent, `.published-input-${randomUUID()}.tmp`);
   const bytes = Buffer.from(
     `${JSON.stringify({ schemaVersion: STATE_SCHEMA_VERSION, digest }, null, 2)}\n`,
   );
@@ -179,15 +174,15 @@ export function writeRecordedInputDigest({ repoRoot, statePath, digest }) {
     throw error;
   }
   if (readRecordedInputDigest({ repoRoot, statePath }) !== digest) {
-    throw new Error('Ghostwriter input state changed while it was recorded.');
+    throw new Error('Published input state changed while it was recorded.');
   }
 }
 
-function inventorySelectedFiles({ root, label, include, budget, history = () => Buffer.alloc(0) }) {
+function inventorySelectedFiles({ root, label, include, budget }) {
   const names = selectedNames(root, include, label);
   budget.files += names.length;
   if (!Number.isSafeInteger(budget.files) || budget.files > MAX_INPUT_FILES) {
-    throw new Error(`Ghostwriter publication input exceeds ${MAX_INPUT_FILES} files.`);
+    throw new Error(`Wargr publication input exceeds ${MAX_INPUT_FILES} files.`);
   }
   const files = names.map((nameBytes) => {
     const name = decodeUtf8(nameBytes, `${label} filename`);
@@ -197,9 +192,7 @@ function inventorySelectedFiles({ root, label, include, budget, history = () => 
     const size = Number(snapshot.size);
     budget.totalBytes += size;
     if (!Number.isSafeInteger(budget.totalBytes) || budget.totalBytes > MAX_INPUT_TOTAL_BYTES) {
-      throw new Error(
-        `Ghostwriter publication input exceeds ${MAX_INPUT_TOTAL_BYTES} total bytes.`,
-      );
+      throw new Error(`Wargr publication input exceeds ${MAX_INPUT_TOTAL_BYTES} total bytes.`);
     }
     return Object.freeze({
       absolutePath,
@@ -210,7 +203,7 @@ function inventorySelectedFiles({ root, label, include, budget, history = () => 
       sortKey: Buffer.from(relativePath),
     });
   });
-  return Object.freeze({ files, history, include, label, names, root });
+  return Object.freeze({ files, include, label, names, root });
 }
 
 function selectedNames(root, include, label) {
@@ -228,7 +221,7 @@ function selectedNames(root, include, label) {
       const nameBytes = Buffer.isBuffer(entry.name) ? entry.name : Buffer.from(entry.name);
       if (include(decodeUtf8(nameBytes, 'publication input filename'))) names.push(nameBytes);
       if (names.length > MAX_INPUT_FILES) {
-        throw new Error(`Ghostwriter publication input exceeds ${MAX_INPUT_FILES} files.`);
+        throw new Error(`Wargr publication input exceeds ${MAX_INPUT_FILES} files.`);
       }
     }
   } finally {
@@ -293,46 +286,6 @@ function assertFileSnapshot(filePath, expected, label) {
   }
 }
 
-function capturePublishedHistory(repository, head, filename) {
-  const result = spawnSync(
-    'git',
-    ['--no-pager', 'log', '--follow', '--format=%H%x00%cI', head, '--', `wargr/${filename}`],
-    {
-      cwd: repository,
-      encoding: 'buffer',
-      env: { ...process.env, GIT_OPTIONAL_LOCKS: '0' },
-      maxBuffer: MAX_GIT_OUTPUT_BYTES,
-    },
-  );
-  if (result.error)
-    throw new Error(`Could not capture Ghostwriter history: ${result.error.message}`);
-  if (result.status !== 0) {
-    throw new Error(
-      decodeUtf8(result.stderr, 'Ghostwriter Git history error').trim() ||
-        `Ghostwriter history failed with status ${result.status}.`,
-    );
-  }
-  return Buffer.from(result.stdout);
-}
-
-function captureGitHead(repository) {
-  const result = spawnSync('git', ['rev-parse', '--verify', 'HEAD'], {
-    cwd: repository,
-    encoding: 'utf8',
-    env: { ...process.env, GIT_OPTIONAL_LOCKS: '0' },
-    maxBuffer: 1_024 * 1_024,
-  });
-  if (result.error)
-    throw new Error(`Could not capture Ghostwriter revision: ${result.error.message}`);
-  const revision = result.stdout.trim();
-  if (result.status !== 0 || !/^[a-f0-9]{40,64}$/.test(revision)) {
-    throw new Error(
-      result.stderr.trim() || 'Ghostwriter repository has no canonical HEAD revision.',
-    );
-  }
-  return revision;
-}
-
 function readStableFile(filePath, maxBytes, label) {
   const descriptor = fs.openSync(
     filePath,
@@ -366,10 +319,8 @@ function resolveStatePath(candidateRepo, candidateState) {
     'Wargr runtime',
   );
   const resolved = path.resolve(candidateState);
-  if (resolved !== path.join(runtime, 'ghostwriter-input.json')) {
-    throw new Error(
-      `Ghostwriter input state must be ${path.join(runtime, 'ghostwriter-input.json')}.`,
-    );
+  if (resolved !== path.join(runtime, 'published-input.json')) {
+    throw new Error(`Published input state must be ${path.join(runtime, 'published-input.json')}.`);
   }
   return resolved;
 }
@@ -402,7 +353,7 @@ function requireCanonicalDirectory(candidate, label) {
 
 function assertDigest(value) {
   if (typeof value !== 'string' || !DIGEST_PATTERN.test(value)) {
-    throw new Error('Ghostwriter input digest must be a lowercase SHA-256 digest.');
+    throw new Error('Published input digest must be a lowercase SHA-256 digest.');
   }
 }
 

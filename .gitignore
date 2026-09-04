@@ -69,6 +69,8 @@ web_modules/
 .env
 .env.*
 !.env.example
+!.env.web.example
+!.env.worker.example
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -164,3 +166,6 @@ out-tsc/
 
 # macOS
 .DS_Store
+
+# Operational article database and private data — never committed
+/data/

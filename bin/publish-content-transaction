@@ -1,5 +1,5 @@
 #!/bin/zsh
-# Internal locked worker for bin/sync-from-ghostwriter. Invoke only through that command-form
+# Internal locked worker for bin/publish-content. Invoke only through that command-form
 # kernel-lock owner so manual and scheduled generated-output transactions remain mutually exclusive.
 set -eu
 umask 077
@@ -7,17 +7,17 @@ export PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin
 NODE=/opt/homebrew/bin/node
 
 if (( $# != 0 )); then
-  echo "sync-from-ghostwriter-transaction accepts no arguments" >&2
+  echo "publish-content-transaction accepts no arguments" >&2
   exit 64
 fi
 
 TOOL_REPO="${WARGR_PUBLISHER_TOOL_ROOT:?WARGR_PUBLISHER_TOOL_ROOT is required}"
 REPO="${WARGR_REPO_ROOT:?WARGR_REPO_ROOT is required}"
-GHOSTWRITER_ROOT="${WARGR_GHOSTWRITER_ROOT:?WARGR_GHOSTWRITER_ROOT is required}"
+DB_PATH="${WARGR_DB_PATH:?WARGR_DB_PATH is required}"
 OPS_TOOL_ROOT="${WARGR_SERVER_OPS_TOOL_ROOT:?WARGR_SERVER_OPS_TOOL_ROOT is required}"
-ALLOWLIST="$TOOL_REPO/scripts/ghostwriter-generated-source.json"
-SOURCE_ATTESTATION="$REPO/.run/ghostwriter-source.json"
-INPUT_STATE="$TOOL_REPO/scripts/ghostwriter-input-state.mjs"
+ALLOWLIST="$TOOL_REPO/scripts/wargr-generated-source.json"
+SOURCE_ATTESTATION="$REPO/.run/generated-source.json"
+INPUT_STATE="$TOOL_REPO/scripts/published-input-state.mjs"
 CONTENT_TRANSACTION="$TOOL_REPO/scripts/generated-content-transaction.mjs"
 SOURCE_GUARD="$OPS_TOOL_ROOT/bin/generated-source-guard.mjs"
 SITE_RELEASE="$OPS_TOOL_ROOT/bin/site-release.mjs"
@@ -28,7 +28,7 @@ cleanup_transaction() {
   trap - EXIT
   if ! WARGR_REPO_ROOT="$REPO" \
     WARGR_PUBLISHER_TOOL_ROOT="$TOOL_REPO" \
-    WARGR_GHOSTWRITER_ROOT="$GHOSTWRITER_ROOT" \
+    WARGR_DB_PATH="$DB_PATH" \
     WARGR_SERVER_OPS_TOOL_ROOT="$OPS_TOOL_ROOT" \
       "$NODE" "$CONTENT_TRANSACTION" recover; then
     echo "generated-content recovery failed; exact source state needs review" >&2
@@ -40,12 +40,12 @@ trap cleanup_transaction EXIT
 
 WARGR_REPO_ROOT="$REPO" \
 WARGR_PUBLISHER_TOOL_ROOT="$TOOL_REPO" \
-WARGR_GHOSTWRITER_ROOT="$GHOSTWRITER_ROOT" \
+WARGR_DB_PATH="$DB_PATH" \
   "$NODE" "$CONTENT_TRANSACTION" recover
 
 input_before="$("$NODE" "$INPUT_STATE" capture)"
 if "$NODE" "$INPUT_STATE" matches "$input_before"; then
-  exit 0 # published set unchanged — nothing to do
+  exit 0 # published closure unchanged — nothing to do
 fi
 
 ts() { date -u +%FT%TZ }
@@ -65,11 +65,11 @@ if [[ -z "$pre_revision" || -z "$pre_fingerprint" || "$pre_revision" == "$pre_fi
 fi
 WARGR_REPO_ROOT="$REPO" \
 WARGR_PUBLISHER_TOOL_ROOT="$TOOL_REPO" \
-WARGR_GHOSTWRITER_ROOT="$GHOSTWRITER_ROOT" \
+WARGR_DB_PATH="$DB_PATH" \
   "$NODE" "$CONTENT_TRANSACTION" generate --defer-attestation
 input_after="$("$NODE" "$INPUT_STATE" capture)"
 if [[ "$input_after" != "$input_before" ]]; then
-  echo "Ghostwriter publication inputs changed during generation; publication was refused" >&2
+  echo "publication inputs changed during generation; publication was refused" >&2
   exit 75
 fi
 generated_state=$(

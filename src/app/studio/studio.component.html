@@ -1,0 +1,495 @@
+@if (authenticated()) {
+  <section class="wg-studio-workspace" aria-label="Wargr studio">
+    <button
+      class="wg-studio-workspace__scrim"
+      [class.wg-studio-workspace__scrim--visible]="mobileNavOpen()"
+      type="button"
+      aria-label="Dismiss studio menu"
+      (click)="closeMobileNav()"
+    ></button>
+
+    <div
+      class="wg-studio-workspace__nav"
+      [class.wg-studio-workspace__nav--visible]="mobileNavOpen()"
+    >
+      <cx-side-nav [groups]="navGroups" (itemSelect)="closeMobileNav()">
+        <div header class="wg-studio-brand">
+          <cx-icon icon="edit" size="24" mood="primary" shape="square-subtle" />
+          <span>Wargr studio</span>
+          <span class="wg-studio-brand__close cx-hide-desktop">
+            <cx-icon-button
+              icon="sidebar-left"
+              variant="transparent"
+              ariaLabel="Close studio menu"
+              (pressed)="closeMobileNav()"
+            />
+          </span>
+        </div>
+
+        <cx-account-control
+          footer
+          username="Michael Wargr"
+          [disabled]="submitting()"
+          [menuItems]="accountMenu()"
+          (itemSelect)="onAccountMenu($event)"
+          (logout)="signOut()"
+        />
+      </cx-side-nav>
+    </div>
+
+    <section class="wg-studio-workspace__main cx-page">
+      <cx-top-bar
+        [pageTitle]="{
+          kind: 'heading',
+          heading: topBarHeading(),
+          description: topBarDescription(),
+        }"
+        [menuItems]="view() === 'editor' ? editorMenu() : undefined"
+        menuAriaLabel="Essay actions"
+        (menuItemSelect)="onEditorMenu($event)"
+      >
+        <div actions class="wg-studio-top-bar-actions">
+          <span class="cx-hide-desktop">
+            <cx-icon-button
+              icon="sidebar-left"
+              ariaLabel="Open studio menu"
+              [selected]="mobileNavOpen()"
+              [ariaPressed]="mobileNavOpen()"
+              (pressed)="toggleMobileNav()"
+            />
+          </span>
+
+          @switch (view()) {
+            @case ('list') {
+              @if (articles().length > 0) {
+                <cx-button text="New essay" icon="new" mood="primary" (pressed)="startNewEssay()" />
+              }
+            }
+            @case ('editor') {
+              <cx-button
+                text="Essays"
+                icon="arrow-left"
+                [transparent]="true"
+                (pressed)="showList()"
+              />
+              <cx-button
+                text="Save"
+                icon="check"
+                mood="primary"
+                [loading]="saving()"
+                [disabled]="!dirty() || saving() || polishing()"
+                (pressed)="save()"
+              />
+            }
+          }
+        </div>
+      </cx-top-bar>
+
+      <div class="cx-page__content">
+        @switch (view()) {
+          @case ('list') {
+            @if (listError()) {
+              <cx-alert mood="danger" [heading]="listError()" />
+            }
+
+            @if (articles().length === 0) {
+              <cx-state-message
+                heading="No essays yet"
+                description="Start with a working title. Rough notes are enough; the ghostwriter does the first full pass."
+                icon="edit"
+                [action]="newEssayAction"
+                (action)="startNewEssay()"
+              />
+            } @else {
+              <cx-table
+                [columns]="articleColumns"
+                [rows]="articleRows()"
+                rowActivation="press"
+                [columnsResizable]="false"
+                [columnsReorderable]="false"
+                (rowActivate)="onRowActivate($event)"
+                (rowMenuItemSelect)="onRowMenu($event)"
+              />
+            }
+          }
+
+          @case ('editor') {
+            @if (article(); as current) {
+              <div class="wg-studio-editor">
+                <div class="wg-studio-editor__main">
+                  <cx-stack gap="xl" gapMobile="lg">
+                    @if (editorError()) {
+                      <cx-alert mood="danger" [heading]="editorError()">
+                        @if (publishProblems().length > 0) {
+                          <ul class="wg-studio-problems">
+                            @for (problem of publishProblems(); track $index) {
+                              <li>{{ problem }}</li>
+                            }
+                          </ul>
+                        }
+                      </cx-alert>
+                    }
+                    @if (editorNotice()) {
+                      <cx-alert mood="success" [heading]="editorNotice()" />
+                    }
+
+                    <section class="wg-studio-section" aria-label="Essay">
+                      <cx-stack gap="lg">
+                        <cx-text-field
+                          label="Title"
+                          hint="Creates curiosity and remains findable through search."
+                          [value]="draft().title"
+                          [disabled]="polishing()"
+                          (valueChange)="updateDraftField('title', $event)"
+                        />
+                        <cx-text-field
+                          label="Topic"
+                          hint="One sentence on what the essay is really about. Internal only, never shown to readers."
+                          [value]="draft().topic"
+                          [disabled]="polishing()"
+                          (valueChange)="updateDraftField('topic', $event)"
+                        />
+                        <cx-text-area
+                          label="Ingress"
+                          [hint]="ingressHint()"
+                          sizing="fixed"
+                          [minLines]="2"
+                          [value]="draft().ingress"
+                          [disabled]="polishing()"
+                          (valueChange)="updateDraftField('ingress', $event)"
+                        />
+                        <div class="wg-studio-body-field">
+                          <span class="wg-studio-field-label">Body</span>
+                          <div
+                            class="wg-studio-body-editor"
+                            [class.wg-studio-body-editor--busy]="polishing()"
+                          >
+                            <cx-markdown-editor
+                              ariaLabel="Essay body"
+                              presentation="document"
+                              placeholder="Write whatever you have, however raw."
+                              [value]="draft().body"
+                              [disabled]="polishing()"
+                              (valueChange)="updateDraftField('body', $event)"
+                            />
+                          </div>
+                        </div>
+                        <cx-text-field
+                          label="Address"
+                          [hint]="
+                            current.state === 'published'
+                              ? 'A published essay keeps its address.'
+                              : 'Lowercase words separated by hyphens: wargr.com/<address>/'
+                          "
+                          [value]="slugDraft()"
+                          [disabled]="polishing() || current.state === 'published'"
+                          (valueChange)="updateSlug($event)"
+                        />
+                      </cx-stack>
+                    </section>
+
+                    <section class="wg-studio-section" aria-label="Publishing furniture">
+                      <h2>Publishing furniture</h2>
+                      <p class="wg-studio-prose">
+                        The ghostwriter writes all of this alongside the essay. Publishing requires
+                        10–20 tags, three social posts, two or three pull quotes and three image
+                        prompts.
+                      </p>
+                      <cx-stack gap="lg">
+                        <cx-tag-field
+                          label="Tags"
+                          hint="10–20 lowercase tags, no # prefix."
+                          [tags]="availableTags()"
+                          [values]="tagValues()"
+                          [creatable]="true"
+                          [disabled]="polishing()"
+                          (valuesChange)="updateTags($event)"
+                        />
+
+                        <div class="wg-studio-list-block">
+                          <cx-inline gap="sm" justify="between">
+                            <span class="wg-studio-field-label">Social posts</span>
+                            <cx-icon-button
+                              icon="plus"
+                              variant="transparent"
+                              ariaLabel="Add a social post"
+                              [disabled]="polishing() || draft().socialPosts.length >= 10"
+                              (pressed)="addListEntry('socialPosts')"
+                            />
+                          </cx-inline>
+                          @for (post of draft().socialPosts; track $index) {
+                            <div class="wg-studio-list-row">
+                              <cx-text-area
+                                [label]="'Post ' + ($index + 1)"
+                                hint="Within 280 characters. No numbering, no title."
+                                sizing="fixed"
+                                [minLines]="2"
+                                [value]="post"
+                                [disabled]="polishing()"
+                                (valueChange)="updateListEntry('socialPosts', $index, $event)"
+                              />
+                              <cx-icon-button
+                                icon="delete"
+                                variant="transparent"
+                                [ariaLabel]="'Remove post ' + ($index + 1)"
+                                [disabled]="polishing()"
+                                (pressed)="removeListEntry('socialPosts', $index)"
+                              />
+                            </div>
+                          }
+                        </div>
+
+                        <div class="wg-studio-list-block">
+                          <cx-inline gap="sm" justify="between">
+                            <span class="wg-studio-field-label">Pull quotes</span>
+                            <cx-icon-button
+                              icon="plus"
+                              variant="transparent"
+                              ariaLabel="Add a pull quote"
+                              [disabled]="polishing() || draft().pullQuotes.length >= 10"
+                              (pressed)="addPullQuote()"
+                            />
+                          </cx-inline>
+                          @for (quote of draft().pullQuotes; track $index) {
+                            <div class="wg-studio-list-row">
+                              <cx-stack gap="sm">
+                                <cx-text-field
+                                  [label]="'Hook ' + ($index + 1)"
+                                  [value]="quote.hook"
+                                  [disabled]="polishing()"
+                                  (valueChange)="updatePullQuote($index, 'hook', $event)"
+                                />
+                                <cx-text-area
+                                  label="Expansion"
+                                  sizing="fixed"
+                                  [minLines]="2"
+                                  [value]="quote.expansion"
+                                  [disabled]="polishing()"
+                                  (valueChange)="updatePullQuote($index, 'expansion', $event)"
+                                />
+                              </cx-stack>
+                              <cx-icon-button
+                                icon="delete"
+                                variant="transparent"
+                                [ariaLabel]="'Remove pull quote ' + ($index + 1)"
+                                [disabled]="polishing()"
+                                (pressed)="removePullQuote($index)"
+                              />
+                            </div>
+                          }
+                        </div>
+
+                        <div class="wg-studio-list-block">
+                          <cx-inline gap="sm" justify="between">
+                            <span class="wg-studio-field-label">Image prompts</span>
+                            <cx-icon-button
+                              icon="plus"
+                              variant="transparent"
+                              ariaLabel="Add an image prompt"
+                              [disabled]="polishing() || draft().imagePrompts.length >= 10"
+                              (pressed)="addListEntry('imagePrompts')"
+                            />
+                          </cx-inline>
+                          @for (prompt of draft().imagePrompts; track $index) {
+                            <div class="wg-studio-list-row">
+                              <cx-text-area
+                                [label]="'Prompt ' + ($index + 1)"
+                                hint="Begins with “Create a”. Colour photography, no text in the image."
+                                sizing="fixed"
+                                [minLines]="2"
+                                [value]="prompt"
+                                [disabled]="polishing()"
+                                (valueChange)="updateListEntry('imagePrompts', $index, $event)"
+                              />
+                              <cx-icon-button
+                                icon="delete"
+                                variant="transparent"
+                                [ariaLabel]="'Remove prompt ' + ($index + 1)"
+                                [disabled]="polishing()"
+                                (pressed)="removeListEntry('imagePrompts', $index)"
+                              />
+                            </div>
+                          }
+                        </div>
+                      </cx-stack>
+                    </section>
+                  </cx-stack>
+                </div>
+
+                <aside class="wg-studio-editor__side" aria-label="The ghostwriter">
+                  <cx-card heading="The ghostwriter" icon="ai" padding="large">
+                    <cx-stack gap="md">
+                      @if (polishError()) {
+                        <cx-alert mood="danger" [heading]="polishError()" />
+                      }
+                      @if (polishing()) {
+                        <cx-state-message
+                          state="pending"
+                          heading="The ghostwriter is writing"
+                          description="The round is safely queued and survives leaving this page. The result replaces the essay when it lands."
+                        />
+                      } @else {
+                        <p class="wg-studio-prose">
+                          Pick how settled the current text is, then run a round. Your edits are
+                          read as meaning, not wording; run round after round until the essay is
+                          true.
+                        </p>
+                        <cx-dropdown
+                          label="This round"
+                          [availableValues]="polishModeOptions"
+                          [value]="polishMode()"
+                          [disabled]="polishing()"
+                          (valueChange)="selectPolishMode($event)"
+                        />
+                        <cx-text-area
+                          label="Instruction for this round"
+                          [optional]="true"
+                          hint="What to push, what is settled, what felt wrong."
+                          sizing="fixed"
+                          [minLines]="2"
+                          [maxLength]="2000"
+                          [value]="polishInstruction()"
+                          [disabled]="polishing()"
+                          (valueChange)="updatePolishInstruction($event)"
+                        />
+                        <cx-button
+                          class="wg-studio-run"
+                          text="Run the ghostwriter"
+                          icon="bolt"
+                          mood="primary"
+                          [loading]="polishing()"
+                          [disabled]="polishing() || saving()"
+                          (pressed)="startPolish()"
+                        />
+                      }
+                    </cx-stack>
+                  </cx-card>
+
+                  @if (versions().length > 0) {
+                    <cx-expansion-panel heading="Rounds">
+                      <cx-stack gap="sm">
+                        @for (version of versions(); track version.articleVersion) {
+                          <cx-inline gap="md" justify="between">
+                            <span class="wg-studio-meta">
+                              {{ version.articleVersion }} · {{ versionLabel(version) }}
+                            </span>
+                            <cx-button
+                              size="small"
+                              text="Load into editor"
+                              [transparent]="true"
+                              [disabled]="polishing()"
+                              (pressed)="restoreVersion(version)"
+                            />
+                          </cx-inline>
+                          <cx-divider [discreet]="true" />
+                        }
+                      </cx-stack>
+                    </cx-expansion-panel>
+                  }
+                </aside>
+              </div>
+            }
+          }
+        }
+      </div>
+    </section>
+  </section>
+
+  <cx-dialog
+    variant="confirm"
+    heading="New essay"
+    description="A working title is enough. Everything else can arrive as rough notes."
+    [open]="newEssayOpen()"
+    primaryText="Create essay"
+    [primaryLoading]="creating()"
+    [primaryDisabled]="creating()"
+    secondaryText="Cancel"
+    [closeOnPrimary]="false"
+    (primary)="createEssay()"
+    (secondary)="closeNewEssay()"
+    (dismiss)="closeNewEssay()"
+  >
+    <cx-stack body gap="md">
+      <cx-text-field
+        #newTitleField
+        label="Working title"
+        [value]="newTitle()"
+        [validation]="newTitleValidation()"
+        [disabled]="creating()"
+        (valueChange)="updateNewTitle($event)"
+      />
+    </cx-stack>
+  </cx-dialog>
+
+  <cx-dialog
+    variant="confirm"
+    mood="danger"
+    heading="Delete essay"
+    [open]="pendingDelete() !== undefined"
+    [description]="
+      pendingDelete()
+        ? '“' +
+          (pendingDelete()!.title || pendingDelete()!.slug) +
+          '” is removed with its complete round history. This cannot be undone.'
+        : ''
+    "
+    primaryText="Delete essay"
+    secondaryText="Keep essay"
+    (primary)="confirmDelete()"
+    (secondary)="cancelDelete()"
+    (dismiss)="cancelDelete()"
+  />
+} @else {
+  <section class="wg-studio-login" aria-label="Wargr studio">
+    <cx-card
+      class="wg-studio-login__panel"
+      heading="Wargr studio"
+      icon="lock"
+      padding="large"
+      shadow
+    >
+      <cx-stack gap="lg">
+        <p class="wg-studio-prose">Sign in to write.</p>
+
+        <form aria-label="Sign in" (submit)="onSubmit($event)">
+          <cx-stack gap="md">
+            @if (requestError()) {
+              <cx-alert mood="danger" [heading]="requestError()" />
+            }
+
+            <cx-text-field
+              #usernameField
+              label="Username"
+              name="username"
+              autocomplete="username"
+              prependIcon="user"
+              [value]="username()"
+              [validation]="usernameValidation()"
+              [disabled]="submitting()"
+              (valueChange)="updateUsername($event)"
+            />
+
+            <cx-password-field
+              label="Password"
+              name="password"
+              autocomplete="current-password"
+              [value]="password()"
+              [validation]="passwordValidation()"
+              [disabled]="submitting()"
+              (valueChange)="updatePassword($event)"
+            />
+
+            <cx-button
+              class="wg-studio-login__submit"
+              text="Sign in"
+              mood="primary"
+              icon="lock-open"
+              type="submit"
+              [loading]="submitting()"
+            />
+          </cx-stack>
+        </form>
+      </cx-stack>
+    </cx-card>
+  </section>
+}

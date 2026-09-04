@@ -5,10 +5,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { isDeepStrictEqual } from 'node:util';
 import { fileURLToPath } from 'node:url';
-import { preflightPublishedEssayInventory } from './article-slugs.mjs';
+import { preflightPublishedArticleInventory } from './article-slugs.mjs';
 
-const JOURNAL_FILENAME = 'ghostwriter-generated-content-transaction.json';
-const TRANSACTION_PREFIX = 'ghostwriter-generated-content.';
+const JOURNAL_FILENAME = 'wargr-generated-content-transaction.json';
+const TRANSACTION_PREFIX = 'wargr-generated-content.';
 const TRANSACTION_KIND = 'wargr-generated-content-transaction';
 const TRANSACTION_SCHEMA_VERSION = 3;
 const MAX_GENERATED_FILES = 8_192;
@@ -19,8 +19,8 @@ const MAX_TRANSACTION_FILES = MAX_GENERATED_FILES * 4;
 const MAX_TRANSACTION_TOTAL_BYTES = MAX_GENERATED_TOTAL_BYTES * 8;
 const MAX_JOURNAL_BYTES = 256 * 1024;
 const MAX_RUNTIME_ENTRIES = 256;
-const SOURCE_ATTESTATION_RELATIVE = '.run/ghostwriter-source.json';
-const SOURCE_ALLOWLIST_RELATIVE = 'scripts/ghostwriter-generated-source.json';
+const SOURCE_ATTESTATION_RELATIVE = '.run/generated-source.json';
+const SOURCE_ALLOWLIST_RELATIVE = 'scripts/wargr-generated-source.json';
 const SOURCE_GUARD_RELATIVE = 'bin/generated-source-guard.mjs';
 
 export const GENERATED_OUTPUT_PATHS = Object.freeze([
@@ -90,30 +90,29 @@ export function run(argv) {
     });
     return;
   }
-  const ghostwriterRoot = requireCanonicalDirectory(
-    path.resolve(process.env.WARGR_GHOSTWRITER_ROOT ?? path.resolve(repoRoot, '..', 'ghostwriter')),
-    'Ghostwriter repository',
+  const databasePath = path.resolve(
+    process.env.WARGR_DB_PATH ?? path.join(repoRoot, 'data', 'wargr.db'),
   );
-  generateGeneratedContent({ repoRoot, toolRoot, ghostwriterRoot, deferAttestation });
+  generateGeneratedContent({ repoRoot, toolRoot, databasePath, deferAttestation });
 }
 
 export function generateGeneratedContent({
   repoRoot,
   toolRoot,
-  ghostwriterRoot,
+  databasePath,
   spawn = spawnSync,
   faultInjector,
   deferAttestation = false,
 } = {}) {
   const repo = requireCanonicalDirectory(repoRoot, 'Wargr repository');
   const tools = requireCanonicalDirectory(toolRoot, 'Wargr publisher tool root');
-  const ghostwriter = requireCanonicalDirectory(ghostwriterRoot, 'Ghostwriter repository');
+  const database = path.resolve(databasePath);
   recoverGeneratedContentTransaction({ repoRoot: repo });
 
   // This is the first operation after recovery and precedes staging creation. An empty or
   // colliding slug set therefore performs zero generated-output mutation and starts no renderer.
-  const inventory = preflightPublishedEssayInventory({
-    essaysRoot: path.join(ghostwriter, 'wargr'),
+  const inventory = preflightPublishedArticleInventory({
+    databasePath: database,
     imagesRoot: path.join(repo, 'article-images'),
   });
 
@@ -123,11 +122,11 @@ export function generateGeneratedContent({
   const stagedSnapshotRoot = path.join(transactionRoot, 'snapshot');
   fs.mkdirSync(stagedSnapshotRoot, { mode: 0o700 });
   try {
-    for (const script of ['prepare-article-images.mjs', 'import-articles.mjs']) {
+    for (const script of ['prepare-article-images.mjs', 'generate-articles.mjs']) {
       runGenerator({
         repoRoot: repo,
         toolRoot: tools,
-        ghostwriterRoot: ghostwriter,
+        databasePath: database,
         stagedSnapshotRoot,
         script,
         spawn,
@@ -610,7 +609,7 @@ export function assertExactGeneratedSnapshot(stagedSnapshotRoot, { expectedSlugs
   return Object.freeze({ files, totalBytes });
 }
 
-function runGenerator({ repoRoot, toolRoot, ghostwriterRoot, stagedSnapshotRoot, script, spawn }) {
+function runGenerator({ repoRoot, toolRoot, databasePath, stagedSnapshotRoot, script, spawn }) {
   if (typeof spawn !== 'function')
     throw new TypeError('Generated-content spawn adapter is invalid.');
   const entrypoint = containedPath(path.join(toolRoot, 'scripts'), script);
@@ -619,7 +618,7 @@ function runGenerator({ repoRoot, toolRoot, ghostwriterRoot, stagedSnapshotRoot,
     env: {
       ...process.env,
       WARGR_REPO_ROOT: repoRoot,
-      WARGR_GHOSTWRITER_ROOT: ghostwriterRoot,
+      WARGR_DB_PATH: databasePath,
       WARGR_GENERATED_OUTPUT_ROOT: stagedSnapshotRoot,
     },
     encoding: 'utf8',

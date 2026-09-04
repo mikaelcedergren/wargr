@@ -1,55 +1,33 @@
 #!/usr/bin/env node
-// Pulls essays from ../ghostwriter/wargr and generates the Angular pages + routes for wargr.com.
+// Generates the Angular pages + routes for wargr.com from the article database — the Studio
+// authoring source that replaced the retired ghostwriter repository. Only articles in the
+// published state enter the site; drafts and their round history never leave the database.
 //
-// Publishing rule: ONLY files whose name starts with "☑" are published. Everything else is a draft
-// and is skipped. (The ghostwriter author marks a piece ready by prefixing the filename with ☑.)
-//
-// Each ghostwriter file has the shape:
-//   # <title>
-//   ## Topic: <internal note — NOT shown to readers>
-//   ## Published: <YYYY-MM-DD or full ISO — the publish date of record; see articleDates()>
-//   ---
-//   **<ingress / dek>**          <- reader-facing one-line hook
-//   <body markdown...>
-//   ---
-//   <tags, comma-separated>      <- publishing metadata (we use tags as keywords)
-//   1. <pull-quote hook>         <- 2–3 hand-authored pull-quotes (hook + elaboration)...
-//   <elaboration...>
-//   1. Create a ... photograph   <- ...then thumbnail-generation prompts (start with "Create a")
-//
-// This runs at build time (and on every ghostwriter change via the sync job). It is idempotent and
-// fully regenerates src/app/articles/*, the home feed, app.routes.ts, sitemap.xml, robots.txt and
-// the RSS feed. It also derives reading-time, reclaims the pull-quotes, and wires every essay to its
-// related + previous/next neighbours so the article pages link into a dense internal graph.
-import { execFileSync } from 'node:child_process';
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  readdirSync,
-  rmSync,
-  statSync,
-  writeFileSync,
-} from 'node:fs';
+// This runs inside the generated-content transaction (scheduled by the publisher when the
+// published closure changes, or manually via pnpm generate:content). It is idempotent and fully
+// regenerates src/app/articles/*, the home feed, app.routes.ts, sitemap.xml, robots.txt and the
+// RSS feed. It also derives reading-time, renders the structured pull-quotes, and wires every
+// essay to its related + previous/next neighbours so the article pages link into a dense internal
+// graph.
+import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { marked } from 'marked';
 import sanitizeHtml from 'sanitize-html';
-import { preflightPublishedEssayInventory } from './article-slugs.mjs';
+import { preflightPublishedArticleInventory } from './article-slugs.mjs';
 
 const TOOL_REPO = resolve(fileURLToPath(new URL('.', import.meta.url)), '..');
 const REPO = resolve(process.env.WARGR_REPO_ROOT ?? TOOL_REPO);
 if (!process.env.WARGR_GENERATED_OUTPUT_ROOT) {
   throw new Error(
-    'import-articles.mjs is a staging-only generator; use the generated-content transaction.',
+    'generate-articles.mjs is a staging-only generator; use the generated-content transaction.',
   );
 }
 const OUTPUT_ROOT = resolve(process.env.WARGR_GENERATED_OUTPUT_ROOT);
 if (OUTPUT_ROOT === REPO) {
-  throw new Error('Article import staging output must not be the mutable Wargr checkout root.');
+  throw new Error('Article generation staging output must not be the mutable Wargr checkout root.');
 }
-const GHOST = resolve(process.env.WARGR_GHOSTWRITER_ROOT ?? resolve(REPO, '..', 'ghostwriter'));
-const SRC = join(GHOST, 'wargr');
+const DB_PATH = resolve(process.env.WARGR_DB_PATH ?? join(REPO, 'data', 'wargr.db'));
 const APP = join(OUTPUT_ROOT, 'src', 'app');
 const ARTICLES_DIR = join(APP, 'articles');
 const PAGES_DIR = join(APP, 'pages');
@@ -258,38 +236,13 @@ function pascal(slug) {
     .map((w) => w[0].toUpperCase() + w.slice(1))
     .join('');
 }
-function gitDates(filename) {
-  try {
-    const dates = execFileSync(
-      'git',
-      ['-C', GHOST, 'log', '--follow', '--format=%cI', '--', `wargr/${filename}`],
-      { encoding: 'utf8' },
-    )
-      .trim()
-      .split('\n')
-      .filter(Boolean);
-    if (dates.length) {
-      return {
-        published: dates[dates.length - 1],
-        modified: dates[0],
-      };
-    }
-  } catch {
-    /* not a git repo / not committed */
-  }
-  return null;
-}
-// The essay's own `## Published:` line is the publish date of record: it travels with the piece, so
-// every machine builds the same dates regardless of how deep its ghostwriter clone's history goes.
-// Git history supplies dateModified (and the published fallback for essays without the line); file
-// mtime is the last resort. A date-only value normalises to noon UTC so it renders as the same
-// calendar day in every timezone.
-function articleDates(filename, publishedLine) {
-  const git = gitDates(filename);
-  let published = publishedLine || git?.published;
-  if (!published) published = statSync(join(SRC, filename)).mtime.toISOString();
+// The record's own publish date is the date of record: it travels with the essay, so every machine
+// builds the same dates. The record's modified date is Studio's last accepted write. A date-only
+// value normalises to noon UTC so it renders as the same calendar day in every timezone.
+function articleDates(record) {
+  let published = record.publishedAt;
   if (/^\d{4}-\d{2}-\d{2}$/.test(published)) published = `${published}T12:00:00Z`;
-  let modified = git?.modified ?? published;
+  let modified = record.updatedAt;
   if (new Date(modified) < new Date(published)) modified = published;
   return { published, modified };
 }
@@ -352,73 +305,19 @@ function seoForArticle({ slug, title, dek, tags }) {
   };
 }
 
-/**
- * Pull the hand-authored pull-quotes out of the trailing metadata. They are numbered blocks
- * ("1. <hook>\n\n<elaboration>"); the thumbnail prompts are ALSO numbered but their hook starts with
- * "Create a", so we drop those. Returns up to 3 { hook, elab } pairs (possibly empty).
- */
-function parsePullQuotes(trailing) {
-  if (!trailing) return [];
-  const items = [];
-  let cur = null;
-  for (const line of trailing.split('\n')) {
-    const m = line.match(/^\s*\d+\.\s+(.*)$/);
-    if (m) {
-      if (cur) items.push(cur);
-      cur = { hook: m[1].trim(), rest: [] };
-    } else if (cur) {
-      cur.rest.push(line);
-    }
-  }
-  if (cur) items.push(cur);
-  return items
-    .filter((it) => it.hook && !/^create\b/i.test(it.hook))
-    .slice(0, 3)
-    .map((it) => ({ hook: it.hook, elab: it.rest.join('\n').trim() }));
-}
-
-function parse(filename, slug) {
-  const raw = readFileSync(join(SRC, filename), 'utf8').replace(/\r\n/g, '\n');
-  const titleMatch = raw.match(/^#\s+(.+?)\s*$/m);
-  const topicMatch = raw.match(/^##\s+Topic:\s*(.+?)\s*$/m);
-  const publishedMatch = raw.match(/^##\s+Published:\s*(.+?)\s*$/m);
-  const title = titleMatch ? titleMatch[1].trim() : slug;
-
-  // Split on horizontal rules. Published shape => [preamble, body, trailingMeta].
-  const parts = raw.split(/^\s*---\s*$/m);
-  let bodyMd = (parts.length >= 3 ? parts[1] : parts.slice(1).join('\n---\n')).trim();
-  const trailing = parts.length >= 3 ? parts.slice(2).join('\n').trim() : '';
-
-  // Ingress: the first bolded line of the body is the reader-facing dek; lift it out of the body.
-  let dek = topicMatch ? topicMatch[1].trim() : '';
-  const lines = bodyMd.split('\n');
-  let i = 0;
-  while (i < lines.length && lines[i].trim() === '') i++;
-  const ing = lines[i] ? lines[i].match(/^\*\*(.+?)\*\*\s*$/) : null;
-  if (ing) {
-    dek = ing[1].trim();
-    lines.splice(0, i + 1);
-    bodyMd = lines.join('\n').trim();
-  }
-
-  // Tags: first non-empty line of the trailing metadata, comma-separated.
-  let tags = [];
-  if (trailing) {
-    const firstLine = trailing.split('\n').find((l) => l.trim());
-    if (firstLine && firstLine.includes(',')) {
-      tags = firstLine
-        .split(',')
-        .map((t) => t.trim().toLowerCase())
-        .filter(Boolean)
-        .slice(0, 20);
-    }
-  }
-
-  const dates = articleDates(filename, publishedMatch ? publishedMatch[1].trim() : null);
-  const bodyHtml = sanitizeHtml(marked.parse(bodyMd), SANITIZE_OPTIONS);
-  const wordCount = countWords(bodyMd);
+/** Map one stored published record onto the exact article shape the site generator renders. */
+function fromRecord({ slug, record }) {
+  const title = record.title;
+  const dek = record.ingress;
+  const tags = record.tags.slice(0, 20);
+  const dates = articleDates(record);
+  const bodyHtml = sanitizeHtml(marked.parse(record.body), SANITIZE_OPTIONS);
+  const wordCount = countWords(record.body);
   const readingTime = Math.max(1, Math.round(wordCount / WORDS_PER_MINUTE));
-  const pullQuotes = parsePullQuotes(trailing);
+  const pullQuotes = record.pullQuotes.map((quote) => ({
+    hook: quote.hook,
+    elab: quote.expansion,
+  }));
   const seo = seoForArticle({ slug, title, dek, tags });
   const hero = requireArticleImage(slug);
   const ogCard = requireArticleImage(slug, '-og');
@@ -508,7 +407,7 @@ function writeArticleComponent(a) {
 import { RouterLink } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
 
-// Generated by scripts/import-articles.mjs from ../ghostwriter/wargr. Do not edit by hand.
+// Generated by scripts/generate-articles.mjs from the wargr article database. Do not edit by hand.
 const HTML = ${JSON.stringify(a.bodyHtml)};
 
 type WgLink = { slug: string; title: string };
@@ -610,7 +509,7 @@ function writeHome(articles) {
   const src = `import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-// Generated by scripts/import-articles.mjs. Do not edit by hand.
+// Generated by scripts/generate-articles.mjs. Do not edit by hand.
 @Component({
   selector: 'wg-home',
   imports: [RouterLink],
@@ -704,13 +603,19 @@ function writeRoutes(articles, classes) {
   const src = `import { Routes } from '@angular/router';
 import { PageSeo } from './shared/seo';
 
-// GENERATED by scripts/import-articles.mjs from ../ghostwriter/wargr. Do not edit by hand.
+// GENERATED by scripts/generate-articles.mjs from the wargr article database. Do not edit by hand.
 export const routes: Routes = [
   {
     path: '',
     loadComponent: () => import('./pages/home.component').then((m) => m.HomeComponent),
     title: 'Wargr — essays by Michael Wargr',
     data: { seo: ${JSON.stringify(homeSeo)} satisfies PageSeo },
+  },
+  {
+    path: 'studio',
+    loadComponent: () => import('./studio/studio.component').then((m) => m.StudioComponent),
+    title: 'Studio — Wargr',
+    data: { chrome: 'bare', seo: { path: '/studio', description: 'Wargr Studio.', noindex: true } satisfies PageSeo },
   },
 ${entries.join('\n')}
   {
@@ -801,24 +706,20 @@ function writeSitemapAndRobots(articles) {
   writeFileSync(join(OUTPUT_ROOT, 'public', 'sitemap.xml'), sitemap);
   writeFileSync(
     join(OUTPUT_ROOT, 'public', 'robots.txt'),
-    `User-agent: *\nAllow: /\nSitemap: ${SITE_ORIGIN}/sitemap.xml\n`,
+    `User-agent: *\nAllow: /\nDisallow: /studio\nDisallow: /api/\nSitemap: ${SITE_ORIGIN}/sitemap.xml\n`,
   );
 }
 
 // ---- run ----
-if (!existsSync(SRC)) {
-  console.error(`[import] ghostwriter source not found: ${SRC}`);
-  process.exit(1);
-}
-// Re-prove the same complete slug/master inventory used by image preparation before parsing or
+// Re-prove the same complete slug/master inventory used by image preparation before rendering or
 // writing. Routes, components, image names, feeds, and canonical URLs therefore share one exact
 // non-empty and collision-free identity set.
-const inventory = preflightPublishedEssayInventory({
-  essaysRoot: SRC,
+const inventory = preflightPublishedArticleInventory({
+  databasePath: DB_PATH,
   imagesRoot: join(REPO, 'article-images'),
 });
 const published = inventory
-  .map(({ filename, slug }) => parse(filename, slug))
+  .map(fromRecord)
   // Newest first by publish date; ties break by modified date, then slug, so the
   // feed/prev/next order is identical on every machine.
   .sort(
@@ -840,7 +741,7 @@ writeRoutes(published, classes);
 writeFeed(published);
 writeSitemapAndRobots(published);
 
-console.log(`[import] published ${published.length} essays:`);
+console.log(`[generate] published ${published.length} essays:`);
 for (const a of published) {
   console.log(
     `  - /${a.slug}/  "${a.title}"  (${a.date}, ${a.readingTime} min, ${a.tags.length} tags, ${a.pullQuotes.length} quotes, ${a.related.length} related)`,

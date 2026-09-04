@@ -3,24 +3,23 @@
   "kind": "wargr-scheduled-publisher",
   "publisher": "wargr",
   "repository": "wargr",
-  "entrypoint": "bin/sync-from-ghostwriter",
+  "entrypoint": "bin/publish-content",
   "sourceFiles": [
-    "bin/sync-from-ghostwriter",
-    "bin/sync-from-ghostwriter-transaction",
+    "bin/publish-content",
+    "bin/publish-content-transaction",
     "scripts/article-slugs.mjs",
+    "scripts/generate-articles.mjs",
     "scripts/generated-content-transaction.mjs",
-    "scripts/ghostwriter-generated-source.json",
-    "scripts/ghostwriter-input-state.mjs",
-    "scripts/import-articles.mjs",
-    "scripts/prepare-article-images.mjs"
+    "scripts/prepare-article-images.mjs",
+    "scripts/published-input-state.mjs",
+    "scripts/wargr-generated-source.json"
   ],
   "inputs": {
-    "ghostwriterRepository": "ghostwriter",
-    "essays": "ghostwriter/wargr",
+    "database": "wargr/data/wargr.db",
     "images": "wargr/article-images"
   },
   "logs": {
-    "stdout": "wargr/.run/sync.out.log",
-    "stderr": "wargr/.run/sync.err.log"
+    "stdout": "wargr/.run/publish.out.log",
+    "stderr": "wargr/.run/publish.err.log"
   }
 }

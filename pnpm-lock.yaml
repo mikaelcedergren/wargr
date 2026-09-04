@@ -131,6 +131,9 @@ importers:
       '@types/node':
         specifier: ^26.0.0
         version: 26.2.0
+      tsx:
+        specifier: ^4.23.1
+        version: 4.23.13
       typescript:
         specifier: ~6.0.3
         version: 6.0.3
@@ -803,7 +806,7 @@ packages:
     os: [win32]
 
   '@mikaelcedergren/cx-framework@https://codeload.github.com/mikaelcedergren/cx-framework/tar.gz/1cf9c1aaf47aef3eb2f61f7cde7a46c2577b7e3f':
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/mikaelcedergren/cx-framework/tar.gz/1cf9c1aaf47aef3eb2f61f7cde7a46c2577b7e3f}
+    resolution: {gitHosted: true, integrity: sha512-tfJagLiZU6nEJ+ZM0rzLZ7lefij9F6aYu/05o/DOfSSYlDtUftYBWahRlh6GU+0jsFUr+l751iip9Lnvq2fq9g==, tarball: https://codeload.github.com/mikaelcedergren/cx-framework/tar.gz/1cf9c1aaf47aef3eb2f61f7cde7a46c2577b7e3f}
     version: 0.9.24
     engines: {node: '>=26 <27'}
     hasBin: true
@@ -2503,6 +2506,11 @@ packages:
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
+
+  tsx@4.23.13:
+    resolution: {integrity: sha512-BL5MGkRln6aDYhb0xbQlEAGw743BaZYWdbWtdJOBriYJboKgUUYCadFp2/FpBBZquBC/ezNBn7wMMPx7FDZUDw==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
 
   tuf-js@4.1.0:
     resolution: {integrity: sha512-50QV99kCKH5P/Vs4E2Gzp7BopNV+KzTXqWeaxrfu5IQJBOULRsTIS9seSsOVT8ZnGXzCyx55nYWAi4qJzpZKEQ==}
@@ -5034,6 +5042,12 @@ snapshots:
   toidentifier@1.0.1: {}
 
   tslib@2.8.1: {}
+
+  tsx@4.23.13:
+    dependencies:
+      esbuild: 0.28.1
+    optionalDependencies:
+      fsevents: 2.3.3
 
   tuf-js@4.1.0:
     dependencies:

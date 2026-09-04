@@ -3,27 +3,30 @@ import fs from 'node:fs';
 import test from 'node:test';
 
 const syncWrapperSource = fs.readFileSync(
-  new URL('../bin/sync-from-ghostwriter', import.meta.url),
+  new URL('../bin/publish-content', import.meta.url),
   'utf8',
 );
 const syncSource = fs.readFileSync(
-  new URL('../bin/sync-from-ghostwriter-transaction', import.meta.url),
+  new URL('../bin/publish-content-transaction', import.meta.url),
   'utf8',
 );
 const allowlist = JSON.parse(
-  fs.readFileSync(new URL('../scripts/ghostwriter-generated-source.json', import.meta.url), 'utf8'),
+  fs.readFileSync(new URL('../scripts/wargr-generated-source.json', import.meta.url), 'utf8'),
 );
 const imageSource = fs.readFileSync(
   new URL('../scripts/prepare-article-images.mjs', import.meta.url),
   'utf8',
 );
 const importSource = fs.readFileSync(
-  new URL('../scripts/import-articles.mjs', import.meta.url),
+  new URL('../scripts/generate-articles.mjs', import.meta.url),
   'utf8',
 );
-const manualSyncSource = fs.readFileSync(new URL('../bin/sync-content', import.meta.url), 'utf8');
+const manualSyncSource = fs.readFileSync(
+  new URL('../bin/generate-content', import.meta.url),
+  'utf8',
+);
 
-test('automatic Ghostwriter publication proves a clean and bounded source transition', () => {
+test('automatic content publication proves a clean and bounded source transition', () => {
   const recovery = syncSource.indexOf('"$NODE" "$CONTENT_TRANSACTION" recover');
   const firstInput = syncSource.indexOf('input_before="$("$NODE" "$INPUT_STATE" capture)"');
   const unchangedExit = syncSource.indexOf('matches "$input_before"');
@@ -50,7 +53,7 @@ test('automatic Ghostwriter publication proves a clean and bounded source transi
     syncWrapperSource,
     /exec \/usr\/bin\/lockf -t 0 -k "\$LOCK" \/bin\/zsh "\$LOCKED_TRANSACTION"/,
   );
-  assert.match(syncWrapperSource, /sync-from-ghostwriter-transaction/);
+  assert.match(syncWrapperSource, /publish-content-transaction/);
   assert.doesNotMatch(syncWrapperSource, /exec 9>|lockf -s -t 0 9/);
   assert.doesNotMatch(syncWrapperSource, /(?:\brm\b|\bunlink\b)[^\n]*\$LOCK/);
   assert.doesNotMatch(syncSource, /\/usr\/bin\/lockf/);
@@ -82,7 +85,7 @@ test('automatic Ghostwriter publication proves a clean and bounded source transi
   assert.equal([...syncSource.matchAll(/"\$NODE" "\$SITE_RELEASE"/g)].length, 1);
 });
 
-test('automatic Ghostwriter publication can change only its tracked browser snapshot', () => {
+test('automatic content publication can change only its tracked browser snapshot', () => {
   assert.deepEqual(Object.keys(allowlist).sort(), ['exactPaths', 'pathPatterns', 'schemaVersion']);
   assert.equal(allowlist.schemaVersion, 1);
   assert.deepEqual(allowlist.exactPaths, [
@@ -109,10 +112,10 @@ test('automatic Ghostwriter publication can change only its tracked browser snap
   }
 });
 
-test('images, imports, and routes share one exact slug authority', () => {
+test('images, generation, and routes share one exact slug authority', () => {
   for (const source of [imageSource, importSource]) {
     assert.match(source, /from '\.\/article-slugs\.mjs'/);
-    assert.match(source, /preflightPublishedEssayInventory/);
+    assert.match(source, /preflightPublishedArticleInventory/);
     assert.doesNotMatch(source, /function slugify\(/);
     assert.match(source, /staging-only generator/);
   }
@@ -123,5 +126,5 @@ test('manual content synchronization shares the crash-releasing scheduled lock',
   assert.match(manualSyncSource, /\/usr\/bin\/lockf -s -t 0 9/);
   assert.doesNotMatch(manualSyncSource, /(?:\brm\b|\bunlink\b)[^\n]*\$LOCK/);
   assert.match(manualSyncSource, /generated-content-transaction\.mjs" generate/);
-  assert.doesNotMatch(manualSyncSource, /import-articles|prepare-article-images/);
+  assert.doesNotMatch(manualSyncSource, /generate-articles|prepare-article-images/);
 });

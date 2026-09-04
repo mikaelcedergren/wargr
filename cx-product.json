@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "id": "wargr",
   "family": "web",
-  "profile": "static-site",
+  "profile": "hybrid-site",
   "deployment": "mac-mini",
   "frontend": {
     "framework": "angular",
@@ -12,9 +12,9 @@
     "visualSystem": "framework"
   },
   "capabilities": {
-    "authentication": "none",
-    "persistentData": "none",
-    "backgroundWork": "build-time",
-    "externalEffects": []
+    "authentication": "owner",
+    "persistentData": "structured-records",
+    "backgroundWork": "durable",
+    "externalEffects": ["ai"]
   }
 }

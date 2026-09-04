@@ -3,7 +3,7 @@
 <plist version="1.0">
   <dict>
     <key>Label</key>
-    <string>com.wargr.sync</string>
+    <string>com.wargr.publisher</string>
 
     <key>UserName</key>
     <string>cortex</string>
@@ -27,14 +27,15 @@
       <key>CX_DEVELOPMENT_ROOT</key><string>__CX_DEVELOPMENT_ROOT__</string>
     </dict>
 
-    <!-- Fire instantly when essays or canonical article images change… -->
+    <!-- Fire instantly when the article database or canonical article images change… -->
     <key>WatchPaths</key>
     <array>
-      <string>__WARGR_WATCH_ESSAYS__</string>
+      <string>__WARGR_WATCH_DATABASE__</string>
       <string>__WARGR_WATCH_IMAGES__</string>
     </array>
-    <!-- …and poll hourly as a safety net for in-place edits. The signature guard makes a
-         no-change run a cheap no-op; only ☑ essays and canonical PNG masters affect it. -->
+    <!-- …and poll hourly as a safety net. The signature guard makes a no-change run a cheap
+         no-op; only the published closure and canonical PNG masters affect it, so draft edits,
+         polish rounds and session writes never trigger a rebuild. -->
     <key>StartInterval</key>
     <integer>3600</integer>
 
@@ -55,8 +56,9 @@
     <dict><key>NumberOfFiles</key><integer>16384</integer></dict>
 
     <key>StandardOutPath</key>
-    <string>__WARGR_SYNC_STDOUT__</string>
+    <string>__WARGR_PUBLISH_STDOUT__</string>
+
     <key>StandardErrorPath</key>
-    <string>__WARGR_SYNC_STDERR__</string>
+    <string>__WARGR_PUBLISH_STDERR__</string>
   </dict>
 </plist>

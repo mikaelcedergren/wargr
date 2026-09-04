@@ -106,7 +106,9 @@ function uniqueRoutes(routes, fallback = '/') {
 
 export function routeForSourcePath(file) {
   const article = /^src\/app\/articles\/([^/]+)\.component\.ts$/u.exec(file)?.[1];
-  return article ? `/${article}/` : '/';
+  if (article) return `/${article}/`;
+  if (/^src\/app\/studio\//u.test(file)) return '/studio';
+  return '/';
 }
 
 export function classifyChanges(
@@ -127,11 +129,11 @@ export function classifyChanges(
   const documentationPattern = /^(?:README\.md|DOMAIN_SETUP\.md|.*\.md)$/u;
   const interfacePattern = /^(?:src\/|public\/)/u;
   const generatedPresentationPattern =
-    /^(?:src\/app\/(?:articles\/|app\.routes\.ts$)|public\/(?:assets\/articles\/|feed\.xml$|sitemap\.xml$)|scripts\/ghostwriter-generated-source\.json$)/u;
+    /^(?:src\/app\/(?:articles\/|app\.routes\.ts$)|public\/(?:assets\/articles\/|feed\.xml$|sitemap\.xml$)|scripts\/wargr-generated-source\.json$)/u;
   const e2ePattern =
     /^(?:e2e\/|playwright\.config\.ts$|scripts\/(?:run-e2e|e2e-server|e2e-environment)\.mjs$)/u;
   const highRiskPattern =
-    /^(?:AGENTS\.md|CLAUDE\.md|\.agents\/|\.codex\/|\.gitignore$|package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|angular\.json|tsconfig(?:\.[^.]+)?\.json|cx-product\.json|publisher-contract\.json|\.github\/|server\/|launchd\/|bin\/|article-images\/|scripts\/(?:verify-change|prepare-article-images|ghostwriter-input-state|import-articles|article-slugs|generated-content-transaction)\.mjs$|tests\/(?!e2e\/)|DEVELOPMENT-VERIFICATION\.md$)/u;
+    /^(?:AGENTS\.md|CLAUDE\.md|\.agents\/|\.codex\/|\.gitignore$|package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|angular\.json|tsconfig(?:\.[^.]+)?\.json|cx-product\.json|publisher-contract\.json|\.github\/|server\/|launchd\/|bin\/|article-images\/|scripts\/(?:verify-change|prepare-article-images|published-input-state|generate-articles|article-slugs|generated-content-transaction)\.mjs$|tests\/(?!e2e\/)|DEVELOPMENT-VERIFICATION\.md$)/u;
   const interfaceFiles = changedFiles.filter((file) => interfacePattern.test(file));
   const generatedPresentationChange = has(generatedPresentationPattern);
   const e2eChange = has(e2ePattern);
@@ -245,7 +247,7 @@ export function checkOwnsPath(checkId, file) {
     return /^(?:src\/|public\/|angular\.json|package\.json|pnpm-lock\.yaml)/u.test(file);
   }
   if (checkId === 'test-content') {
-    return /^(?:src\/app\/(?:articles\/|app\.routes\.ts$)|public\/(?:assets\/articles\/|feed\.xml$|sitemap\.xml$)|scripts\/ghostwriter-generated-source\.json$|tests\/(?:build-contract|snapshot-contract)\.test\.mjs$)/u.test(
+    return /^(?:src\/app\/(?:articles\/|app\.routes\.ts$)|public\/(?:assets\/articles\/|feed\.xml$|sitemap\.xml$)|scripts\/wargr-generated-source\.json$|tests\/(?:build-contract|snapshot-contract)\.test\.mjs$)/u.test(
       file,
     );
   }

@@ -20,11 +20,8 @@ test('macOS scheduled command lock spans the Node transaction, rejects concurren
   const ready = path.join(fixture.root, 'holder-ready');
   const forbiddenMutation = path.join(fixture.root, 'concurrent-mutation');
   const recoveryResult = path.join(fixture.root, 'recovery-result.json');
-  const lockPath = path.join(fixture.repo, '.run/ghostwriter-sync.lock');
-  const journalPath = path.join(
-    fixture.repo,
-    '.run/ghostwriter-generated-content-transaction.json',
-  );
+  const lockPath = path.join(fixture.repo, '.run/content-publish.lock');
+  const journalPath = path.join(fixture.repo, '.run/wargr-generated-content-transaction.json');
   holder = spawn(
     '/usr/bin/lockf',
     [
@@ -115,7 +112,7 @@ test('macOS fd lock transfers through the manual shell exec into Node', async (t
     if (holder) killProcessGroupIfPresent(holder.pid);
     fs.rmSync(root, { recursive: true, force: true });
   });
-  const lockPath = path.join(root, 'ghostwriter-sync.lock');
+  const lockPath = path.join(root, 'content-publish.lock');
   const ready = path.join(root, 'exec-ready');
   const forbiddenMutation = path.join(root, 'concurrent-mutation');
   holder = spawn(
@@ -167,7 +164,7 @@ function createFixture() {
   const repo = path.join(root, 'wargr');
   fs.mkdirSync(path.join(repo, '.run'), { recursive: true, mode: 0o700 });
   writeSnapshot(repo, 'original');
-  const transaction = fs.mkdtempSync(path.join(repo, '.run', 'ghostwriter-generated-content.'));
+  const transaction = fs.mkdtempSync(path.join(repo, '.run', 'wargr-generated-content.'));
   fs.chmodSync(transaction, 0o700);
   const stage = path.join(transaction, 'snapshot');
   fs.mkdirSync(stage, { mode: 0o700 });

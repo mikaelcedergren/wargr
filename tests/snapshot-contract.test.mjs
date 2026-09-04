@@ -23,11 +23,14 @@ test('the tracked essay snapshot is internally complete without its external aut
   );
   assert.ok(articleSlugs.length > 0, 'The tracked snapshot must contain at least one essay.');
 
+  // The studio route is the one platform page inside the generated route file: the private
+  // authoring surface, reserved by the slug authority and outside the essay set.
   const routeSlugs = sorted(
     [...routes.matchAll(/^\s+path: '([^']+)',$/gm)]
       .map((match) => match[1])
-      .filter((slug) => slug !== '**'),
+      .filter((slug) => slug !== '**' && slug !== 'studio'),
   );
+  assert.match(routes, /path: 'studio',/, 'The generated routes must keep the studio page.');
   const homeSlugs = sorted([...home.matchAll(/"slug":"([^"]+)"/g)].map((match) => match[1]));
   const heroSlugs = sorted(
     imageEntries

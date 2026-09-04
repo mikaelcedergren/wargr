@@ -1,42 +1,46 @@
 <cx-navigation-recovery />
 
 <div class="wg-shell">
-  <header class="wg-masthead">
-    <div class="wg-masthead__mark">
-      <a routerLink="/" class="wg-logo">
-        <img
-          class="wg-logo__img wg-logo__img--light"
-          src="/assets/brand/mark-light.png"
-          alt=""
-          width="737"
-          height="320"
-        />
-        <img
-          class="wg-logo__img wg-logo__img--dark"
-          src="/assets/brand/mark-dark.png"
-          alt=""
-          width="737"
-          height="320"
-        />
-        <span class="wg-sr-only">Wargr — essays by Michael Wargr</span>
-      </a>
-    </div>
-    <p class="wg-masthead__byline">MICHAEL WARGR</p>
-  </header>
+  @if (!bare()) {
+    <header class="wg-masthead">
+      <div class="wg-masthead__mark">
+        <a routerLink="/" class="wg-logo">
+          <img
+            class="wg-logo__img wg-logo__img--light"
+            src="/assets/brand/mark-light.png"
+            alt=""
+            width="737"
+            height="320"
+          />
+          <img
+            class="wg-logo__img wg-logo__img--dark"
+            src="/assets/brand/mark-dark.png"
+            alt=""
+            width="737"
+            height="320"
+          />
+          <span class="wg-sr-only">Wargr — essays by Michael Wargr</span>
+        </a>
+      </div>
+      <p class="wg-masthead__byline">MICHAEL WARGR</p>
+    </header>
+  }
 
   <main class="wg-main">
     <router-outlet />
   </main>
 
-  <footer class="wg-footer">
-    <cx-icon-button
-      [icon]="night() ? 'light-mode' : 'night-mode'"
-      [ariaLabel]="night() ? 'Switch to light theme' : 'Switch to night theme'"
-      variant="transparent"
-      size="small"
-      [rounded]="true"
-      (pressed)="toggleTheme()"
-    />
-    <span class="wg-footer__line">© {{ year }} Michael Wargr · wargr.com</span>
-  </footer>
+  @if (!bare()) {
+    <footer class="wg-footer">
+      <cx-icon-button
+        [icon]="night() ? 'light-mode' : 'night-mode'"
+        [ariaLabel]="night() ? 'Switch to light theme' : 'Switch to night theme'"
+        variant="transparent"
+        size="small"
+        [rounded]="true"
+        (pressed)="toggleTheme()"
+      />
+      <span class="wg-footer__line">© {{ year }} Michael Wargr · wargr.com</span>
+    </footer>
+  }
 </div>

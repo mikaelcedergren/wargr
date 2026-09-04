@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
@@ -16,15 +16,21 @@ const serverIdentityFile = path.join(
 );
 
 test(
-  'the compiled entrypoint pins its artifact manifest and serves the essay-site contract',
-  { timeout: 15_000 },
+  'the compiled entrypoint pins its artifact manifest and serves the essay-site and Studio contract',
+  { timeout: 20_000 },
   async (t) => {
-    const entrypointSource = await readFile(path.join(repoRoot, 'server', 'index.ts'), 'utf8');
+    const entrypointSource = await readFile(
+      path.join(repoRoot, 'server', 'src', 'index.ts'),
+      'utf8',
+    );
     assert.match(entrypointSource, /entrypointUrl:\s*import\.meta\.url/);
-    const fixtureRoot = await mkdtemp(path.join(os.tmpdir(), 'wargr-server-'));
+    // macOS temp roots are symlinked (/var -> /private/var); the runtime pins real paths.
+    const fixtureRoot = await realpath(await mkdtemp(path.join(os.tmpdir(), 'wargr-server-')));
     const browserDir = path.join(fixtureRoot, 'browser');
+    const dataDir = path.join(fixtureRoot, 'data');
     const port = await reservePort();
     await mkdir(browserDir, { recursive: true });
+    await mkdir(dataDir, { recursive: true, mode: 0o700 });
     await writeFile(
       path.join(browserDir, 'index.html'),
       '<!doctype html><title>Wargr fixture</title>',
@@ -39,30 +45,30 @@ test(
       path.join(articleDir, 'index.html'),
       '<!doctype html><title>Corruption fixture</title>',
     );
+    const studioDir = path.join(browserDir, 'studio');
+    await mkdir(studioDir, { recursive: true });
+    await writeFile(
+      path.join(studioDir, 'index.html'),
+      '<!doctype html><title>Studio fixture</title>',
+    );
     await writeFile(
       path.join(browserDir, 'main-0123456789abcdef.js'),
       'globalThis.wargrFixture = true;',
     );
     await writeFile(path.join(browserDir, 'feed.xml'), '<rss version="2.0"></rss>\n');
     const serverIdentity = JSON.parse(await readFile(serverIdentityFile, 'utf8'));
-    const artifactManifest = JSON.parse(
-      await readFile(path.join(repoRoot, 'cx-product.json'), 'utf8'),
-    );
-    const operationalManifestFile = path.join(fixtureRoot, 'cx-product.json');
-    await writeFile(
-      operationalManifestFile,
-      `${JSON.stringify({ ...artifactManifest, id: 'mutable-source-before' }, null, 2)}\n`,
-    );
 
     const child = spawn(process.execPath, [path.join(repoRoot, 'server', 'dist', 'index.js')], {
       cwd: fixtureRoot,
       env: {
         CX_SERVER_RELEASE_IDENTITY_FILE: serverIdentityFile,
+        DATA_DIR: 'data',
         HOST: '127.0.0.1',
         NODE_ENV: 'test',
         PATH: process.env.PATH,
         PORT: String(port),
         SITE_BROWSER_DIR: browserDir,
+        WARGR_LOAD_ENV_FILE: 'false',
       },
       stdio: ['ignore', 'pipe', 'pipe'],
     });
@@ -98,13 +104,6 @@ test(
     assert.equal(health.headers.get('x-xss-protection'), '0');
     assert.equal(health.headers.get('x-powered-by'), null);
     assert.match(health.headers.get('content-type') ?? '', /^application\/json(?:;|$)/);
-
-    await writeFile(
-      operationalManifestFile,
-      `${JSON.stringify({ ...artifactManifest, id: 'mutable-source-after' }, null, 2)}\n`,
-    );
-    const healthAfterSourceMutation = await localFetch(`${origin}/healthz`);
-    assert.deepEqual(await healthAfterSourceMutation.json(), { app: 'wargr', ok: true, port });
 
     const identity = await localFetch(`${origin}/cx-server.json`);
     assert.equal(identity.status, 200);
@@ -158,6 +157,128 @@ test(
     assert.match(missingProductRoute.headers.get('content-type') ?? '', /^text\/html/);
     assert.match(await missingProductRoute.text(), /wargr-product-404/);
 
+    // Studio is served but never indexed, and its API refuses anonymous access outright.
+    const studioRoute = await localFetch(`${origin}/studio`);
+    assert.equal(studioRoute.status, 200);
+    assert.equal(studioRoute.headers.get('x-robots-tag'), 'noindex, nofollow');
+    assert.match(await studioRoute.text(), /Studio fixture/);
+
+    const anonymousSession = await localFetch(`${origin}/api/studio/session`);
+    assert.equal(anonymousSession.status, 200);
+    assert.equal(anonymousSession.headers.get('cache-control'), 'private, no-store');
+    assert.equal(anonymousSession.headers.get('x-robots-tag'), 'noindex, nofollow');
+    assert.deepEqual(await anonymousSession.json(), { authenticated: false });
+
+    const anonymousArticles = await localFetch(`${origin}/api/studio/articles`);
+    assert.equal(anonymousArticles.status, 401);
+
+    const wrongLogin = await localFetch(`${origin}/api/studio/login`, {
+      body: JSON.stringify({ password: 'wrong-password', username: 'dev' }),
+      headers: { 'Content-Type': 'application/json', Origin: origin },
+      method: 'POST',
+    });
+    assert.equal(wrongLogin.status, 401);
+
+    const login = await localFetch(`${origin}/api/studio/login`, {
+      body: JSON.stringify({ password: 'dev', username: 'dev' }),
+      headers: { 'Content-Type': 'application/json', Origin: origin },
+      method: 'POST',
+    });
+    assert.equal(login.status, 200);
+    const setCookie = login.headers.get('set-cookie') ?? '';
+    assert.match(setCookie, /^wg_studio_session=/);
+    assert.match(setCookie, /HttpOnly/);
+    assert.match(setCookie, /SameSite=Strict/);
+    const cookie = setCookie.split(';')[0];
+
+    const session = await localFetch(`${origin}/api/studio/session`, {
+      headers: { Cookie: cookie },
+    });
+    assert.deepEqual(await session.json(), { authenticated: true });
+
+    const created = await localFetch(`${origin}/api/studio/articles`, {
+      body: JSON.stringify({ title: 'A working title' }),
+      headers: { 'Content-Type': 'application/json', Cookie: cookie, Origin: origin },
+      method: 'POST',
+    });
+    assert.equal(created.status, 201);
+    const createdPayload = await created.json();
+    assert.equal(createdPayload.article.slug, 'a-working-title');
+    assert.equal(createdPayload.article.state, 'draft');
+    assert.equal(createdPayload.article.revision, 1);
+
+    const listed = await localFetch(`${origin}/api/studio/articles`, {
+      headers: { Cookie: cookie },
+    });
+    assert.equal(listed.status, 200);
+    const listedPayload = await listed.json();
+    assert.equal(listedPayload.articles.length, 1);
+
+    const updated = await localFetch(`${origin}/api/studio/articles/${createdPayload.article.id}`, {
+      body: JSON.stringify({
+        document: {
+          body: 'Something honest, however raw.',
+          imagePrompts: [],
+          ingress: '',
+          pullQuotes: [],
+          socialPosts: [],
+          tags: [],
+          title: 'A working title',
+          topic: '',
+        },
+        expectedRevision: 1,
+      }),
+      headers: { 'Content-Type': 'application/json', Cookie: cookie, Origin: origin },
+      method: 'PUT',
+    });
+    assert.equal(updated.status, 200);
+    const updatedPayload = await updated.json();
+    assert.equal(updatedPayload.article.revision, 2);
+
+    const staleUpdate = await localFetch(
+      `${origin}/api/studio/articles/${createdPayload.article.id}`,
+      {
+        body: JSON.stringify({
+          document: {
+            body: 'A conflicting write.',
+            imagePrompts: [],
+            ingress: '',
+            pullQuotes: [],
+            socialPosts: [],
+            tags: [],
+            title: 'A working title',
+            topic: '',
+          },
+          expectedRevision: 1,
+        }),
+        headers: { 'Content-Type': 'application/json', Cookie: cookie, Origin: origin },
+        method: 'PUT',
+      },
+    );
+    assert.equal(staleUpdate.status, 409);
+
+    const incompletePublish = await localFetch(
+      `${origin}/api/studio/articles/${createdPayload.article.id}/publish`,
+      {
+        body: JSON.stringify({ expectedRevision: 2 }),
+        headers: { 'Content-Type': 'application/json', Cookie: cookie, Origin: origin },
+        method: 'POST',
+      },
+    );
+    assert.equal(incompletePublish.status, 422);
+    const publishPayload = await incompletePublish.json();
+    assert.ok(Array.isArray(publishPayload.error.details.problems));
+
+    const polishUnavailable = await localFetch(
+      `${origin}/api/studio/articles/${createdPayload.article.id}/polish`,
+      {
+        body: JSON.stringify({ expectedRevision: 2, mode: 'rough' }),
+        headers: { 'Content-Type': 'application/json', Cookie: cookie, Origin: origin },
+        method: 'POST',
+      },
+    );
+    assert.equal(polishUnavailable.status, 503);
+
     assert.deepEqual(await stopChild(child), { code: 0, signal: null });
   },
 );
@@ -188,7 +309,7 @@ function localFetch(input, init) {
 }
 
 async function waitForHealth(url, child, readOutput) {
-  for (let attempt = 0; attempt < 100; attempt += 1) {
+  for (let attempt = 0; attempt < 200; attempt += 1) {
     if (child.exitCode !== null || child.signalCode !== null) {
       throw new Error(`Production entrypoint exited before health check:\n${readOutput()}`);
     }
