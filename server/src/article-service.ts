@@ -27,7 +27,6 @@ import type {
   ArticleMutationResult,
   ArticleService,
   ArticleSummaryDto,
-  ArticleVersionDto,
   ArticleVersionSummaryDto,
   UpdateArticleInput,
 } from './http-contracts.js';
