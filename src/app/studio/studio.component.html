@@ -160,10 +160,7 @@
                         />
                         <div class="wg-studio-body-field">
                           <span class="wg-studio-field-label">Body</span>
-                          <div
-                            class="wg-studio-body-editor"
-                            [class.wg-studio-body-editor--busy]="polishing()"
-                          >
+                          <div class="wg-studio-body-editor">
                             <cx-markdown-editor
                               ariaLabel="Essay body"
                               presentation="document"
@@ -317,7 +314,7 @@
                 </div>
 
                 <aside class="wg-studio-editor__side" aria-label="The ghostwriter">
-                  <cx-card heading="The ghostwriter" icon="ai" padding="large">
+                  <cx-card heading="The ghostwriter" icon="ai">
                     <cx-stack gap="md">
                       @if (polishError()) {
                         <cx-alert mood="danger" [heading]="polishError()" />
@@ -441,13 +438,7 @@
   />
 } @else {
   <section class="wg-studio-login" aria-label="Wargr studio">
-    <cx-card
-      class="wg-studio-login__panel"
-      heading="Wargr studio"
-      icon="lock"
-      padding="large"
-      shadow
-    >
+    <cx-card class="wg-studio-login__panel" heading="Wargr studio" icon="lock">
       <cx-stack gap="lg">
         <p class="wg-studio-prose">Sign in to write.</p>
 

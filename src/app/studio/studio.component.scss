@@ -178,14 +178,6 @@ wg-studio {
 
 .wg-studio-body-editor {
   min-height: 20rem;
-  padding: var(--space-lg);
-  border: 1px solid var(--outline);
-  border-radius: var(--radius-md);
-  background: var(--surface-raised);
-}
-
-.wg-studio-body-editor--busy {
-  opacity: var(--opacity-disabled, 0.5);
 }
 
 /* One list entry and its remove control. */
