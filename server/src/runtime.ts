@@ -26,7 +26,7 @@ import {
   type WargrEnvironment,
 } from './environment.js';
 import { createPolishService } from './polish-service.js';
-import { verifyWargrDatabaseBeforeWrite } from './database.js';
+import { verifyWargrDatabase } from './database.js';
 import { assertWargrProductManifest } from './product-contract.js';
 
 const HTTP_SHUTDOWN_TIMEOUT_MS = 10_000;
@@ -70,12 +70,13 @@ export async function startWargrServer({
   });
 
   const persistence = createWargrPersistence({
+    executionScope: environment.execution.executionScope,
     databasePath: environment.databasePath,
     operationalRoot: environment.operationalRoot,
-    ...(environment.isProduction && !environment.releaseValidation
+    ...(environment.execution.dataMode === 'shared'
       ? {
           requireExisting: true as const,
-          verifyBeforeWrite: verifyWargrDatabaseBeforeWrite,
+          verifyBeforeWrite: verifyWargrDatabase,
         }
       : {}),
   });

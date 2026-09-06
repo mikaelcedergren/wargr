@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import type { JsonValue } from '@mikaelcedergren/cx-framework/server/errors';
 import {
   createDurableJobStore,
+  validateDurableJobExecutionScope,
   type DurableJobStore,
   type DurableJobTransaction,
   type EnqueueDurableJob,
@@ -125,13 +126,7 @@ export interface ArticleRepository {
 
 export type PolishState = 'queued' | 'running' | 'succeeded' | 'failed' | 'ambiguous';
 export type ProviderEffectState =
-  | 'prepared'
-  | 'creating'
-  | 'submitted'
-  | 'polling'
-  | 'succeeded'
-  | 'rejected'
-  | 'ambiguous';
+  'prepared' | 'creating' | 'submitted' | 'polling' | 'succeeded' | 'rejected' | 'ambiguous';
 
 export interface PolishRun {
   readonly articleId: string;
@@ -498,12 +493,14 @@ interface ProviderEffectRow extends SqliteRow {
 }
 
 export type CreateWargrPersistenceOptions = OpenWargrDatabaseOptions & {
+  readonly executionScope: string;
   readonly clock?: () => number;
   readonly createJobId?: () => string;
   readonly createLeaseToken?: () => string;
 };
 
 export function createWargrPersistence({
+  executionScope,
   clock = Date.now,
   createJobId = () => randomUUID(),
   createLeaseToken = () => randomUUID(),
@@ -511,6 +508,7 @@ export function createWargrPersistence({
 }: CreateWargrPersistenceOptions): WargrPersistence {
   const database = openWargrDatabase(databaseOptions);
   const jobs = createDurableJobStore({
+    executionScope,
     createJobId,
     createLeaseToken,
     database: database.sqlite,
@@ -1060,6 +1058,17 @@ export function createPolishRepository(
   articles: ArticleRepository,
   clock: () => number = Date.now,
 ): PolishRepository & PolishAdmissionRepository & PolishMaintenanceRepository {
+  const executionScope = validateDurableJobExecutionScope(jobs.executionScope);
+  function ownedRun(runId: string): PolishRunRow | undefined {
+    return database.get<PolishRunRow>(
+      'SELECT * FROM polish_runs WHERE run_id = ? AND execution_scope = ?',
+      [runId, executionScope],
+    );
+  }
+  function requireOwnedRun(runId: string): void {
+    if (!ownedRun(runId)) throw new PersistenceRevisionConflictError('Polish run', runId);
+  }
+
   function insertRun(
     transaction: DurableJobTransaction,
     input: CreatePolishRunInput,
@@ -1087,8 +1096,8 @@ export function createPolishRepository(
       `INSERT INTO polish_runs (
          run_id, article_id, owner_session_id_hash, mode, instruction, input_sha256, state,
          expected_article_revision, job_id, attempt, created_at, updated_at,
-         finished_at, revision
-       ) VALUES (?, ?, ?, ?, ?, ?, 'queued', ?, ?, 1, ?, ?, NULL, 1)
+         finished_at, revision, execution_scope
+       ) VALUES (?, ?, ?, ?, ?, ?, 'queued', ?, ?, 1, ?, ?, NULL, 1, '${executionScope}')
        RETURNING *`,
       [
         input.runId,
@@ -1154,12 +1163,11 @@ export function createPolishRepository(
     },
     finalizeRun(input) {
       assertIdentifier(input.runId, 'Polish run id');
+      requireOwnedRun(input.runId);
       assertPositiveInteger(input.expectedRunRevision, 'Expected polish revision');
       const now = checkedClock(clock);
       return jobs.withTransaction(() => {
-        const row = database.get<PolishRunRow>('SELECT * FROM polish_runs WHERE run_id = ?', [
-          input.runId,
-        ]);
+        const row = ownedRun(input.runId);
         if (!row) throw new PersistenceRevisionConflictError('Polish run', input.runId);
         const current = parsePolishRun(row);
         if (current.revision !== input.expectedRunRevision || current.state !== 'running') {
@@ -1233,29 +1241,31 @@ export function createPolishRepository(
         'SELECT * FROM provider_effects WHERE effect_id = ?',
         [effectId],
       );
-      return row ? parseProviderEffect(row) : null;
+      return row && ownedRun(row.run_id) ? parseProviderEffect(row) : null;
     },
     getLatestRun(articleId) {
       if (!isArticleId(articleId)) return null;
       const row = database.get<PolishRunRow>(
         `SELECT * FROM polish_runs
-         WHERE article_id = ? ORDER BY run_sequence DESC LIMIT 1`,
+         WHERE article_id = ? AND execution_scope = '${executionScope}' ORDER BY run_sequence DESC LIMIT 1`,
         [articleId],
       );
       return row ? parsePolishRun(row) : null;
     },
     getRun(runId) {
-      const row = database.get<PolishRunRow>('SELECT * FROM polish_runs WHERE run_id = ?', [runId]);
+      const row = ownedRun(runId);
       return row ? parsePolishRun(row) : null;
     },
     getRunByJobId(jobId) {
       assertIdentifier(jobId, 'Durable job id');
+      if (!jobs.get(jobId)) return null;
       const row = database.get<PolishRunRow>('SELECT * FROM polish_runs WHERE job_id = ?', [jobId]);
       return row ? parsePolishRun(row) : null;
     },
     isReceiptRecoveryJob({ jobId, runId }) {
       assertIdentifier(jobId, 'Durable recovery job id');
       assertIdentifier(runId, 'Polish recovery run id');
+      if (!jobs.get(jobId) || !ownedRun(runId)) return false;
       return (
         database.get(
           `SELECT 1 AS present
@@ -1275,9 +1285,10 @@ export function createPolishRepository(
         .all<PolishRunRow>(
           `SELECT latest_run.*
            FROM polish_runs AS latest_run
-           WHERE latest_run.run_sequence IN (
+           WHERE latest_run.execution_scope = '${executionScope}' AND latest_run.run_sequence IN (
              SELECT MAX(candidate.run_sequence)
              FROM polish_runs AS candidate
+             WHERE candidate.execution_scope = '${executionScope}'
              GROUP BY candidate.article_id
            )
              AND latest_run.state IN ('queued', 'running', 'failed', 'ambiguous')
@@ -1296,6 +1307,7 @@ export function createPolishRepository(
              error_message = 'Provider create may have crossed the network without returning a response id.',
              finished_at = ?, updated_at = ?, revision = revision + 1
          WHERE state = 'creating' AND provider_response_id IS NULL
+           AND EXISTS (SELECT 1 FROM polish_runs AS owned WHERE owned.run_id = provider_effects.run_id AND owned.execution_scope = '${executionScope}')
            AND NOT EXISTS (
              SELECT 1
              FROM polish_runs AS run
@@ -1310,6 +1322,7 @@ export function createPolishRepository(
     prepareEffect(input) {
       assertIdentifier(input.effectId, 'Effect id');
       assertIdentifier(input.runId, 'Polish run id');
+      requireOwnedRun(input.runId);
       assertIdentifier(input.effectKey, 'Effect key');
       assertSafeText(input.operation, 128, 'Provider operation');
       assertHash(input.requestSha256, 'Provider request hash');
@@ -1376,6 +1389,7 @@ export function createPolishRepository(
         [input.effectId],
       );
       if (!existing) throw new PersistenceRevisionConflictError('Provider effect', input.effectId);
+      requireOwnedRun(existing.run_id);
       const current = parseProviderEffect(existing);
       const terminal = ['succeeded', 'rejected', 'ambiguous'].includes(input.state);
       let responseBytes: Buffer | null = null;
@@ -1473,6 +1487,7 @@ export function createPolishRepository(
     },
     transitionRun(input) {
       assertIdentifier(input.runId, 'Polish run id');
+      requireOwnedRun(input.runId);
       assertPositiveInteger(input.expectedRevision, 'Expected polish revision');
       const now = checkedClock(clock);
       const terminal = ['succeeded', 'failed', 'ambiguous'].includes(input.state);
@@ -1510,7 +1525,7 @@ export function createPolishRepository(
                   job.failure_message AS job_failure_message
            FROM polish_runs AS run
            JOIN cx_jobs AS job ON job.id = run.job_id
-           WHERE run.state IN ('queued', 'running') AND job.status = 'failed'
+           WHERE run.execution_scope = '${executionScope}' AND run.state IN ('queued', 'running') AND job.status = 'failed'
            ORDER BY run.run_sequence
            LIMIT ?`,
           [limit],
@@ -1673,7 +1688,7 @@ export function createPolishRepository(
                   COALESCE(SUM(length(effect.response_json)), 0) AS response_bytes
            FROM polish_runs AS run
            LEFT JOIN provider_effects AS effect ON effect.run_id = run.run_id
-           WHERE run.state IN ('succeeded', 'failed', 'ambiguous')
+           WHERE run.execution_scope = '${executionScope}' AND run.state IN ('succeeded', 'failed', 'ambiguous')
              AND (run.finished_at <= ? OR ? = 1)
              AND NOT (
                run.state IN ('failed', 'ambiguous')
@@ -1720,7 +1735,7 @@ export function createPolishRepository(
           `DELETE FROM cx_jobs
            WHERE id IN (
              SELECT id FROM cx_jobs
-             WHERE status IN ('succeeded', 'failed')
+             WHERE execution_scope = '${executionScope}' AND status IN ('succeeded', 'failed')
                AND (finished_at < ? OR ? = 1)
                AND NOT EXISTS (
                  SELECT 1 FROM polish_runs AS active_run

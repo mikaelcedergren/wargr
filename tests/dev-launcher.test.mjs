@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { chmodSync, lstatSync, mkdirSync, realpathSync, symlinkSync } from 'node:fs';
+import { existsSync, mkdirSync, realpathSync, symlinkSync, writeFileSync } from 'node:fs';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -11,44 +11,35 @@ test('the browser and server keep separate development ports', () => {
   const environments = createDevelopmentEnvironments({ SOURCE: 'test' });
   assert.equal(environments.server.PORT, '4261');
   assert.equal(environments.server.APP_BASE_URL, 'http://127.0.0.1:4260');
+  assert.equal(environments.server.CX_EXECUTION_SCOPE, 'development');
+  assert.equal(environments.server.CX_DATA_MODE, 'shared');
+  assert.equal(environments.server.CX_SCHEDULE_OWNER, 'false');
+  assert.equal(environments.server.DATA_DIR, 'data');
   assert.equal(environments.browser.PORT, undefined);
   assert.equal(environments.browser.SOURCE, 'test');
 });
 
-test('the development launcher creates a private real database ancestry', async (t) => {
+test('shared development requires the existing authority and never seeds it', async (t) => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'wargr-dev-'));
   t.after(() => rm(root, { force: true, recursive: true }));
-
   const canonicalRoot = realpathSync(root);
-  const data = prepareDevelopmentDataDirectory(canonicalRoot);
-  assert.equal(data, path.join(canonicalRoot, '.run', 'dev', 'data'));
-  for (const candidate of [
-    path.join(canonicalRoot, '.run'),
-    path.join(canonicalRoot, '.run', 'dev'),
-    data,
-  ]) {
-    const metadata = lstatSync(candidate);
-    assert.equal(metadata.isDirectory(), true);
-    assert.equal(metadata.isSymbolicLink(), false);
-    assert.equal(metadata.mode & 0o777, 0o700);
-  }
-
-  chmodSync(data, 0o755);
-  prepareDevelopmentDataDirectory(canonicalRoot);
-  assert.equal(lstatSync(data).mode & 0o777, 0o700);
+  assert.throws(() => prepareDevelopmentDataDirectory(canonicalRoot), /ENOENT/);
+  assert.equal(existsSync(path.join(root, 'data')), false);
+  mkdirSync(path.join(root, 'data'), { mode: 0o700 });
+  assert.throws(() => prepareDevelopmentDataDirectory(canonicalRoot), /ENOENT/);
+  writeFileSync(path.join(root, 'data', 'wargr.db'), 'synthetic fixture', { mode: 0o600 });
+  assert.equal(prepareDevelopmentDataDirectory(canonicalRoot), path.join(canonicalRoot, 'data'));
 });
 
-test('the development launcher refuses a symbolic-link database ancestry', async (t) => {
+test('the development launcher refuses a symbolic-link authority', async (t) => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'wargr-dev-link-'));
   const outside = await mkdtemp(path.join(os.tmpdir(), 'wargr-dev-outside-'));
   t.after(() => rm(root, { force: true, recursive: true }));
   t.after(() => rm(outside, { force: true, recursive: true }));
-  mkdirSync(path.join(root, '.run'), { mode: 0o700 });
-  symlinkSync(outside, path.join(root, '.run', 'dev'));
-
+  symlinkSync(outside, path.join(root, 'data'));
   assert.throws(
     () => prepareDevelopmentDataDirectory(realpathSync(root)),
-    /Unsafe Wargr development directory/,
+    /Unsafe Wargr shared development store/,
   );
 });
 

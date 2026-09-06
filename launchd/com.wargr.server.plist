@@ -27,6 +27,12 @@
       <string>127.0.0.1</string>
       <key>PORT</key>
       <string>3060</string>
+      <key>CX_EXECUTION_SCOPE</key>
+      <string>production</string>
+      <key>CX_DATA_MODE</key>
+      <string>shared</string>
+      <key>CX_SCHEDULE_OWNER</key>
+      <string>false</string>
       <key>NODE_ENV</key>
       <string>production</string>
       <key>APP_BASE_URL</key>

@@ -21,6 +21,7 @@ function openFixturePersistence(t: { after(fn: () => void): void }): WargrPersis
   const dataDirectory = path.join(root, 'data');
   mkdirSync(dataDirectory, { mode: 0o700 });
   const persistence = createWargrPersistence({
+    executionScope: 'test',
     databasePath: path.join(dataDirectory, 'wargr.db'),
     operationalRoot: root,
   });
@@ -359,4 +360,99 @@ test('owner sessions persist, touch monotonically, and clear login failures', as
   assert.equal(touched?.lastSeenAt, 2_500);
   assert.equal(await ownerAuth.deleteSession(sessionIdHash), true);
   assert.equal(await ownerAuth.findSession(sessionIdHash), null);
+});
+
+test('shared articles keep jobs, receipts and recovery scoped while polish allowance stays global', (t) => {
+  const development = openFixturePersistence(t);
+  const production = createWargrPersistence({
+    executionScope: 'production',
+    databasePath: development.database.databasePath,
+    operationalRoot: path.dirname(path.dirname(development.database.databasePath)),
+    migrate: false,
+  });
+  try {
+    const created = development.articles.create(record('shared-scopes'), 'author');
+    assert.equal(production.articles.get(created.record.id)?.record.body, created.record.body);
+    const admit = (persistence: WargrPersistence, article: ArticleRecord) => {
+      const runId = nextUuid();
+      const inputSha256 = polishInputSha256(article);
+      return persistence.polishAdmission.admit({
+        now: Date.now(),
+        policy: { maximumPolishes: 1, windowMs: 600_000 },
+        run: {
+          articleId: article.id,
+          expectedArticleRevision: article.revision,
+          inputSha256,
+          instruction: null,
+          mode: 'polish',
+          ownerSessionIdHash: 'b'.repeat(64),
+          runId,
+          job: buildArticlePolishJob({
+            articleId: article.id,
+            expectedArticleRevision: article.revision,
+            inputSha256,
+            mode: 'polish',
+            runId,
+          }),
+        },
+      });
+    };
+    const accepted = admit(development, created.record);
+    assert.equal(accepted.status, 'accepted');
+    if (accepted.status !== 'accepted') throw new Error('Expected admission');
+    const run = accepted.run;
+    assert.equal(production.jobs.claim('production-worker'), null);
+    assert.equal(production.polish.getRun(run.runId), null);
+    assert.equal(production.polish.getRunByJobId(run.jobId), null);
+    assert.equal(production.polish.getLatestRun(created.record.id), null);
+    assert.deepEqual(production.polish.listLatestRecoverableRuns({ limit: 10 }), []);
+    assert.throws(
+      () =>
+        production.polish.transitionRun({
+          runId: run.runId,
+          expectedRevision: 1,
+          state: 'running',
+        }),
+      /revision|Polish run/,
+    );
+    const effect = development.polish.prepareEffect({
+      effectId: 'e'.repeat(64),
+      effectKey: 'shared-scope-effect',
+      operation: 'responses.create',
+      requestSha256: 'f'.repeat(64),
+      runId: run.runId,
+    });
+    const creating = development.polish.transitionEffect({
+      effectId: effect.effectId,
+      expectedRevision: effect.revision,
+      state: 'creating',
+    });
+    assert.equal(production.polish.getEffect(effect.effectId), null);
+    assert.throws(
+      () =>
+        production.polish.transitionEffect({
+          effectId: effect.effectId,
+          expectedRevision: creating.revision,
+          state: 'creating',
+        }),
+      /revision|Polish run/,
+    );
+    assert.equal(production.polish.markCreatingEffectsAmbiguous(Date.now()), 0);
+    assert.equal(development.polish.getEffect(effect.effectId)?.state, 'creating');
+    assert.deepEqual(
+      production.polishMaintenance.reconcileTerminalJobs({ now: Date.now(), limit: 10 }),
+      { ambiguous: 0, failed: 0, resumed: 0 },
+    );
+    assert.equal(
+      production.polishMaintenance.maintainTerminalStorage({
+        now: Date.now() + 100_000_000,
+        limit: 10,
+      }).runs,
+      0,
+    );
+    const second = production.articles.create(record('same-global-budget'), 'author');
+    assert.equal(admit(production, second.record).status, 'rate_limited');
+  } finally {
+    production.close();
+  }
 });

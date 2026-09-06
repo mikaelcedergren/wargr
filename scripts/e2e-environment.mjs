@@ -22,6 +22,9 @@ export const E2E_RELEASE_BUILD_ENVIRONMENT_KEYS = Object.freeze(
 export const E2E_SERVER_ENVIRONMENT_KEYS = Object.freeze(
   [
     'CX_SERVER_RELEASE_IDENTITY_FILE',
+    'CX_EXECUTION_SCOPE',
+    'CX_DATA_MODE',
+    'CX_SCHEDULE_OWNER',
     'HOST',
     'NODE_ENV',
     'PATH',
@@ -75,6 +78,9 @@ export function createE2EServerEnvironment({
       CX_SERVER_RELEASE_IDENTITY_FILE: serverIdentityFile,
       HOST: '127.0.0.1',
       NODE_ENV: 'test',
+      CX_EXECUTION_SCOPE: 'test',
+      CX_DATA_MODE: 'isolated',
+      CX_SCHEDULE_OWNER: 'false',
       PATH: pathValue,
       PORT: String(port),
       SITE_BROWSER_DIR: browserDirectory,

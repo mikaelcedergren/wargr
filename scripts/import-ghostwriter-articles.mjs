@@ -42,6 +42,7 @@ for (const directory of production
 }
 
 const persistence = createWargrPersistence({
+  executionScope: production ? 'production' : 'development',
   databasePath,
   operationalRoot: repoRoot,
 });

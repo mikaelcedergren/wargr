@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process';
-import { chmodSync, existsSync, lstatSync, mkdirSync, realpathSync } from 'node:fs';
+import { existsSync, lstatSync, realpathSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -8,8 +8,11 @@ export function createDevelopmentEnvironments(ambient = process.env, root = proc
   const server = {
     ...ambient,
     APP_BASE_URL: 'http://127.0.0.1:4260',
-    DATA_DIR: '.run/dev/data',
-    DB_PATH: '.run/dev/data/wargr.db',
+    DATA_DIR: 'data',
+    CX_EXECUTION_SCOPE: 'development',
+    CX_DATA_MODE: 'shared',
+    CX_SCHEDULE_OWNER: 'false',
+    DB_PATH: 'data/wargr.db',
     HOST: '127.0.0.1',
     NODE_ENV: 'development',
     PORT: '4261',
@@ -32,27 +35,23 @@ export function prepareDevelopmentDataDirectory(root = process.cwd()) {
   if (canonicalRoot !== resolve(root)) {
     throw new Error('Wargr development must run from its canonical repository path.');
   }
-  const directories = [
-    resolve(canonicalRoot, '.run'),
-    resolve(canonicalRoot, '.run', 'dev'),
-    resolve(canonicalRoot, '.run', 'dev', 'data'),
-  ];
-  for (const directory of directories) {
-    if (!existsSync(directory)) {
-      mkdirSync(directory, { mode: 0o700 });
-    }
-    const metadata = lstatSync(directory);
+  const directory = resolve(canonicalRoot, 'data');
+  const database = resolve(directory, 'wargr.db');
+  for (const [candidate, kind] of [
+    [directory, 'directory'],
+    [database, 'file'],
+  ]) {
+    const metadata = lstatSync(candidate);
     if (
-      !metadata.isDirectory() ||
+      (kind === 'directory' ? !metadata.isDirectory() : !metadata.isFile()) ||
       metadata.isSymbolicLink() ||
       metadata.uid !== process.getuid?.() ||
-      realpathSync(directory) !== directory
+      realpathSync(candidate) !== candidate
     ) {
-      throw new Error(`Unsafe Wargr development directory: ${directory}`);
+      throw new Error(`Unsafe Wargr shared development store: ${candidate}`);
     }
-    chmodSync(directory, 0o700);
   }
-  return directories.at(-1);
+  return directory;
 }
 
 export function startDevelopment() {

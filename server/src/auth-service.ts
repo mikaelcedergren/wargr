@@ -291,12 +291,20 @@ function validateCredential(value: string, label: string): void {
 
 function boundedCredential(value: unknown): value is string {
   return (
-    typeof value === 'string' && value.length >= 1 && value.length <= 256 && !/[ -]/u.test(value)
+    typeof value === 'string' &&
+    value.length >= 1 &&
+    value.length <= 256 &&
+    !/[\u0000-\u001f\u007f]/u.test(value)
   );
 }
 
 function validateClientKey(value: string): string {
-  if (typeof value !== 'string' || value.length < 1 || value.length > 512 || /[ -]/u.test(value)) {
+  if (
+    typeof value !== 'string' ||
+    value.length < 1 ||
+    value.length > 512 ||
+    /[\u0000-\u001f\u007f]/u.test(value)
+  ) {
     throw new Error('Owner login client keys must contain between 1 and 512 safe characters.');
   }
   return value;

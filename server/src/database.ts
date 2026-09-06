@@ -7,6 +7,7 @@ import {
 import {
   SQLITE_MIGRATION_LEDGER_TABLE,
   applySqliteMigrations,
+  applySqliteMigrationsAtomically,
   createPreparedSyncSqliteAdapter,
   openOwnedSqliteDatabase,
   verifySqliteIntegrity,
@@ -435,7 +436,7 @@ const PRODUCT_MIGRATIONS = Object.freeze([
   }),
 ] as const satisfies readonly SqliteMigration[]);
 
-const JOB_MIGRATIONS = DURABLE_JOB_SCHEMA_MIGRATIONS.map((migration) =>
+const JOB_MIGRATIONS = DURABLE_JOB_SCHEMA_MIGRATIONS.slice(0, 4).map((migration) =>
   Object.freeze({
     version: PRODUCT_MIGRATIONS.length + migration.version,
     name: `shared_${migration.name}`,
@@ -446,6 +447,26 @@ const JOB_MIGRATIONS = DURABLE_JOB_SCHEMA_MIGRATIONS.map((migration) =>
 export const WARGR_MIGRATIONS = Object.freeze([
   ...PRODUCT_MIGRATIONS,
   ...JOB_MIGRATIONS,
+  {
+    ...DURABLE_JOB_SCHEMA_MIGRATIONS[4]!,
+    version: PRODUCT_MIGRATIONS.length + 5,
+    name: 'shared_durable_job_execution_scopes',
+  },
+  {
+    version: PRODUCT_MIGRATIONS.length + 6,
+    name: 'polish_execution_scopes',
+    statements: [
+      "ALTER TABLE polish_runs ADD COLUMN execution_scope TEXT NOT NULL DEFAULT 'legacy'",
+      'CREATE INDEX polish_runs_scope_article ON polish_runs(execution_scope, article_id, run_sequence DESC)',
+      `CREATE TRIGGER polish_runs_scope_insert BEFORE INSERT ON polish_runs
+       WHEN NOT EXISTS (SELECT 1 FROM cx_jobs WHERE id = NEW.job_id AND execution_scope = NEW.execution_scope)
+       BEGIN SELECT RAISE(ABORT, 'polish run and job scopes must match'); END`,
+      `CREATE TRIGGER polish_runs_scope_update BEFORE UPDATE OF execution_scope, job_id ON polish_runs
+       WHEN (NEW.execution_scope IS NOT OLD.execution_scope AND OLD.execution_scope <> 'legacy')
+         OR NOT EXISTS (SELECT 1 FROM cx_jobs WHERE id = NEW.job_id AND execution_scope = NEW.execution_scope)
+       BEGIN SELECT RAISE(ABORT, 'polish run execution scope is immutable'); END`,
+    ],
+  },
 ] as const satisfies readonly SqliteMigration[]);
 
 const REQUIRED_TABLES = Object.freeze([
@@ -520,7 +541,7 @@ export interface WargrPersistenceDatabase extends WargrDatabase {
 export function openWargrDatabase(options: OpenWargrDatabaseOptions): WargrDatabase {
   const {
     databasePath,
-    migrate = true,
+    migrate = !options.requireExisting,
     now = () => new Date().toISOString(),
     operationalRoot,
   } = options;
@@ -580,7 +601,9 @@ export function migrateWargrDatabase(
   database: SyncSqliteDatabase,
   now: () => string = () => new Date().toISOString(),
 ): void {
-  const result = applySqliteMigrations(database, WARGR_MIGRATIONS, {
+  const result = applySqliteMigrationsAtomically(database, WARGR_MIGRATIONS, {
+    captureState: () => undefined,
+    verifyFinalState: (current) => verifyWargrDatabase(current),
     fingerprint: sha256Hex,
     now,
   });
@@ -823,6 +846,7 @@ function migrationFingerprint(migration: SqliteMigration): string {
       name: migration.name,
       statements: migration.statements,
       version: migration.version,
+      ...(migration.rebuildReferencedTables ? { rebuildReferencedTables: true } : {}),
     }),
   );
 }

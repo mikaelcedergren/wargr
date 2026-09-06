@@ -5,6 +5,8 @@ import { fileURLToPath } from 'node:url';
 import {
   integerEnvironmentValue,
   localBindHost,
+  resolveExecutionPolicy,
+  type ExecutionPolicy,
   nodeEnvironmentValue,
   portEnvironmentValue,
   releaseValidationEnvironmentValue,
@@ -26,6 +28,7 @@ export const WARGR_MANIFEST_FILE = fileURLToPath(new URL('../../cx-product.json'
 export const WARGR_ARTIFACT_ROOT = path.dirname(WARGR_MANIFEST_FILE);
 
 interface WargrBaseEnvironment {
+  readonly execution: ExecutionPolicy;
   readonly appOrigin: string;
   readonly dataDirectory: string;
   readonly databasePath: string;
@@ -91,6 +94,7 @@ export function loadWargrEnvironment(
   const nodeEnvironment = nodeEnvironmentValue(environment);
   const releaseValidation = releaseValidationEnvironmentValue(environment);
   const isProduction = nodeEnvironment === 'production';
+  const execution = resolveExecutionPolicy(environment);
 
   const operationalRoot = resolveWargrOperationalRoot(environment);
   const port = role === 'web' ? portEnvironmentValue(environment, 'PORT', 3060) : undefined;
@@ -102,7 +106,7 @@ export function loadWargrEnvironment(
   const appOrigin = normalizeHttpOrigin(
     configuredOrigin ?? `http://127.0.0.1:${String(port ?? 3060)}`,
   );
-  const defaultDataDirectory = isProduction || releaseValidation ? 'data' : '.run/dev/data';
+  const defaultDataDirectory = 'data';
   const dataDirectory = resolveContainedPath(
     operationalRoot,
     environment['DATA_DIR'] ?? defaultDataDirectory,
@@ -113,7 +117,7 @@ export function loadWargrEnvironment(
     environment['DB_PATH'] ?? path.join(dataDirectory, 'wargr.db'),
     'DB_PATH',
   );
-  if (isProduction) {
+  if (isProduction || execution.dataMode === 'shared') {
     const expectedDataDirectory = path.join(operationalRoot, 'data');
     const expectedDatabasePath = path.join(expectedDataDirectory, 'wargr.db');
     if (dataDirectory !== expectedDataDirectory) {
@@ -130,6 +134,7 @@ export function loadWargrEnvironment(
   );
 
   const base = {
+    execution,
     appOrigin,
     dataDirectory,
     databasePath,
@@ -174,7 +179,7 @@ export function loadWargrEnvironment(
     : exactSecret(
         environment,
         'WARGR_STUDIO_USERNAME',
-        isProduction ? undefined : DEVELOPMENT_STUDIO_USERNAME,
+        execution.dataMode === 'shared' ? undefined : DEVELOPMENT_STUDIO_USERNAME,
       );
   if (studioUsername.length > 256) {
     throw new Error('WARGR_STUDIO_USERNAME must contain at most 256 characters.');
@@ -184,7 +189,7 @@ export function loadWargrEnvironment(
     : exactSecret(
         environment,
         'WARGR_STUDIO_PASSWORD_HASH',
-        isProduction ? undefined : developmentStudioPasswordHash(),
+        execution.dataMode === 'shared' ? undefined : developmentStudioPasswordHash(),
       );
   parseStudioPasswordHash(studioPasswordHash);
   const sessionSecret = releaseValidation
@@ -192,7 +197,7 @@ export function loadWargrEnvironment(
     : exactSecret(
         environment,
         'WARGR_STUDIO_SESSION_SECRET',
-        isProduction ? undefined : DEVELOPMENT_SESSION_SECRET,
+        execution.dataMode === 'shared' ? undefined : DEVELOPMENT_SESSION_SECRET,
       );
   if (sessionSecret.length < 32) {
     throw new Error('WARGR_STUDIO_SESSION_SECRET must contain at least 32 characters.');

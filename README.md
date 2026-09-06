@@ -8,7 +8,7 @@ from the database's published closure. See [AGENTS.md](AGENTS.md).
 
 ```bash
 pnpm install
-pnpm dev              # Angular on 4260, API + worker on 4261, dev database under .run/dev
+pnpm dev              # Angular on 4260, API on 4261 + worker, real data/wargr.db
 pnpm generate:content # explicitly regenerate the snapshot from published essays and image masters
 pnpm build            # prerender the tracked snapshot and compile the production web/worker
 pnpm build:server:release # internal self-contained server-artifact build
@@ -17,6 +17,10 @@ pnpm e2e              # isolated Chromium smoke test of a temporary production b
 pnpm start:web        # serve at http://127.0.0.1:3060 (health: /healthz)
 pnpm start:worker     # the compiled polish worker
 ```
+
+Normal dev and production share article records and private owner authentication. Their jobs and
+polish results use separate execution scopes; neither dev startup nor a database edit publishes
+the public site. Shared startup verifies the existing schema without seeding or migrating it.
 
 ## The Studio
 

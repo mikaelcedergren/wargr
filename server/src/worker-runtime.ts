@@ -11,8 +11,10 @@ import {
 import {
   acquireServerWorkerReadinessLease,
   createServerWorkerReadiness,
+  createWorkerLifetimeReference,
   signalServerWorkerReadiness,
   type ServerWorkerReadinessLease,
+  type WorkerLifetimeReference,
 } from '@mikaelcedergren/cx-framework/server/worker-readiness';
 
 import { createWargrPersistence, type WargrPersistence } from './article-repository.js';
@@ -24,7 +26,7 @@ import {
   type WargrWorkerEnvironment,
 } from './environment.js';
 import { createArticlePolishWorker, type ArticlePolishWorkerLoop } from './polish-worker.js';
-import { verifyWargrDatabaseBeforeWrite } from './database.js';
+import { verifyWargrDatabase } from './database.js';
 import { createOpenAiResponsesProvider } from './openai-provider.js';
 import { assertWargrProductManifest } from './product-contract.js';
 
@@ -87,12 +89,13 @@ export async function startWargrWorker({
   }
 
   const persistence = createWargrPersistence({
+    executionScope: environment.execution.executionScope,
     databasePath: environment.databasePath,
     operationalRoot: environment.operationalRoot,
-    ...(environment.isProduction && !environment.releaseValidation
+    ...(environment.execution.dataMode === 'shared'
       ? {
           requireExisting: true as const,
-          verifyBeforeWrite: verifyWargrDatabaseBeforeWrite,
+          verifyBeforeWrite: verifyWargrDatabase,
         }
       : {}),
   });
@@ -219,6 +222,7 @@ export async function startWargrWorker({
     let closing: Promise<void> | undefined;
     let disposeSignals = (): void => undefined;
     let readinessLease: ServerWorkerReadinessLease | undefined;
+    let lifetimeReference: WorkerLifetimeReference | undefined;
     let workerStarted = false;
     const shutdown: GracefulShutdown = {
       get closing() {
@@ -230,6 +234,7 @@ export async function startWargrWorker({
         closing = closeWorkerRuntime({
           closeReadinessLease: () => {
             readinessLease?.close();
+            lifetimeReference?.close();
           },
           closePersistence: () => {
             if (!persistenceOpen) return;
@@ -259,6 +264,9 @@ export async function startWargrWorker({
         identity,
         production: environment.isProduction,
       });
+      if (!environment.isProduction) {
+        lifetimeReference = createWorkerLifetimeReference();
+      }
       workerStarted = true;
       worker.start();
     } catch (startupError) {
@@ -278,6 +286,18 @@ export async function startWargrWorker({
         ? '[wargr] article polish worker ready with claims enabled'
         : '[wargr] article polish worker ready with claims disabled',
     );
+    if (sourceEnvironment['CX_DEV_GENERATION']) {
+      console.info(
+        JSON.stringify({
+          developmentRuntime: {
+            generation: sourceEnvironment['CX_DEV_GENERATION'],
+            pid: process.pid,
+            role: WARGR_WORKER_KEY,
+            ...environment.execution,
+          },
+        }),
+      );
+    }
     return Object.freeze({
       claimsEnabled: environment.polishEnabled,
       environment,

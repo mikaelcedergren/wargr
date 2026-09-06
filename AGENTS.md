@@ -1,5 +1,19 @@
 # wargr.com
 
+## Everyday development
+
+Wolfie uses the product with real records, fixes problems in development as they appear, and
+publishes when satisfied. Follow the shared [development contract](../SERVER-STANDARD.md#local-development)
+and [dev-first delivery rule](../AGENTS.md#user-facing-delivery). Automated mutation checks and
+release validation remain isolated and synthetic.
+
+Normal dev and production share `data/wargr.db`. Draft and polish actions remain separate from
+explicit article publication; the sealed publisher remains the only public-content publisher.
+
+Shared-storage upgrades require a coordinated maintenance window for every writer. The
+[cross-repo implementation record](../SHARED-DATA-DEVELOPMENT-PLAN.md) distinguishes source
+preparation from installed runtime adoption.
+
 Michael Wargr's essays — an **Angular 22 SSG site plus the private Studio**, built on
 `@mikaelcedergren/cx-framework` and served by one compiled TypeScript/Express web process on the
 Mac mini. A separate listener-free worker owns durable AI polish work. Substack-like reading
@@ -213,3 +227,16 @@ The root web architecture owns the shared [toolchain](../WEB-ARCHITECTURE.md#too
 plus the `sanitize-html` allowlist for explicit content generation. Product ports are dev `4260`
 (browser) and `4261` (API/worker), production `3060`. Shared allocations and operating rules
 remain owned by [`PORTS.md`](../PORTS.md) and [`SERVER-STANDARD.md`](../SERVER-STANDARD.md).
+
+## Shared storage maintenance
+
+The registered offline candidate tools run `quiesce-database`, `migrate-database`, and
+`verify-database` from `server/dist/database-maintenance.js`. They do not load secrets, seed data,
+or start workers. The host operator must prove every dev and production writer stopped, take a
+verified backup, migrate once, and select schema-compatible runtimes before restarting.
+
+Migration preserves old jobs and their domain records in the held `legacy` scope. New workers
+cannot claim them. `server/src/scope-migration.ts` assigns reviewed terminal or never-attempted jobs
+and their domain owner atomically. Attempted or ambiguous provider work requires explicit outcome
+resolution before assignment; never infer an origin or replay it automatically. Old isolated dev
+stores remain preserved until a separately reviewed import resolves duplicate or changed records.
