@@ -12,6 +12,7 @@
     "scripts/generated-content-transaction.mjs",
     "scripts/prepare-article-images.mjs",
     "scripts/published-input-state.mjs",
+    "scripts/publisher-log.mjs",
     "scripts/wargr-generated-source.json"
   ],
   "inputs": {
@@ -19,7 +20,6 @@
     "images": "wargr/article-images"
   },
   "logs": {
-    "stdout": "wargr/.run/publish.out.log",
-    "stderr": "wargr/.run/publish.err.log"
+    "producer": "wargr-publisher"
   }
 }

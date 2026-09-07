@@ -13,6 +13,11 @@
     <key>ProgramArguments</key>
     <array>
       <string>/opt/homebrew/bin/node</string>
+      <string>/Users/cortex/Development/server-ops/bin/system-job-launcher.mjs</string>
+      <string>--capture</string>
+      <string>wargr-jobs</string>
+      <string>--</string>
+      <string>/opt/homebrew/bin/node</string>
       <string>/Users/cortex/Development/wargr/.run/site-releases/server/current-server/artifact/server/dist/worker.js</string>
     </array>
 
@@ -69,9 +74,9 @@
     </dict>
 
     <key>StandardOutPath</key>
-    <string>/Users/cortex/Development/wargr/.run/jobs.out.log</string>
+    <string>/dev/null</string>
 
     <key>StandardErrorPath</key>
-    <string>/Users/cortex/Development/wargr/.run/jobs.err.log</string>
+    <string>/dev/null</string>
   </dict>
 </plist>
