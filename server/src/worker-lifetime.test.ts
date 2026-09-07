@@ -1,3 +1,4 @@
+import { parseLogRecord } from '@mikaelcedergren/cx-framework/server/logging';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
@@ -86,5 +87,11 @@ test('a disabled worker remains alive without a provider until graceful shutdown
   const result = await closed;
   clearTimeout(timer);
   assert.deepEqual(result, [0, null], stderr);
-  assert.equal(stderr, '');
+  const records = stderr.trim().split('\n').map(parseLogRecord);
+  assert.deepEqual(
+    records.map((record) => record.event),
+    ['process.ready', 'process.stopped'],
+  );
+  assert.equal(records[0]?.code, 'CLAIMS_DISABLED');
+  assert.ok(records.every((record) => record.role === 'jobs' && record.outcome === 'success'));
 });

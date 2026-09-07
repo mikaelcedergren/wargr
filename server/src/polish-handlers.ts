@@ -1,3 +1,6 @@
+import { randomUUID } from 'node:crypto';
+import { runWithLogContext } from '@mikaelcedergren/cx-framework/server/logging';
+import { log } from './logging.js';
 import type {
   DurableJobDisposition,
   DurableJobExecutionContext,
@@ -251,11 +254,15 @@ export function createArticlePolishHandlers({
     context: DurableJobExecutionContext,
   ): never {
     const terminal = providerFailure(error, context);
-    terminalizeRun(run, {
-      errorCode: terminal.code,
-      errorMessage: terminal.message,
-      state: terminal.outcome,
-    });
+    terminalizeRun(
+      run,
+      {
+        errorCode: terminal.code,
+        errorMessage: terminal.message,
+        state: terminal.outcome,
+      },
+      terminal,
+    );
   }
 
   function providerFailure(
@@ -322,16 +329,60 @@ export function createArticlePolishHandlers({
     );
   }
 
-  function terminalizeRun(run: PolishRun, outcome: TerminalPolishOutcome): never {
+  function terminalizeRun(run: PolishRun, outcome: TerminalPolishOutcome, cause?: unknown): never {
     polish.finalizeRun({
       expectedRunRevision: run.revision,
       outcome,
       runId: run.runId,
     });
-    throw new ArticlePolishExecutionError(outcome.errorCode, outcome.errorMessage, false);
+    throw new ArticlePolishExecutionError(
+      outcome.errorCode,
+      outcome.errorMessage,
+      false,
+      cause === undefined ? {} : { cause },
+    );
   }
 
-  return Object.freeze({ [ARTICLE_POLISH_JOB_TYPE]: handler });
+  const observedHandler: DurableJobHandler = (payload, context) =>
+    runWithLogContext({ runId: randomUUID(), jobId: context.jobId }, async () => {
+      const started = performance.now();
+      log.emit({
+        event: 'job.started',
+        level: 'info',
+        category: 'diagnostic',
+        outcome: 'started',
+        operation: ARTICLE_POLISH_JOB_TYPE,
+        attempt: context.attempt,
+      });
+      try {
+        await handler(payload, context);
+        log.emit({
+          event: 'job.handler_completed',
+          level: 'info',
+          category: 'diagnostic',
+          outcome: 'success',
+          operation: ARTICLE_POLISH_JOB_TYPE,
+          attempt: context.attempt,
+          durationMs: performance.now() - started,
+        });
+      } catch (error) {
+        const disposition = classifyArticlePolishFailure(error, Date.now());
+        const waiting = 'type' in disposition;
+        log.emit({
+          event: waiting ? 'job.waiting' : 'job.handler_failed',
+          level: waiting ? 'info' : 'error',
+          category: 'diagnostic',
+          outcome: waiting ? 'skipped' : 'failure',
+          operation: ARTICLE_POLISH_JOB_TYPE,
+          attempt: context.attempt,
+          durationMs: performance.now() - started,
+          code: disposition.code,
+          ...(waiting ? {} : { error }),
+        });
+        throw error;
+      }
+    });
+  return Object.freeze({ [ARTICLE_POLISH_JOB_TYPE]: observedHandler });
 }
 
 function runMatchesJob(

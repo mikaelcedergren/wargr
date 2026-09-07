@@ -1,3 +1,4 @@
+import { log } from './logging.js';
 import { randomUUID } from 'node:crypto';
 
 import type { JsonValue } from '@mikaelcedergren/cx-framework/server/errors';
@@ -126,7 +127,13 @@ export interface ArticleRepository {
 
 export type PolishState = 'queued' | 'running' | 'succeeded' | 'failed' | 'ambiguous';
 export type ProviderEffectState =
-  'prepared' | 'creating' | 'submitted' | 'polling' | 'succeeded' | 'rejected' | 'ambiguous';
+  | 'prepared'
+  | 'creating'
+  | 'submitted'
+  | 'polling'
+  | 'succeeded'
+  | 'rejected'
+  | 'ambiguous';
 
 export interface PolishRun {
   readonly articleId: string;
@@ -1146,7 +1153,7 @@ export function createPolishRepository(
       validatePolishRunInput(input.run);
       assertEpoch(input.now, 'Polish admission time');
       assertWindowPolicy(input.policy.maximumPolishes, input.policy.windowMs, 'Polish');
-      return jobs.withTransaction((transaction) => {
+      const result = jobs.withTransaction((transaction) => {
         // Admission state is checked before charging the bounded window. Every later mutation is
         // in this same immediate transaction, so job/run capacity or insert failure rolls it back.
         assertAdmissionState(input.run);
@@ -1160,13 +1167,24 @@ export function createPolishRepository(
           status: 'accepted' as const,
         });
       });
+      if (result.status === 'accepted')
+        log.emit({
+          event: 'polish.admitted',
+          level: 'info',
+          category: 'diagnostic',
+          outcome: 'success',
+          jobId: result.run.jobId,
+          effectId: result.run.runId,
+          operation: 'article.polish',
+        });
+      return result;
     },
     finalizeRun(input) {
       assertIdentifier(input.runId, 'Polish run id');
       requireOwnedRun(input.runId);
       assertPositiveInteger(input.expectedRunRevision, 'Expected polish revision');
       const now = checkedClock(clock);
-      return jobs.withTransaction(() => {
+      const result = jobs.withTransaction(() => {
         const row = ownedRun(input.runId);
         if (!row) throw new PersistenceRevisionConflictError('Polish run', input.runId);
         const current = parsePolishRun(row);
@@ -1235,6 +1253,18 @@ export function createPolishRepository(
           finalizedRun: finalize('succeeded', null, null),
         });
       });
+      const completed = result.finalizedRun;
+      log.emit({
+        event: 'polish.completed',
+        level: completed.state === 'succeeded' ? 'info' : 'error',
+        category: 'operation',
+        outcome: completed.state === 'succeeded' ? 'success' : 'failure',
+        jobId: completed.jobId,
+        effectId: completed.runId,
+        operation: 'article.polish',
+        code: completed.state.toUpperCase(),
+      });
+      return result;
     },
     getEffect(effectId) {
       const row = database.get<ProviderEffectRow>(

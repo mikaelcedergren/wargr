@@ -6,6 +6,8 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { DatabaseSync } from 'node:sqlite';
+import { parseLogRecord } from '@mikaelcedergren/cx-framework/server/logging';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const serverIdentityFile = path.join(
@@ -282,7 +284,45 @@ test(
     );
     assert.equal(polishUnavailable.status, 503);
 
+    const database = new DatabaseSync(path.join(dataDir, 'wargr.db'));
+    try {
+      database.exec(
+        "CREATE TRIGGER synthetic_insert_failure BEFORE INSERT ON articles BEGIN SELECT RAISE(ABORT, 'PRIVATE synthetic insert failed'); END",
+      );
+      const failed = await localFetch(`${origin}/api/studio/articles`, {
+        body: JSON.stringify({ title: 'PRIVATE draft must not reach logs' }),
+        headers: {
+          'Content-Type': 'application/json',
+          Cookie: cookie,
+          Origin: origin,
+          'X-Request-ID': 'spoofed-request-identifier',
+        },
+        method: 'POST',
+      });
+      assert.equal(failed.status, 500);
+      const body = await failed.json();
+      assert.equal(body.error.requestId, failed.headers.get('x-request-id'));
+      assert.notEqual(body.error.requestId, 'spoofed-request-identifier');
+      const deadline = Date.now() + 2_000;
+      while (!output.includes(body.error.requestId) && Date.now() < deadline)
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      const records = output.trim().split('\n').map(parseLogRecord);
+      const causes = records.filter(
+        (record) =>
+          record.event === 'http.internal_error' && record.requestId === body.error.requestId,
+      );
+      assert.equal(causes.length, 1);
+      assert.ok(causes[0].error.fingerprint);
+      assert.doesNotMatch(output, /PRIVATE|Something honest|A working title|scrypt\$/u);
+    } finally {
+      database.exec('DROP TRIGGER synthetic_insert_failure');
+      database.close();
+    }
+
     assert.deepEqual(await stopChild(child), { code: 0, signal: null });
+    const records = output.trim().split('\n').map(parseLogRecord);
+    assert.equal(records.filter((record) => record.event === 'process.ready').length, 1);
+    assert.equal(records.filter((record) => record.event === 'process.stopped').length, 1);
   },
 );
 

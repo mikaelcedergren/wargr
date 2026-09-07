@@ -1,5 +1,7 @@
 # wargr.com
 
+Operational diagnostics follow the [shared logging policy](../SERVER-STANDARD.md#logs-and-bounded-storage). Web requests, admitted polish runs, provider receipts and committed results use opaque references. Polling emits bounded summaries, and storage health logs only failure and recovery transitions. Essay drafts, instructions, credentials and provider bodies stay out of logs. The [implementation plan](../LOGGING-IMPLEMENTATION-PLAN.md) tracks host capture activation separately from producer code.
+
 Michael Wargr's essays — Angular 22 SSG on cx-framework plus the private Studio, served by one
 compiled TypeScript/Express web process on the Mac mini (port 3060) with a separate listener-free
 AI polish worker. Essays are authored in the Studio at `/studio` and stored in the article

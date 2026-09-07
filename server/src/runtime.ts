@@ -1,3 +1,4 @@
+import { configureWargrLogging, log } from './logging.js';
 import type { Server } from 'node:http';
 
 import { listenHttpApplication } from '@mikaelcedergren/cx-framework/server/listen';
@@ -54,6 +55,7 @@ export async function startWargrServer({
     environment: sourceEnvironment,
     required: environment.isProduction || environment.releaseValidation,
   });
+  configureWargrLogging('web', sourceEnvironment, identity?.releaseId);
   if (identity) {
     assertServerProcessRole({
       artifactRoot: WARGR_ARTIFACT_ROOT,
@@ -123,7 +125,6 @@ export async function startWargrServer({
       },
       close(reason = 'shutdown') {
         if (closing) return closing;
-        console.info(`[wargr] web process stopping (${reason})`);
         closing = closeWebRuntime({
           closeHttp: () => httpShutdown.close(reason),
           closePersistence: () => {
@@ -132,6 +133,13 @@ export async function startWargrServer({
             persistence.close();
           },
           disposeSignals: () => disposeSignals(),
+        }).then(() => {
+          log.emit({
+            event: 'process.stopped',
+            level: 'info',
+            category: 'operation',
+            outcome: 'success',
+          });
         });
         return closing;
       },
@@ -140,7 +148,13 @@ export async function startWargrServer({
     try {
       disposeSignals = bindShutdownSignals({
         onError(error) {
-          console.error('[wargr] web process shutdown failed', error);
+          log.emit({
+            event: 'process.stop_failed',
+            level: 'error',
+            category: 'diagnostic',
+            outcome: 'failure',
+            error: error,
+          });
           process.exitCode = 1;
         },
         shutdown,
@@ -158,9 +172,7 @@ export async function startWargrServer({
       throw signalError;
     }
 
-    console.info(
-      `[wargr] web process listening on http://${environment.host}:${String(environment.port)}`,
-    );
+    log.emit({ event: 'process.ready', level: 'info', category: 'operation', outcome: 'success' });
     return Object.freeze({ environment, identity, persistence, server, shutdown });
   } catch (error) {
     const failures: unknown[] = [error];

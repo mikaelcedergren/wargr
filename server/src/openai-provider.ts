@@ -1,3 +1,5 @@
+import { currentLogContext, runWithLogContext } from '@mikaelcedergren/cx-framework/server/logging';
+import { log } from './logging.js';
 import { createHash } from 'node:crypto';
 
 import type { JsonValue } from '@mikaelcedergren/cx-framework/server/errors';
@@ -24,6 +26,20 @@ const DEFINITIVE_CREATE_REJECTION_STATUSES = new Set([400, 401, 403, 404, 422, 4
 type ProviderFetch = (input: string | URL | Request, init?: RequestInit) => Promise<Response>;
 
 type Delay = (milliseconds: number, signal: AbortSignal) => Promise<void>;
+
+interface EffectInput<Result> {
+  readonly ordinal: number;
+  readonly runId: string;
+  readonly signal: AbortSignal;
+  readonly spec: StructuredGenerationSpec<Result>;
+}
+
+const LOG_OPERATIONS = new Set([
+  'article-polish:rough',
+  'article-polish:reference',
+  'article-polish:developed',
+  'article-polish:polish',
+]);
 
 interface ProviderFetchReceipt {
   readonly response: Response;
@@ -138,17 +154,78 @@ export function createOpenAiResponsesProvider(
     throw new Error('Structured generation exhausted an unreachable attempt count.');
   }
 
-  async function executeEffect<Result>({
-    ordinal,
-    runId,
-    signal,
-    spec,
-  }: {
-    readonly ordinal: number;
-    readonly runId: string;
-    readonly signal: AbortSignal;
-    readonly spec: StructuredGenerationSpec<Result>;
-  }): Promise<JsonValue> {
+  async function executeEffect<Result>(input: EffectInput<Result>): Promise<JsonValue> {
+    const effectId = sha256(
+      `${input.runId}\u0000${input.spec.operation}:attempt:${String(input.ordinal)}`,
+    );
+    return runWithLogContext({ ...currentLogContext(), effectId }, async () => {
+      const started = performance.now();
+      const operation = LOG_OPERATIONS.has(input.spec.operation)
+        ? input.spec.operation
+        : 'article.polish';
+      let calls = 0;
+      let failures = 0;
+      let lastStatus: number | undefined;
+      const observedFetch: ProviderFetch = async (url, init) => {
+        calls += 1;
+        try {
+          const response = await fetchProvider(url, init);
+          lastStatus = response.status;
+          if (!response.ok) failures += 1;
+          return response;
+        } catch (error) {
+          failures += 1;
+          throw error;
+        }
+      };
+      log.emit({
+        event: 'provider.started',
+        level: 'info',
+        category: 'diagnostic',
+        outcome: 'started',
+        provider: 'openai',
+        operation,
+        attempt: input.ordinal,
+      });
+      let outcome: 'success' | 'failure' | 'retry' = 'failure';
+      let code = 'PROVIDER_UNEXPECTED';
+      try {
+        const result = await executeEffectResult(input, observedFetch);
+        outcome = 'success';
+        code = calls === 0 ? 'DURABLE_REPLAY' : 'RECEIPT_COMMITTED';
+        return result;
+      } catch (error) {
+        if (error instanceof GenerationProviderPendingError) {
+          outcome = 'retry';
+          code = error.code;
+        } else if (error instanceof GenerationProviderTerminalError) {
+          code = error.code;
+        }
+        // The job boundary owns the safe cause. This bounded summary also includes retrieval
+        // failures that were recovered within the same effect, without logging every poll.
+        throw error;
+      } finally {
+        log.emit({
+          event: 'provider.finished',
+          level: outcome === 'failure' ? 'warn' : 'info',
+          category: 'diagnostic',
+          outcome,
+          provider: 'openai',
+          operation,
+          attempt: calls,
+          count: failures,
+          code,
+          durationMs: performance.now() - started,
+          ...(lastStatus === undefined ? {} : { statusCode: lastStatus }),
+        });
+      }
+    });
+  }
+
+  async function executeEffectResult<Result>(
+    { ordinal, runId, signal, spec }: EffectInput<Result>,
+    fetchEffect: ProviderFetch,
+  ): Promise<JsonValue> {
     const request = providerRequest(model, spec);
     const requestJson = canonicalJson(request);
     const requestSha256 = sha256(requestJson);
@@ -222,7 +299,7 @@ export function createOpenAiResponsesProvider(
           },
           signal,
           requestTimeoutMs,
-          fetchProvider,
+          fetchEffect,
         );
       } catch (error) {
         effect = repository.transitionEffect({
@@ -316,6 +393,7 @@ export function createOpenAiResponsesProvider(
       initialRepresentation: representation,
       pollDeadlineMs: spec.pollDeadlineMs,
       signal,
+      fetchEffect,
     });
   }
 
@@ -324,11 +402,13 @@ export function createOpenAiResponsesProvider(
     initialRepresentation,
     pollDeadlineMs,
     signal,
+    fetchEffect,
   }: {
     readonly effect: ProviderEffect;
     readonly initialRepresentation: JsonValue | undefined;
     readonly pollDeadlineMs: number;
     readonly signal: AbortSignal;
+    readonly fetchEffect: ProviderFetch;
   }): Promise<JsonValue> {
     positiveTimer(pollDeadlineMs, 'Provider polling deadline');
     const startedAt = safeClock(clock);
@@ -427,7 +507,7 @@ export function createOpenAiResponsesProvider(
           { headers: providerHeaders(apiKey), method: 'GET' },
           signal,
           Math.min(requestTimeoutMs, deadline - retrievalStartedAt),
-          fetchProvider,
+          fetchEffect,
         );
       } catch (error) {
         if (signal.aborted) {
