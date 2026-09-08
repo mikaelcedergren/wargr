@@ -27,9 +27,6 @@ wg-studio {
 }
 
 .wg-studio-login__submit {
-  // The button exposes its own width custom property for full-width form submits.
-  --cx-button-width: 100%;
-
   width: 100%;
 }
 
@@ -73,13 +70,15 @@ wg-studio {
 }
 
 .wg-studio-workspace__main {
-  --cx-page-measure: var(--measure-xl);
-
   height: 100dvh;
   min-height: 0;
   overflow: auto;
   background: var(--surface);
   overscroll-behavior: contain;
+}
+
+.wg-studio-content {
+  max-width: var(--measure-xl);
 }
 
 .wg-studio-workspace__scrim {
@@ -163,9 +162,6 @@ wg-studio {
 }
 
 .wg-studio-run {
-  // The button exposes its own width custom property for full-width rail actions.
-  --cx-button-width: 100%;
-
   width: 100%;
 }
 
