@@ -127,13 +127,7 @@ export interface ArticleRepository {
 
 export type PolishState = 'queued' | 'running' | 'succeeded' | 'failed' | 'ambiguous';
 export type ProviderEffectState =
-  | 'prepared'
-  | 'creating'
-  | 'submitted'
-  | 'polling'
-  | 'succeeded'
-  | 'rejected'
-  | 'ambiguous';
+  'prepared' | 'creating' | 'submitted' | 'polling' | 'succeeded' | 'rejected' | 'ambiguous';
 
 export interface PolishRun {
   readonly articleId: string;

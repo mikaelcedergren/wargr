@@ -25,8 +25,7 @@ export interface StructuredGenerationSpec<Result> {
 }
 
 export type ValidationResult<Result> =
-  | { readonly ok: true; readonly value: Result }
-  | { readonly error: string; readonly ok: false };
+  { readonly ok: true; readonly value: Result } | { readonly error: string; readonly ok: false };
 
 // Long essays need generous budgets: the complete document returns in one response, and the
 // provider runs it as a background response that can take several minutes at full reasoning depth.
