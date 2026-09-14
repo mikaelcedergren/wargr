@@ -19,6 +19,7 @@
     "images": "pnpm run generate:content",
     "generate:content": "bin/generate-content",
     "dev": "pnpm favicon:check && node scripts/dev.mjs",
+    "dev:owner": "pnpm favicon:check && node scripts/dev.mjs --owner",
     "studio:password-hash": "node scripts/studio-password-hash.mjs",
     "build": "pnpm run build:browser && pnpm run build:server",
     "build:browser": "ng build --configuration prod",

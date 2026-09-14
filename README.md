@@ -24,6 +24,9 @@ Normal dev and production share article records and private owner authentication
 polish results use separate execution scopes; neither dev startup nor a database edit publishes
 the public site. Shared startup verifies the existing schema without seeding or migrating it.
 
+On the personal Mac, `cx wargr` selects `pnpm dev:owner` on the same ports. Its separate local
+Studio database lives under `data/owner-development/`; private files and AI polishing are disabled.
+
 ## The Studio
 
 `/studio` is the owner's writing room: essay drafts, the ghostwriter polish loop (four rewrite
