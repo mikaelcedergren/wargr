@@ -1,19 +1,19 @@
 {
-  "mark": {
-    "source": "public/assets/brand/favicon.png",
-    "mode": "alpha",
-    "threshold": 64
-  },
+  "icons": [
+    {
+      "source": "public/assets/brand/favicon.png",
+      "file": "public/assets/favicon-development.svg",
+      "href": "/assets/favicon-development.svg"
+    },
+    {
+      "source": "public/assets/brand/favicon-dark.png",
+      "file": "public/assets/favicon-development-dark.svg",
+      "href": "/assets/favicon-development-dark.svg",
+      "media": "(prefers-color-scheme: dark)"
+    }
+  ],
   "index": {
     "production": "src/index.html",
     "development": "src/index.development.html"
-  },
-  "favicon": {
-    "file": "public/assets/favicon-development.svg",
-    "href": "/assets/favicon-development.svg"
-  },
-  "maskIcon": {
-    "file": "public/assets/favicon-development-mask.svg",
-    "href": "/assets/favicon-development-mask.svg"
   }
 }
