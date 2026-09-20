@@ -1,7 +1,7 @@
 // wargr.com global styles — "The Quiet Press": a de-chromed editorial reading space built entirely on
 // cx-framework tokens. The framework's display serif (--font-family-heading) carries the voice (titles,
 // deks, pull-quotes); Inter reads the body; Roboto Mono marks the facts (meta, folios). The
-// article body itself is the framework's own `.cx-article` editorial type — this layer only adds the
+// article body itself is the framework's own `.cx-editorial` editorial type — this layer only adds the
 // site's structural patterns (masthead, feed, hero, pull-quote, what's-next) around it, and every
 // design value inside them is a framework token.
 // Light is the default; the whole palette is token-derived so theme-night works for free.
@@ -9,7 +9,7 @@
 @use '@mikaelcedergren/cx-framework/tokens/breakpoints' as bp;
 @use '@mikaelcedergren/cx-framework/styles/fonts';
 @use '@mikaelcedergren/cx-framework/styles/base';
-@use '@mikaelcedergren/cx-framework/styles/article';
+@use '@mikaelcedergren/cx-framework/styles/editorial';
 @use '@mikaelcedergren/cx-framework/styles/utilities';
 
 :root {
@@ -343,12 +343,12 @@ a:active {
 }
 
 // ---- Prose (the rendered markdown body) ----
-// The body now carries the framework's own `.cx-article` editorial type (see import-articles.mjs):
+// The body now carries the framework's own `.cx-editorial` editorial type (see import-articles.mjs):
 // base size/leading, heading scale + display serif, links, blockquote, lists, hr, img, code and the
 // block rhythm are all owned there. Nothing is re-declared here — the framework's real reading
 // typography stands as-is, even where its app-scaled sizes read tighter than the old local layer.
 
-// ---- Pull-quote (a template figure sibling to the body, so it is outside .cx-article) ----
+// ---- Pull-quote (a template figure sibling to the body, so it is outside .cx-editorial) ----
 .wg-pullquote {
   margin: var(--space-2xl) 0;
   padding-left: var(--space-lg);

@@ -423,7 +423,7 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
       <div class="wg-hero__inner wg-container">
         <a class="wg-back wg-back--hero" routerLink="/">← Essays</a>
         <div class="wg-hero__head">
-          <div class="wg-hero__title-type cx-article cx-article--lg cx-article--start">
+          <div class="wg-hero__title-type cx-editorial">
             <h1 class="wg-article__title">{{ title }}</h1>
           </div>
           @if (dek) { <p class="wg-article__dek">{{ dek }}</p> }
@@ -432,7 +432,7 @@ type WgRelated = { slug: string; title: string; dek: string; meta: string };
       </div>
     </header>
     <article class="wg-container wg-article wg-article--hero">
-      <div class="wg-prose cx-article" [innerHTML]="body"></div>
+      <div class="wg-prose cx-editorial" [innerHTML]="body"></div>
       <p class="wg-finis" aria-hidden="true">§</p>
     </article>
     @if (related.length || prev || next) {
