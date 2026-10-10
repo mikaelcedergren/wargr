@@ -100,7 +100,6 @@ scripts/prepare-article-images.mjs staging image generator (macOS sips) from the
 scripts/article-slugs.mjs          the one slug/inventory authority over the published closure
 scripts/published-input-state.mjs  publication input digest: published records + image master bytes
 scripts/generated-content-transaction.mjs bounded staging, exact-output swap, rollback, crash recovery
-scripts/import-ghostwriter-articles.mjs  the one-time content migration from the retired ghostwriter repo
 scripts/dev.mjs             development launcher: web + worker + Angular with the dev database
 bin/generate-content        manual transaction entrypoint sharing the publisher's kernel lock
 bin/publish-content         scheduled publisher entrypoint (input guard + generation + browser release)

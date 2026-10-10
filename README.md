@@ -81,6 +81,5 @@ definition write to the shared `server-ops` installer. Neither installer loads, 
 restarts a service. The bounded `publisher-contract.json` is Wargr's sole declaration of the
 generator sources, database/image inputs, and log paths in that closure.
 
-The retired ghostwriter repository's essays were migrated into the database once via
-`scripts/import-ghostwriter-articles.mjs`; the voice contract lives on in
+The article database is the sole authoring source. The voice contract lives in
 `server/src/voice-contract.ts`.

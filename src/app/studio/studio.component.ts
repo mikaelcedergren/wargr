@@ -227,6 +227,7 @@ export class StudioComponent implements OnInit, OnDestroy {
   private readonly document = inject(DOCUMENT);
   private readonly browser = isPlatformBrowser(inject(PLATFORM_ID));
   private pollSequence = 0;
+  private saveSequence = 0;
   private saveQueue: Promise<void> = Promise.resolve();
 
   @ViewChild('usernameField')
@@ -470,16 +471,28 @@ export class StudioComponent implements OnInit, OnDestroy {
     if (this.submitting()) return;
     this.submitting.set(true);
     try {
-      await this.request('/api/studio/logout', { method: 'POST' });
-    } finally {
+      const response = await this.request('/api/studio/logout', { method: 'POST' });
+      if (!response.ok) {
+        const message = await this.apiErrorMessage(
+          response,
+          'Studio could not sign out. Try again.',
+        );
+        (this.view() === 'editor' ? this.editorError : this.listError).set(message);
+        return;
+      }
       this.pollSequence += 1;
       this.authenticated.set(false);
       this.username.set('');
       this.password.set('');
       this.requestError.set('');
       this.resetStudio();
-      this.submitting.set(false);
       queueMicrotask(() => this.usernameField?.focus());
+    } catch {
+      (this.view() === 'editor' ? this.editorError : this.listError).set(
+        'Studio could not sign out. Try again.',
+      );
+    } finally {
+      this.submitting.set(false);
     }
   }
 
@@ -572,12 +585,16 @@ export class StudioComponent implements OnInit, OnDestroy {
         return;
       }
       if (!response.ok) {
-        this.listError.set(
-          await this.apiErrorMessage(response, 'That essay could not be opened. Try again.'),
+        const message = await this.apiErrorMessage(
+          response,
+          'That essay could not be opened. Try again.',
         );
+        if (sequence !== this.pollSequence) return;
+        this.listError.set(message);
         return;
       }
       const payload = (await response.json()) as { article?: Article };
+      if (sequence !== this.pollSequence) return;
       if (!payload.article) {
         this.listError.set('That essay could not be opened. Try again.');
         return;
@@ -668,19 +685,28 @@ export class StudioComponent implements OnInit, OnDestroy {
   protected async save(): Promise<void> {
     const current = this.article();
     if (!current || !this.dirty() || this.saving() || this.polishing()) return;
+    const sequence = this.pollSequence;
+    const saveSequence = ++this.saveSequence;
+    const document = normalizedDraft(this.draft());
+    const slug = this.slugDraft().trim();
     this.saving.set(true);
     this.editorError.set('');
-    this.saveQueue = this.saveQueue.then(() => this.persistDraft(current));
+    this.saveQueue = this.saveQueue.then(() =>
+      this.persistDraft(current, sequence, document, slug),
+    );
     try {
       await this.saveQueue;
     } finally {
-      this.saving.set(false);
+      if (saveSequence === this.saveSequence) this.saving.set(false);
     }
   }
 
-  private async persistDraft(saved: Article): Promise<void> {
-    const document = normalizedDraft(this.draft());
-    const slug = this.slugDraft().trim();
+  private async persistDraft(
+    saved: Article,
+    sequence: number,
+    document: ArticleDocument,
+    slug: string,
+  ): Promise<void> {
     try {
       const response = await this.request(`/api/studio/articles/${saved.id}`, {
         method: 'PUT',
@@ -689,35 +715,42 @@ export class StudioComponent implements OnInit, OnDestroy {
             ? { expectedRevision: saved.revision, document }
             : { expectedRevision: saved.revision, document, slug },
       });
+      if (!this.isCurrentEditor(saved.id, sequence)) return;
       if (response.status === 401) {
         this.expireSession();
         return;
       }
       if (!response.ok) {
-        this.editorError.set(
-          await this.apiErrorMessage(response, 'The essay could not be saved. Try again.'),
+        const message = await this.apiErrorMessage(
+          response,
+          'The essay could not be saved. Try again.',
         );
-        if (response.status === 409) await this.reloadArticle(saved.id);
+        if (!this.isCurrentEditor(saved.id, sequence)) return;
+        this.editorError.set(message);
+        if (response.status === 409) await this.reloadArticle(saved.id, sequence);
         return;
       }
       const payload = (await response.json()) as { article?: Article };
+      if (!this.isCurrentEditor(saved.id, sequence)) return;
       if (payload.article) {
         this.article.set(payload.article);
         this.draft.set(normalizedDraft(this.draft()));
-        this.slugDraft.set(payload.article.slug);
+        if (this.slugDraft().trim() === slug) this.slugDraft.set(payload.article.slug);
         this.editorNotice.set('Saved.');
         void this.refreshVersions(payload.article.id);
       }
     } catch {
+      if (!this.isCurrentEditor(saved.id, sequence)) return;
       this.editorError.set('Studio cannot be reached right now. The text stays here unsaved.');
     }
   }
 
-  private async reloadArticle(id: string): Promise<void> {
+  private async reloadArticle(id: string, sequence = this.pollSequence): Promise<void> {
     try {
       const response = await this.request(`/api/studio/articles/${id}`);
       if (!response.ok) return;
       const payload = (await response.json()) as { article?: Article };
+      if (!this.isCurrentEditor(id, sequence)) return;
       if (payload.article) {
         this.article.set(payload.article);
       }
@@ -741,9 +774,10 @@ export class StudioComponent implements OnInit, OnDestroy {
   protected async startPolish(): Promise<void> {
     const current = this.article();
     if (!current || this.polishing()) return;
+    const sequence = this.pollSequence;
     if (this.dirty()) {
       await this.save();
-      if (this.dirty()) return;
+      if (!this.isCurrentEditor(current.id, sequence) || this.dirty()) return;
     }
     const saved = this.article();
     if (!saved) return;
@@ -761,21 +795,22 @@ export class StudioComponent implements OnInit, OnDestroy {
           ...(instruction.length > 0 ? { instruction } : {}),
         },
       });
+      if (!this.isCurrentEditor(saved.id, sequence)) return;
       if (response.status === 401) {
         this.expireSession();
         return;
       }
       if (!response.ok) {
-        this.polishError.set(
-          await this.apiErrorMessage(response, this.polishErrorFor(response.status)),
-        );
+        const message = await this.apiErrorMessage(response, this.polishErrorFor(response.status));
+        if (!this.isCurrentEditor(saved.id, sequence)) return;
+        this.polishError.set(message);
         this.polishing.set(false);
-        if (response.status === 409) await this.reloadArticle(saved.id);
+        if (response.status === 409) await this.reloadArticle(saved.id, sequence);
         return;
       }
-      const sequence = ++this.pollSequence;
-      void this.pollPolish(saved.id, sequence);
+      void this.pollPolish(saved.id, ++this.pollSequence);
     } catch {
+      if (!this.isCurrentEditor(saved.id, sequence)) return;
       this.polishError.set('Studio cannot be reached right now. Try again.');
       this.polishing.set(false);
     }
@@ -791,13 +826,17 @@ export class StudioComponent implements OnInit, OnDestroy {
           return;
         }
         if (!response.ok) {
-          this.polishError.set(
-            await this.apiErrorMessage(response, 'The polish status cannot be read right now.'),
+          const message = await this.apiErrorMessage(
+            response,
+            'The polish status cannot be read right now.',
           );
+          if (!this.isCurrentEditor(articleId, sequence)) return;
+          this.polishError.set(message);
           this.polishing.set(false);
           return;
         }
         const payload = (await response.json()) as { status?: PolishStatus };
+        if (!this.isCurrentEditor(articleId, sequence)) return;
         const status = payload.status;
         if (!status || status.articleId !== articleId) {
           this.polishError.set('The polish status came back incomplete. Try again.');
@@ -830,6 +869,7 @@ export class StudioComponent implements OnInit, OnDestroy {
         return;
       }
       const payload = (await response.json()) as { article?: Article };
+      if (!this.isCurrentEditor(articleId, sequence)) return;
       if (!payload.article) return;
       this.article.set(payload.article);
       this.draft.set(documentOf(payload.article));
@@ -851,6 +891,7 @@ export class StudioComponent implements OnInit, OnDestroy {
       if (sequence !== this.pollSequence || !this.authenticated()) return;
       if (!response.ok) return;
       const payload = (await response.json()) as { status?: PolishStatus };
+      if (!this.isCurrentEditor(articleId, sequence)) return;
       const status = payload.status;
       if (!status) return;
       if (status.state === 'queued' || status.state === 'running') {
@@ -896,9 +937,10 @@ export class StudioComponent implements OnInit, OnDestroy {
   private async changeState(action: 'publish' | 'unpublish'): Promise<void> {
     const current = this.article();
     if (!current || this.saving() || this.polishing()) return;
+    const sequence = this.pollSequence;
     if (this.dirty()) {
       await this.save();
-      if (this.dirty()) return;
+      if (!this.isCurrentEditor(current.id, sequence) || this.dirty()) return;
     }
     const saved = this.article();
     if (!saved) return;
@@ -909,12 +951,14 @@ export class StudioComponent implements OnInit, OnDestroy {
         method: 'POST',
         body: { expectedRevision: saved.revision },
       });
+      if (!this.isCurrentEditor(saved.id, sequence)) return;
       if (response.status === 401) {
         this.expireSession();
         return;
       }
       if (!response.ok) {
         const payload = (await response.json().catch(() => ({}))) as ApiError;
+        if (!this.isCurrentEditor(saved.id, sequence)) return;
         const problems = payload.error?.details?.problems;
         if (response.status === 422 && Array.isArray(problems)) {
           this.publishProblems.set(problems);
@@ -923,14 +967,15 @@ export class StudioComponent implements OnInit, OnDestroy {
           this.editorError.set(
             payload.error?.message ?? 'That change could not be made. Try again.',
           );
-          if (response.status === 409) await this.reloadArticle(saved.id);
+          if (response.status === 409) await this.reloadArticle(saved.id, sequence);
         }
         return;
       }
       const payload = (await response.json()) as { article?: Article };
+      if (!this.isCurrentEditor(saved.id, sequence)) return;
       if (payload.article) {
         this.article.set(payload.article);
-        this.slugDraft.set(payload.article.slug);
+        if (this.slugDraft().trim() === saved.slug) this.slugDraft.set(payload.article.slug);
         this.editorNotice.set(
           action === 'publish'
             ? 'Published. The essay is now marked for the next site release.'
@@ -939,6 +984,7 @@ export class StudioComponent implements OnInit, OnDestroy {
       }
       await this.refreshArticles();
     } catch {
+      if (!this.isCurrentEditor(saved.id, sequence)) return;
       this.editorError.set('Studio cannot be reached right now. Try again.');
     }
   }
@@ -984,10 +1030,12 @@ export class StudioComponent implements OnInit, OnDestroy {
   protected async restoreVersion(version: ArticleVersionSummary): Promise<void> {
     const current = this.article();
     if (!current) return;
+    const sequence = this.pollSequence;
     try {
       const response = await this.request(
         `/api/studio/articles/${current.id}/versions/${String(version.articleVersion)}`,
       );
+      if (!this.isCurrentEditor(current.id, sequence)) return;
       if (!response.ok) {
         this.editorError.set('That version could not be loaded.');
         return;
@@ -995,12 +1043,14 @@ export class StudioComponent implements OnInit, OnDestroy {
       const payload = (await response.json()) as {
         version?: { document?: ArticleDocument };
       };
+      if (!this.isCurrentEditor(current.id, sequence)) return;
       if (!payload.version?.document) return;
       this.draft.set({ ...emptyDocument(), ...payload.version.document });
       this.editorNotice.set(
         `Version ${String(version.articleVersion)} is loaded into the editor. Save to keep it.`,
       );
     } catch {
+      if (!this.isCurrentEditor(current.id, sequence)) return;
       this.editorError.set('Studio cannot be reached right now. Try again.');
     }
   }
@@ -1010,6 +1060,15 @@ export class StudioComponent implements OnInit, OnDestroy {
   }
 
   /* Shared helpers */
+
+  private isCurrentEditor(articleId: string, sequence: number): boolean {
+    return (
+      sequence === this.pollSequence &&
+      this.authenticated() &&
+      this.view() === 'editor' &&
+      this.article()?.id === articleId
+    );
+  }
 
   protected dateLabel(value: string): string {
     const date = new Date(value);
