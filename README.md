@@ -2,7 +2,7 @@
 
 Operational diagnostics follow the [shared logging policy](../SERVER-STANDARD.md#logs-and-bounded-storage). Web requests, admitted polish runs, provider receipts and committed results use opaque references. Polling emits bounded summaries, and storage health logs only failure and recovery transitions. Essay drafts, instructions, credentials and provider bodies stay out of logs. The [implementation plan](../LOGGING-IMPLEMENTATION-PLAN.md) tracks host capture activation separately from producer code.
 
-Michael Wargr's essays — Angular 22 SSG on cx-framework plus the private Studio, served by one
+Michael Wargr's personal site — videos, essays, and an about page. Angular 22 SSG on cx-framework plus the private Studio, served by one
 compiled TypeScript/Express web process on the Mac mini (port 3060) with a separate listener-free
 AI polish worker. Essays are authored in the Studio at `/studio` and stored in the article
 database (`data/wargr.db`); the sealed publisher regenerates the tracked presentation snapshot
@@ -26,6 +26,29 @@ the public site. Shared startup verifies the existing schema without seeding or 
 
 On the personal Mac, `cx wargr` selects `pnpm dev:owner` on the same ports. Its separate local
 Studio database lives under `data/owner-development/`; private files and AI polishing are disabled.
+
+## Public site
+
+The start page (`/`) features video episodes linking to YouTube. `/blog/` holds the published
+essay collection; individual essays retain their existing root URLs. `/about/` introduces Michael
+Wargr. The original logo sits in the framework masthead with Videos, Blog, and About navigation.
+There is no contact or subscription funnel.
+
+The public pages compose the installed framework's masthead, hero, cards, layout primitives, and
+editorial typography. Local styles own only shell placement, reading width, footer spacing, and
+selection of the original logo asset for each theme. Components and tokens are consumed as-is.
+The document root selects the framework's `cx-corners-square` profile for the site's square identity.
+
+Home, About, and the missing-page view are authored source. The publisher generates the blog
+index, essay components, routes, RSS, sitemap, and article images. Update the generator when
+changing those templates; never edit the generated essay content. Video thumbnails are checked-in
+public assets, so viewing the site makes no YouTube request until a visitor follows the watch link.
+
+`/sitemap.xml` lists the canonical public pages and published essay hero images, and is advertised
+in `robots.txt`. Essay modification times come from the published records; section pages omit
+`lastmod` because they have no authoritative modification timestamp. Studio, API, and error routes
+are excluded. The isolated browser check verifies every entry against its prerendered canonical
+URL, indexability, and image response.
 
 ## The Studio
 

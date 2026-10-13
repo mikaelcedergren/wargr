@@ -1,15 +1,15 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { CxHeroComponent } from '@mikaelcedergren/cx-framework';
 
 @Component({
   selector: 'wg-not-found',
-  imports: [RouterLink],
+  imports: [RouterLink, CxHeroComponent],
   template: `
-    <section class="wg-container wg-article">
-      <h1 class="wg-article__title">Not found</h1>
-      <p class="wg-article__dek">That page doesn't exist.</p>
-      <a class="wg-back" routerLink="/">← Essays</a>
-    </section>
+    <cx-hero heading="Page not found">
+      <p body>That page doesn't exist.</p>
+      <a actions routerLink="/">Back to home</a>
+    </cx-hero>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

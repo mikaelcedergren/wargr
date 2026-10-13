@@ -30,8 +30,7 @@ export const GENERATED_OUTPUT_PATHS = Object.freeze([
   'public/sitemap.xml',
   'src/app/app.routes.ts',
   'src/app/articles',
-  'src/app/pages/home.component.ts',
-  'src/app/pages/not-found.component.ts',
+  'src/app/pages/blog.component.ts',
 ]);
 
 const TOOL_REPO = path.resolve(fileURLToPath(new URL('..', import.meta.url)));

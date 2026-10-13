@@ -7,7 +7,7 @@ export const SITE_ORIGIN = 'https://wargr.com';
 export const SITE_NAME = 'Wargr';
 export const AUTHOR = 'Michael Wargr';
 export const AUTHOR_DESCRIPTION =
-  'Michael Wargr writes reflective essays on philosophy, ethics, fear, self-deception, conformity, purpose, pain, and human nature.';
+  'Michael Wargr makes videos and writes reflective essays on philosophy, ethics, fear, self-deception, conformity, purpose, pain, and human nature.';
 export const AUTHOR_KNOWS_ABOUT = [
   'Philosophy',
   'Ethics',
@@ -33,13 +33,13 @@ export interface PageSeo {
   keywords?: string;
   ogTitle?: string;
   ogDescription?: string;
-  /** Absolute image URL; only emitted if provided (no default — essays have no thumbnail asset yet). */
+  /** Absolute social image URL. Uses the brand card when omitted. */
   ogImage?: string;
   imageAlt?: string;
   /** og:type — 'website' (default) or 'article'. */
   ogType?: string;
   noindex?: boolean;
-  /** Article enrichment (set by the importer for essay routes). */
+  /** Article enrichment from the published snapshot. */
   datePublished?: string;
   dateModified?: string;
   wordCount?: number;
@@ -51,7 +51,7 @@ export interface PageSeo {
   /** Chronological neighbours → <link rel="prev"/"next"> for crawlers and browsers. */
   prevPath?: string;
   nextPath?: string;
-  /** Home only: the essay index, emitted as a schema.org ItemList. */
+  /** Blog index: the essay index, emitted as a schema.org ItemList. */
   itemList?: { url: string; name: string }[];
   /** Extra JSON-LD @graph nodes (e.g. a BlogPosting) appended after Person/WebSite/WebPage. */
   graph?: object[];
@@ -175,7 +175,7 @@ export class SeoTitleStrategy extends TitleStrategy {
       headline: seo.headline ?? title,
       description: seo.description,
       inLanguage: 'en-US',
-      isPartOf: { '@id': `${SITE_ORIGIN}/#blog` },
+      isPartOf: { '@id': isArticle ? `${SITE_ORIGIN}/blog/#blog` : `${SITE_ORIGIN}/#website` },
       author: { '@id': `${SITE_ORIGIN}/#person` },
       publisher: { '@id': `${SITE_ORIGIN}/#person` },
       mainEntityOfPage: canonical,
@@ -204,18 +204,26 @@ export class SeoTitleStrategy extends TitleStrategy {
         '@type': 'Person',
         '@id': `${SITE_ORIGIN}/#person`,
         name: AUTHOR,
-        url: `${SITE_ORIGIN}/`,
+        url: `${SITE_ORIGIN}/about/`,
         description: AUTHOR_DESCRIPTION,
         knowsAbout: AUTHOR_KNOWS_ABOUT,
       },
       {
-        '@type': 'Blog',
-        '@id': `${SITE_ORIGIN}/#blog`,
+        '@type': 'WebSite',
+        '@id': `${SITE_ORIGIN}/#website`,
         url: `${SITE_ORIGIN}/`,
         name: SITE_NAME,
         inLanguage: 'en-US',
         author: { '@id': `${SITE_ORIGIN}/#person` },
         publisher: { '@id': `${SITE_ORIGIN}/#person` },
+      },
+      {
+        '@type': 'Blog',
+        '@id': `${SITE_ORIGIN}/blog/#blog`,
+        url: `${SITE_ORIGIN}/blog/`,
+        name: 'Blog — Michael Wargr',
+        isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
+        author: { '@id': `${SITE_ORIGIN}/#person` },
       },
       webpage,
     ];
@@ -225,7 +233,7 @@ export class SeoTitleStrategy extends TitleStrategy {
         '@type': 'BreadcrumbList',
         '@id': `${canonical}#breadcrumb`,
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Essays', item: `${SITE_ORIGIN}/` },
+          { '@type': 'ListItem', position: 1, name: 'Blog', item: `${SITE_ORIGIN}/blog/` },
           { '@type': 'ListItem', position: 2, name: title, item: canonical },
         ],
       });
@@ -234,7 +242,7 @@ export class SeoTitleStrategy extends TitleStrategy {
     if (seo.itemList?.length) {
       graph.push({
         '@type': 'ItemList',
-        '@id': `${SITE_ORIGIN}/#essays`,
+        '@id': `${SITE_ORIGIN}/blog/#essays`,
         name: 'Essays',
         itemListElement: seo.itemList.map((it, i) => ({
           '@type': 'ListItem',

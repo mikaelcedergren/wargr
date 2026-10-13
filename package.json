@@ -2,7 +2,7 @@
   "name": "wargr.com",
   "version": "1.0.0",
   "private": true,
-  "description": "wargr.com — Michael Wargr's essays. Angular 22 SSG on cx-framework (light theme), prerendered and served by Express on the Mac mini. Articles are authored in the private Studio and stored in data/wargr.db; the publisher regenerates the tracked snapshot from the published closure.",
+  "description": "wargr.com — Michael Wargr's videos and essays. Angular 22 SSG on cx-framework (light theme), prerendered and served by Express on the Mac mini. Articles are authored in the private Studio and stored in data/wargr.db; the publisher regenerates the tracked snapshot from the published closure.",
   "author": "Michael Wargr <michael@wargr.com>",
   "license": "UNLICENSED",
   "homepage": "https://wargr.com",

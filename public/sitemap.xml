@@ -1,59 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  <url><loc>https://wargr.com/</loc><lastmod>2026-07-21</lastmod></url>
-  <url><loc>https://wargr.com/mercy-of-death/</loc><lastmod>2026-07-21</lastmod>
+  <url>
+    <loc>https://wargr.com/</loc>
+  </url>
+  <url>
+    <loc>https://wargr.com/blog/</loc>
+  </url>
+  <url>
+    <loc>https://wargr.com/about/</loc>
+  </url>
+  <url>
+    <loc>https://wargr.com/mercy-of-death/</loc>
+    <lastmod>2026-07-21T13:55:38.006Z</lastmod>
     <image:image>
       <image:loc>https://wargr.com/assets/articles/mercy-of-death.jpg</image:loc>
-      <image:title>The strange mercy of death</image:title>
-      <image:caption>The strange mercy of death, an essay by Michael Wargr.</image:caption>
     </image:image>
-    <image:image>
-      <image:loc>https://wargr.com/assets/articles/mercy-of-death-og.jpg</image:loc>
-      <image:title>The strange mercy of death social card</image:title>
-      <image:caption>I was fifteen when death moved out of the distance and into the bed beside me, and it took years before I stopped seeing it as an enemy.</image:caption>
-    </image:image></url>
-  <url><loc>https://wargr.com/babylons-whore/</loc><lastmod>2026-07-21</lastmod>
+  </url>
+  <url>
+    <loc>https://wargr.com/babylons-whore/</loc>
+    <lastmod>2026-07-21T13:55:38.006Z</lastmod>
     <image:image>
       <image:loc>https://wargr.com/assets/articles/babylons-whore.jpg</image:loc>
-      <image:title>The whore of Babylon was always us</image:title>
-      <image:caption>The whore of Babylon was always us, an essay by Michael Wargr.</image:caption>
     </image:image>
-    <image:image>
-      <image:loc>https://wargr.com/assets/articles/babylons-whore-og.jpg</image:loc>
-      <image:title>The whore of Babylon was always us social card</image:title>
-      <image:caption>I thought religion was a trick for gullible people. Then the old stories started looking less like superstition and more like a report on the crowd, and on me.</image:caption>
-    </image:image></url>
-  <url><loc>https://wargr.com/knowing-yourself/</loc><lastmod>2026-07-14</lastmod>
+  </url>
+  <url>
+    <loc>https://wargr.com/knowing-yourself/</loc>
+    <lastmod>2026-07-14T11:43:28.715Z</lastmod>
     <image:image>
       <image:loc>https://wargr.com/assets/articles/knowing-yourself.jpg</image:loc>
-      <image:title>The side effect of knowing yourself</image:title>
-      <image:caption>The side effect of knowing yourself, an essay by Michael Wargr.</image:caption>
     </image:image>
-    <image:image>
-      <image:loc>https://wargr.com/assets/articles/knowing-yourself-og.jpg</image:loc>
-      <image:title>The side effect of knowing yourself social card</image:title>
-      <image:caption>The most confident people I have known never seem particularly interested in the question of how they look. That, it turns out, is the trick.</image:caption>
-    </image:image></url>
-  <url><loc>https://wargr.com/slaughterhouse/</loc><lastmod>2026-07-14</lastmod>
+  </url>
+  <url>
+    <loc>https://wargr.com/slaughterhouse/</loc>
+    <lastmod>2026-07-14T11:43:28.715Z</lastmod>
     <image:image>
       <image:loc>https://wargr.com/assets/articles/slaughterhouse.jpg</image:loc>
-      <image:title>How we choose the slaughterhouse</image:title>
-      <image:caption>Meat on a table in a slaughterhouse, matching an essay on conformity and herd mentality.</image:caption>
     </image:image>
-    <image:image>
-      <image:loc>https://wargr.com/assets/articles/slaughterhouse-og.jpg</image:loc>
-      <image:title>How we choose the slaughterhouse social card</image:title>
-      <image:caption>An essay on herd mentality, conformity, propaganda, and the invisible ways people choose the stories that lead them.</image:caption>
-    </image:image></url>
-  <url><loc>https://wargr.com/corruption/</loc><lastmod>2026-07-14</lastmod>
+  </url>
+  <url>
+    <loc>https://wargr.com/corruption/</loc>
+    <lastmod>2026-07-14T11:43:28.714Z</lastmod>
     <image:image>
       <image:loc>https://wargr.com/assets/articles/corruption.jpg</image:loc>
-      <image:title>How fear turns the good in us into corruption</image:title>
-      <image:caption>A solitary figure in a dark room, matching an essay on fear, integrity, and corruption.</image:caption>
     </image:image>
-    <image:image>
-      <image:loc>https://wargr.com/assets/articles/corruption-og.jpg</image:loc>
-      <image:title>How fear turns the good in us into corruption social card</image:title>
-      <image:caption>An essay on corruption, moral compromise, fear, integrity, and how good people become what they once opposed.</image:caption>
-    </image:image></url>
+  </url>
 </urlset>

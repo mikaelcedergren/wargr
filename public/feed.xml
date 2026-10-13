@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Wargr — essays by Michael Wargr</title>
-    <link>https://wargr.com/</link>
+    <link>https://wargr.com/blog/</link>
     <atom:link href="https://wargr.com/feed.xml" rel="self" type="application/rss+xml" />
     <description>Essays by Michael Wargr on philosophy, ethics, fear, self-deception, conformity, purpose, pain, and human nature.</description>
     <language>en-us</language>

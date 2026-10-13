@@ -106,6 +106,7 @@ test('the Studio stays private: noindexed shell, anonymous session, guarded API'
   expect(shell?.headers()['x-robots-tag']).toBe('noindex, nofollow');
   await expect(page).toHaveTitle('Studio — Wargr');
   await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Primary' })).toHaveCount(0);
 
   const session = await request.get('/api/studio/session');
   expect(session.ok()).toBeTruthy();
@@ -118,9 +119,9 @@ test('the Studio stays private: noindexed shell, anonymous session, guarded API'
 test('the checked-in essay snapshot renders from the tracked presentation source alone', async ({
   page,
 }) => {
-  const response = await page.goto('/');
+  const response = await page.goto('/blog/');
   expect(response?.ok()).toBeTruthy();
-  await expect(page).toHaveTitle('Wargr — essays by Michael Wargr');
+  await expect(page).toHaveTitle('Blog — Michael Wargr');
   await expect(page.getByRole('link', { name: 'Read The strange mercy of death' })).toBeVisible();
 });
 
@@ -143,7 +144,7 @@ test('an unknown product route returns the real no-cache 404 page', async ({ pag
   expect(response?.status()).toBe(404);
   expect(response?.headers()['cache-control']).toBe('no-cache');
   expect(response?.headers()['content-type']).toContain('text/html');
-  await expect(page.getByRole('heading', { name: 'Not found' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Page not found' })).toBeVisible();
 });
 
 function requiredEnvironment(name: string): string {
@@ -151,3 +152,137 @@ function requiredEnvironment(name: string): string {
   if (!value) throw new Error(`${name} is required for isolated Wargr E2E.`);
   return value;
 }
+
+test('the personal site leads with video and connects all three sections', async ({ page }) => {
+  await page.goto('/');
+  await expect(page).toHaveTitle('Michael Wargr — videos and essays');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    'What the mirror doesn’t show you',
+  );
+  await expect(page.getByRole('link', { name: 'Watch on YouTube' })).toHaveAttribute(
+    'href',
+    'https://www.youtube.com/watch?v=iG-Tg92NOH4',
+  );
+  await expect(page.getByRole('link', { name: 'Videos', exact: true })).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
+  const video = page.getByRole('img', {
+    name: 'What the mirror doesn’t show you — video thumbnail',
+  });
+  const bounds = await video.boundingBox();
+  expect(bounds).not.toBeNull();
+  expect(bounds!.width / bounds!.height).toBeCloseTo(16 / 9, 1);
+  await page.getByRole('link', { name: 'Read the blog' }).click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Blog');
+  await page.getByRole('link', { name: 'Read The strange mercy of death' }).click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('The strange mercy of death');
+  await expect(
+    page
+      .getByRole('navigation', { name: 'Primary' })
+      .getByRole('link', { name: 'Blog', exact: true }),
+  ).toHaveAttribute('aria-current', 'page');
+  const prose = await page.locator('article .cx-editorial').boundingBox();
+  expect(prose?.width).toBeLessThanOrEqual(640);
+  await page.getByRole('link', { name: 'About', exact: true }).click();
+  await expect(page).toHaveTitle('About — Michael Wargr');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Michael Wargr');
+  await page.getByRole('link', { name: 'Michael Wargr — home' }).click();
+  await expect(page).toHaveTitle('Michael Wargr — videos and essays');
+});
+
+test('public navigation and the logo remain usable in the night theme', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Switch to night theme' }).click();
+  await expect(page.locator('html')).toHaveClass(/theme-night/);
+  await expect(page.locator('.wg-logo-night')).toBeVisible();
+  await page.reload();
+  await expect(page.locator('html')).toHaveClass(/theme-night/);
+  await page.getByRole('button', { name: 'Switch to light theme' }).click();
+  await expect(page.locator('.wg-logo-light')).toBeVisible();
+});
+
+test('the masthead menu supports section navigation and Escape', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Open menu' }).click();
+  await expect(page.getByRole('dialog', { name: 'Menu' })).toBeVisible();
+  await page
+    .getByRole('dialog', { name: 'Menu' })
+    .getByRole('link', { name: 'Blog', exact: true })
+    .click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Blog');
+  await expect(page.getByRole('dialog', { name: 'Menu' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Open menu' }).click();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button', { name: 'Open menu' })).toBeFocused();
+});
+
+test('the sitemap exposes only canonical, prerendered public pages and crawlable images', async ({
+  page,
+  request,
+}) => {
+  const response = await request.get('/sitemap.xml');
+  expect(response.status()).toBe(200);
+  expect(response.headers()['content-type']).toContain('xml');
+  await page.goto('/');
+  const entries = await page.evaluate(
+    (xml) => {
+      const document = new DOMParser().parseFromString(xml, 'application/xml');
+      if (document.querySelector('parsererror')) throw new Error('Invalid sitemap XML');
+      return Array.from(document.getElementsByTagName('url'), (entry) => ({
+        url: entry.getElementsByTagName('loc')[0]?.textContent ?? '',
+        modified: entry.getElementsByTagName('lastmod')[0]?.textContent ?? null,
+        images: Array.from(entry.getElementsByTagNameNS('*', 'loc'))
+          .filter((element) => element.prefix === 'image')
+          .map((element) => element.textContent ?? ''),
+      }));
+    },
+    await response.text(),
+  );
+  const urls = entries.map((entry) => entry.url);
+  expect(new Set(urls).size).toBe(urls.length);
+  expect(urls).toEqual(
+    expect.arrayContaining([
+      'https://wargr.com/',
+      'https://wargr.com/blog/',
+      'https://wargr.com/about/',
+    ]),
+  );
+  for (const entry of entries) {
+    const url = new URL(entry.url);
+    expect(url.origin).toBe('https://wargr.com');
+    expect(url.pathname).toMatch(/\/$/);
+    expect(url.pathname).not.toMatch(/^\/(studio|api|healthz)(\/|$)/);
+    const documentResponse = await request.get(url.pathname, { maxRedirects: 0 });
+    expect(documentResponse.status(), entry.url).toBe(200);
+    expect(documentResponse.headers()['x-robots-tag'] ?? '').not.toContain('noindex');
+    const metadata = await page.evaluate(
+      (html) => {
+        const document = new DOMParser().parseFromString(html, 'text/html');
+        return {
+          canonical: document.querySelector('link[rel="canonical"]')?.getAttribute('href'),
+          robots: document.querySelector('meta[name="robots"]')?.getAttribute('content') ?? '',
+          heading: document.querySelector('h1')?.textContent?.trim(),
+          modified: document
+            .querySelector('meta[property="article:modified_time"]')
+            ?.getAttribute('content'),
+        };
+      },
+      await documentResponse.text(),
+    );
+    expect(metadata.canonical).toBe(entry.url);
+    expect(metadata.robots).not.toContain('noindex');
+    expect(metadata.heading).toBeTruthy();
+    if (entry.modified) expect(entry.modified).toBe(metadata.modified);
+    for (const image of entry.images) {
+      const imageUrl = new URL(image);
+      expect(imageUrl.origin).toBe('https://wargr.com');
+      const imageResponse = await request.get(imageUrl.pathname);
+      expect(imageResponse.status()).toBe(200);
+      expect(imageResponse.headers()['content-type']).toMatch(/^image\//);
+    }
+  }
+  const robots = await request.get('/robots.txt');
+  expect(await robots.text()).toContain('Sitemap: https://wargr.com/sitemap.xml');
+});

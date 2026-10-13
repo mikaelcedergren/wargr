@@ -40,7 +40,18 @@ test('a raw draft validates with nothing but a title and body', () => {
 });
 
 test('reserved and malformed slugs are rejected', () => {
-  for (const slug of ['studio', 'api', 'healthz', 'assets', 'Bad-Case', 'a--b', '-x', '']) {
+  for (const slug of [
+    'about',
+    'blog',
+    'studio',
+    'api',
+    'healthz',
+    'assets',
+    'Bad-Case',
+    'a--b',
+    '-x',
+    '',
+  ]) {
     assert.equal(isArticleSlug(slug), false, slug);
   }
   assert.equal(isArticleSlug('focus-outward'), true);

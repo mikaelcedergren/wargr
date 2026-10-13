@@ -1,12 +1,4 @@
-// wargr.com global styles — "The Quiet Press": a de-chromed editorial reading space built entirely on
-// cx-framework tokens. The framework's display serif (--font-family-heading) carries the voice (titles,
-// deks, pull-quotes); Inter reads the body; Roboto Mono marks the facts (meta, folios). The
-// article body itself is the framework's own `.cx-editorial` editorial type — this layer only adds the
-// site's structural patterns (masthead, feed, hero, pull-quote, what's-next) around it, and every
-// design value inside them is a framework token.
-// Light is the default; the whole palette is token-derived so theme-night works for free.
 @use '@mikaelcedergren/cx-framework/tokens';
-@use '@mikaelcedergren/cx-framework/tokens/breakpoints' as bp;
 @use '@mikaelcedergren/cx-framework/styles/fonts';
 @use '@mikaelcedergren/cx-framework/styles/base';
 @use '@mikaelcedergren/cx-framework/styles/editorial';
@@ -20,513 +12,50 @@
   color-scheme: dark;
 }
 
-body {
-  background: var(--surface);
-  color: var(--ink);
-}
-
-a,
-a:visited,
-a:hover,
-a:active {
-  color: inherit;
-}
-
-// Editorial link treatment: no accent colour, just an underline that draws in on hover. Built only
-// from framework tokens (border-width for the rule, motion + ease for the sweep, currentColor ink).
-.wg-entry__title-text,
-.wg-back,
-.wg-related__title,
-.wg-flip__title {
-  background-image: linear-gradient(currentColor, currentColor);
-  background-position: 0 100%;
-  background-repeat: no-repeat;
-  background-size: 0 var(--border-width);
-  text-decoration: none;
-  transition:
-    background-size var(--motion-base) var(--ease-out),
-    color var(--motion-fast) var(--ease-out);
-}
-
-.wg-entry:hover .wg-entry__title-text,
-.wg-entry:focus-visible .wg-entry__title-text,
-.wg-back:hover,
-.wg-back:focus-visible,
-.wg-related__item:hover .wg-related__title,
-.wg-related__item:focus-visible .wg-related__title,
-.wg-flip__side:hover .wg-flip__title,
-.wg-flip__side:focus-visible .wg-flip__title {
-  background-size: 100% var(--border-width);
-}
-
-// Visually hidden but available to screen readers (e.g. the logo's accessible name).
-.wg-sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-// ---- Shell ----
 .wg-shell {
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
 }
-// The routed page component is inserted as a custom element inside the main landmark; make it a
-// full-width block so the article page's full-bleed "what's next" band can span the viewport.
+
+.wg-main {
+  flex: 1;
+  min-width: 0;
+}
+
 .wg-main > :not(router-outlet) {
   display: block;
 }
-.wg-container {
-  width: 100%;
-  max-width: var(--measure-md);
-  margin-inline: auto;
-  padding-inline: var(--space-lg);
-}
 
-// ---- Mono editorial marks (meta lines, folios) ----
-// Uppercase mono labels. The framework has no letter-spacing (tracking) token, so these track at the
-// font's natural spacing rather than re-declaring a raw em value — the missing tracking scale is a
-// real framework gap the owner should see, not something to hide with a local value.
-.wg-meta {
-  font-family: var(--font-family-mono);
-  font-size: var(--font-size-body-sm);
-  text-transform: uppercase;
-  color: var(--opacity-high);
-}
-
-// ---- Masthead ----
-.wg-masthead {
-  text-align: center;
-  padding: var(--space-xl) var(--space-lg) var(--space-lg);
-  border-bottom: var(--line);
-}
-.wg-masthead__mark {
-  margin: 0;
-  line-height: 0; // the mark is an image; kill inline-box leading so it centres cleanly
-}
-.wg-logo {
-  display: inline-block;
-  transition: opacity var(--motion-base) var(--ease-out);
-}
-.wg-logo:hover {
-  opacity: 0.62;
-}
-// One mark per theme; swap on the html theme class the toggle (and no-flash script) sets.
-.wg-logo__img {
+// Authored brand assets use the masthead's public brand slot.
+.wg-logo-light,
+.wg-logo-night {
   display: block;
-  height: clamp(2rem, 5.5vw, 2.6rem);
-  width: auto;
+  flex: none;
+  block-size: var(--space-lg);
+  inline-size: auto;
 }
-.wg-logo__img--dark {
+
+.wg-logo-night {
   display: none;
 }
-:root.theme-night .wg-logo__img--light {
+
+:root.theme-night .wg-logo-light {
   display: none;
 }
-:root.theme-night .wg-logo__img--dark {
+
+:root.theme-night .wg-logo-night {
   display: block;
 }
-.wg-masthead__byline {
-  margin: var(--space-sm) 0 0;
-  font-family: var(--font-family-mono);
-  font-size: var(--font-size-body-sm);
-  text-transform: uppercase;
-  color: var(--opacity-high);
+
+// Containers own page placement; framework components own their presentation.
+.wg-section {
+  padding-block-end: var(--space-2xl);
 }
 
-// ---- Home feed ----
-.wg-feed {
-  padding-block: var(--space-xl) var(--space-2xl);
-}
-.wg-entry {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(7rem, 20vw, 9rem);
-  align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-lg) 0;
-  border-bottom: var(--line-discreet);
-  color: inherit;
-  text-decoration: none;
-}
-.wg-entry:last-child {
-  border-bottom: 0;
-}
-.wg-entry__body {
-  min-width: 0;
-}
-.wg-entry__media {
-  display: block;
-  order: 2;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  border-radius: var(--radius-md);
-  // Neutral backing shown only while the photo decodes (the opaque image then covers it). Token-driven
-  // surface rather than a raw hex — it reads as a plain framework surface in light, darker in night.
-  background: var(--surface-alt);
-  text-decoration: none;
-}
-.wg-entry__media img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: opacity var(--motion-base) var(--ease-out);
-}
-.wg-entry:hover .wg-entry__media img,
-.wg-entry:focus-visible .wg-entry__media img {
-  opacity: var(--opacity-disabled);
-}
-.wg-entry__title {
-  margin: 0 0 var(--space-xs);
-  font-family: var(--font-family-heading);
-  font-weight: var(--font-weight-bold);
-}
-.wg-entry:not(.wg-entry--lead) .wg-entry__title {
-  font-size: var(--font-size-title-2);
-  line-height: var(--line-height-heading);
-}
-.wg-entry__title-text {
-  color: var(--ink);
-}
-.wg-entry__dek {
-  margin: 0 0 var(--space-sm);
-  font-size: var(--font-size-body-lg);
-  line-height: var(--line-height-body);
-  color: var(--opacity-high);
-}
-.wg-entry:not(.wg-entry--lead) .wg-entry__dek {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.wg-entry__meta {
-  margin: 0;
-}
-
-// The lead (newest) essay carries extra weight so the feed reads as a body of work, not a flat list.
-.wg-entry--lead {
-  display: block;
-  padding-bottom: var(--space-2xl);
-  border-bottom: var(--line);
-}
-.wg-entry--lead .wg-entry__media {
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  margin-bottom: var(--space-md);
-}
-.wg-entry--lead .wg-entry__title {
-  margin: 0 0 var(--space-xs);
-}
-.wg-entry--lead .wg-entry__dek {
-  font-family: var(--font-family-heading);
-  font-style: italic;
-  font-size: var(--font-size-title-2);
-  line-height: var(--line-height-body);
-}
-
-// ---- Article page ----
-.wg-article {
-  padding-block: var(--space-xl);
-}
-.wg-back {
-  display: inline-block;
-  margin-bottom: var(--space-xl);
-  font-size: var(--font-size-body);
-  color: var(--opacity-high);
-}
-.wg-back:hover {
-  color: var(--ink);
-}
-.wg-article__title {
-  margin: 0 0 var(--space-md);
-  font-family: var(--font-family-heading);
-  font-size: var(--font-size-title-1);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-heading);
-}
-.wg-article__dek {
-  margin: 0 0 var(--space-md);
-  font-family: var(--font-family-heading);
-  font-size: var(--font-size-title-2);
-  line-height: var(--line-height-body);
-  color: var(--opacity-high);
-}
-.wg-article__meta {
-  margin: var(--space-lg) 0 var(--space-xl);
-  padding-bottom: var(--space-lg);
-  border-bottom: var(--line);
-}
-
-// ---- Article hero (optional full-bleed photo behind the header; see import-articles.mjs) ----
-// A constant-dark zone: photo + a darkening scrim + light text, legible in light and night themes.
-// The scrim is built from the framework's --overlay-backdrop (its darken-content-behind token, dark
-// in every theme) and text from --on-ink (#fff everywhere) — no raw rgba.
-.wg-hero {
-  position: relative;
-  width: 100%;
-  height: clamp(360px, 60vh, 640px);
-  overflow: hidden;
-  background: var(--surface-alt); // token-driven backing shown only while the opaque photo decodes
-  isolation: isolate;
-}
-.wg-hero__img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 28%; // bias toward the upper subject
-}
-.wg-hero__scrim {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  // Darken the top (for the back-link) and, more heavily, the bottom (where the title sits). Both
-  // ramps fade the framework darken token toward transparent — the percentages are the gradient shape.
-  background:
-    linear-gradient(to bottom, var(--overlay-backdrop) 0%, transparent 24%),
-    linear-gradient(
-      to top,
-      var(--overlay-backdrop) 0%,
-      color-mix(in srgb, var(--overlay-backdrop) 55%, transparent) 30%,
-      color-mix(in srgb, var(--overlay-backdrop) 12%, transparent) 62%,
-      transparent 100%
-    );
-}
-.wg-hero__inner {
-  position: relative;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between; // back-link pinned top, header pinned bottom
-  padding-top: var(--space-lg);
-  padding-bottom: var(--space-2xl);
-}
-.wg-hero__head > * {
-  margin: 0;
-}
-.wg-hero__head > * + * {
-  margin-top: var(--space-sm);
-}
-// Light text over the photo. --on-ink is #fff in every theme; the muted variants mix it toward the
-// (night) ink surface so dek/meta step down in weight without raw colours.
-.wg-hero .wg-article__title {
-  color: var(--on-ink);
-}
-.wg-hero .wg-article__dek {
-  color: color-mix(in srgb, var(--on-ink) 86%, transparent);
-}
-.wg-hero .wg-article__meta {
-  margin: var(--space-md) 0 0;
-  padding: 0;
-  border: 0;
-  color: color-mix(in srgb, var(--on-ink) 62%, transparent);
-}
-.wg-back--hero {
-  align-self: flex-start;
-  margin: 0;
-  color: color-mix(in srgb, var(--on-ink) 82%, transparent);
-}
-.wg-back--hero:hover {
-  color: var(--on-ink);
-}
-// With a hero the title block lives in the photo, so the body just needs breathing room above it.
-.wg-article--hero {
-  padding-top: var(--space-2xl);
-}
-
-// ---- Prose (the rendered markdown body) ----
-// The body now carries the framework's own `.cx-editorial` editorial type (see import-articles.mjs):
-// base size/leading, heading scale + display serif, links, blockquote, lists, hr, img, code and the
-// block rhythm are all owned there. Nothing is re-declared here — the framework's real reading
-// typography stands as-is, even where its app-scaled sizes read tighter than the old local layer.
-
-// ---- Pull-quote (a template figure sibling to the body, so it is outside .cx-editorial) ----
-.wg-pullquote {
-  margin: var(--space-2xl) 0;
-  padding-left: var(--space-lg);
-  border-left: calc(var(--border-width) * 2) solid var(--opacity-high);
-}
-.wg-pullquote__hook {
-  margin: 0;
-  font-family: var(--font-family-heading);
-  font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-title-1);
-  line-height: var(--line-height-heading);
-}
-.wg-pullquote__hook::before {
-  content: '\201C';
-  color: var(--opacity-high);
-  font-weight: var(--font-weight-bold);
-}
-.wg-pullquote__elab {
-  margin-top: var(--space-md);
-  font-size: var(--font-size-body-lg);
-  line-height: var(--line-height-body);
-  color: var(--opacity-high);
-}
-
-// ---- Tags (quiet inline text, not pills) + finis ----
-.wg-finis {
-  margin: var(--space-lg) 0 0;
-  text-align: center;
-  font-family: var(--font-family-mono);
-  font-size: var(--font-size-body-lg);
-  color: var(--opacity-high);
-}
-
-// ---- "What's next" corridor (full-bleed band: related essays + prev/next flip) ----
-.wg-next {
-  margin-top: var(--space-lg);
-  padding: var(--space-2xl) 0;
-  background: var(--surface-alt);
-  border-top: var(--line);
-}
-.wg-related__head {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-sm);
-  margin: 0 0 var(--space-md);
-  font-family: var(--font-family-mono);
-  font-size: var(--font-size-body-sm);
-  text-transform: uppercase;
-  color: var(--opacity-high);
-}
-.wg-related__head::before {
-  content: '';
-  width: var(--space-lg);
-  height: calc(var(--border-width) * 2);
-  background: var(--opacity-high);
-}
-.wg-related__item {
-  display: block;
-  padding: var(--space-md) 0;
-  border-bottom: var(--line-discreet);
-  text-decoration: none;
-  color: inherit;
-}
-.wg-related__item:last-of-type {
-  border-bottom: 0;
-}
-.wg-related__title {
-  display: inline;
-  font-family: var(--font-family-heading);
-  font-weight: var(--font-weight-bold);
-  font-size: var(--font-size-title-2);
-  line-height: var(--line-height-heading);
-  color: var(--ink);
-}
-.wg-related__dek {
-  display: block;
-  margin-top: var(--space-xs);
-  font-size: var(--font-size-body);
-  line-height: var(--line-height-body);
-  color: var(--opacity-high);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.wg-related__meta {
-  display: block;
-  margin-top: var(--space-sm);
-  color: var(--opacity-high);
-}
-
-.wg-flip {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-lg);
-  margin-top: var(--space-2xl);
-  padding-top: var(--space-xl);
-  border-top: var(--line);
-}
-.wg-flip__side {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-  text-decoration: none;
-  color: inherit;
-}
-.wg-flip__side:empty {
-  display: none;
-}
-.wg-flip__next {
-  text-align: right;
-  align-items: flex-end;
-}
-.wg-flip__label {
-  font-family: var(--font-family-mono);
-  font-size: var(--font-size-body-sm);
-  text-transform: uppercase;
-  color: var(--opacity-high);
-}
-.wg-flip__title {
-  font-family: var(--font-family-heading);
-  font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-body-lg);
-  line-height: var(--line-height-body);
-  color: var(--ink);
-}
-.wg-flip__prev .wg-flip__title::before {
-  content: '← ';
-  color: var(--opacity-high);
-}
-.wg-flip__next .wg-flip__title::after {
-  content: ' →';
-  color: var(--opacity-high);
-}
-
-// ---- Footer (with the low-key light/dark switch) ----
 .wg-footer {
-  margin-top: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-md);
-  padding: var(--space-xl) var(--space-lg);
+  padding-block: var(--space-lg);
   border-top: var(--line);
-  font-size: var(--font-size-body-sm);
   color: var(--opacity-high);
-}
-@media (prefers-reduced-motion: reduce) {
-  .wg-entry__title-text,
-  .wg-back,
-  .wg-related__title,
-  .wg-flip__title {
-    transition: none;
-  }
-}
-
-// ---- Phone (the framework's single $mobile breakpoint) ----
-@media (max-width: bp.$mobile) {
-  .wg-entry {
-    grid-template-columns: minmax(0, 1fr) 6rem;
-  }
-  .wg-pullquote {
-    margin-inline: 0;
-  }
-  .wg-flip {
-    grid-template-columns: 1fr;
-    gap: var(--space-xl);
-  }
-  // Forward momentum first: NEXT sits on top when the flip stacks.
-  .wg-flip__next {
-    order: -1;
-    text-align: left;
-    align-items: flex-start;
-  }
-}
-
-// Let the pull-quote breathe slightly outside the reading measure on wider viewports.
-@media (min-width: (bp.$mobile + 1px)) {
-  .wg-pullquote {
-    margin-inline: calc(var(--space-xl) * -1);
-  }
+  font-size: var(--font-size-body-sm);
 }

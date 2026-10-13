@@ -23,7 +23,7 @@ export const ARTICLE_VERSION_SOURCES = Object.freeze(['author', 'polish', 'impor
 export type ArticleVersionSource = (typeof ARTICLE_VERSION_SOURCES)[number];
 
 export const RESERVED_ARTICLE_SLUGS = Object.freeze(
-  new Set(['api', 'assets', 'healthz', 'studio']),
+  new Set(['about', 'api', 'assets', 'blog', 'healthz', 'studio']),
 );
 
 export const MAX_TITLE_CHARACTERS = 300;

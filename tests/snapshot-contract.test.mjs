@@ -7,11 +7,11 @@ import { fileURLToPath } from 'node:url';
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 test('the tracked essay snapshot is internally complete without its external authoring source', async () => {
-  const [articleEntries, imageEntries, routes, home, sitemap, feed] = await Promise.all([
+  const [articleEntries, imageEntries, routes, blog, sitemap, feed] = await Promise.all([
     readdir(path.join(repoRoot, 'src', 'app', 'articles')),
     readdir(path.join(repoRoot, 'public', 'assets', 'articles')),
     readFile(path.join(repoRoot, 'src', 'app', 'app.routes.ts'), 'utf8'),
-    readFile(path.join(repoRoot, 'src', 'app', 'pages', 'home.component.ts'), 'utf8'),
+    readFile(path.join(repoRoot, 'src', 'app', 'pages', 'blog.component.ts'), 'utf8'),
     readFile(path.join(repoRoot, 'public', 'sitemap.xml'), 'utf8'),
     readFile(path.join(repoRoot, 'public', 'feed.xml'), 'utf8'),
   ]);
@@ -23,15 +23,19 @@ test('the tracked essay snapshot is internally complete without its external aut
   );
   assert.ok(articleSlugs.length > 0, 'The tracked snapshot must contain at least one essay.');
 
-  // The studio route is the one platform page inside the generated route file: the private
-  // authoring surface, reserved by the slug authority and outside the essay set.
+  // Public section routes and Studio are outside the essay slug set.
   const routeSlugs = sorted(
     [...routes.matchAll(/^\s+path: '([^']+)',$/gm)]
       .map((match) => match[1])
-      .filter((slug) => slug !== '**' && slug !== 'studio'),
+      .filter((slug) => !['**', 'studio', 'blog', 'about'].includes(slug)),
   );
-  assert.match(routes, /path: 'studio',/, 'The generated routes must keep the studio page.');
-  const homeSlugs = sorted([...home.matchAll(/"slug":"([^"]+)"/g)].map((match) => match[1]));
+  for (const page of ['studio', 'blog', 'about']) {
+    assert.ok(routes.includes(`path: '${page}',`), `The generated routes must keep ${page}.`);
+  }
+  for (const page of ['blog', 'about']) {
+    assert.ok(sitemap.includes(`<loc>https://wargr.com/${page}/</loc>`));
+  }
+  const blogSlugs = sorted([...blog.matchAll(/"slug":"([^"]+)"/g)].map((match) => match[1]));
   const heroSlugs = sorted(
     imageEntries
       .filter((name) => name.endsWith('.jpg') && !name.endsWith('-og.jpg'))
@@ -45,17 +49,17 @@ test('the tracked essay snapshot is internally complete without its external aut
   const sitemapSlugs = sorted(
     [...sitemap.matchAll(/<loc>https:\/\/wargr\.com\/([^<]*)<\/loc>/g)]
       .map((match) => match[1].replace(/\/$/, ''))
-      .filter(Boolean),
+      .filter((slug) => slug && !['blog', 'about'].includes(slug)),
   );
   const feedSlugs = sorted(
     [...feed.matchAll(/<link>https:\/\/wargr\.com\/([^<]*)<\/link>/g)]
       .map((match) => match[1].replace(/\/$/, ''))
-      .filter(Boolean),
+      .filter((slug) => slug && !['blog', 'about'].includes(slug)),
   );
 
   for (const [label, slugs] of [
     ['routes', routeSlugs],
-    ['home feed', homeSlugs],
+    ['blog index', blogSlugs],
     ['hero images', heroSlugs],
     ['social images', socialSlugs],
     ['sitemap', sitemapSlugs],

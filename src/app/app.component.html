@@ -2,28 +2,27 @@
 
 <div class="wg-shell">
   @if (!bare()) {
-    <header class="wg-masthead">
-      <div class="wg-masthead__mark">
-        <a routerLink="/" class="wg-logo">
+    <cx-masthead [items]="navigation()">
+      <a brand routerLink="/" aria-label="Michael Wargr — home">
+        <cx-inline gap="sm" align="center">
           <img
-            class="wg-logo__img wg-logo__img--light"
+            class="wg-logo-light"
             src="/assets/brand/mark-light.png"
             alt=""
-            width="737"
-            height="320"
+            width="74"
+            height="32"
           />
           <img
-            class="wg-logo__img wg-logo__img--dark"
+            class="wg-logo-night"
             src="/assets/brand/mark-dark.png"
             alt=""
-            width="737"
-            height="320"
+            width="74"
+            height="32"
           />
-          <span class="wg-sr-only">Wargr — essays by Michael Wargr</span>
-        </a>
-      </div>
-      <p class="wg-masthead__byline">MICHAEL WARGR</p>
-    </header>
+          <span class="cx-text-title-2 cx-font-bold">Michael Wargr</span>
+        </cx-inline>
+      </a>
+    </cx-masthead>
   }
 
   <main class="wg-main">
@@ -32,15 +31,18 @@
 
   @if (!bare()) {
     <footer class="wg-footer">
-      <cx-icon-button
-        [icon]="night() ? 'light-mode' : 'night-mode'"
-        [ariaLabel]="night() ? 'Switch to light theme' : 'Switch to night theme'"
-        variant="transparent"
-        size="small"
-        [rounded]="true"
-        (pressed)="toggleTheme()"
-      />
-      <span class="wg-footer__line">© {{ year }} Michael Wargr · wargr.com</span>
+      <div class="cx-container">
+        <cx-inline justify="between" align="center">
+          <span>© {{ year }} Michael Wargr</span>
+          <cx-icon-button
+            [icon]="night() ? 'light-mode' : 'night-mode'"
+            [ariaLabel]="night() ? 'Switch to light theme' : 'Switch to night theme'"
+            variant="transparent"
+            size="small"
+            (pressed)="toggleTheme()"
+          />
+        </cx-inline>
+      </div>
     </footer>
   }
 </div>

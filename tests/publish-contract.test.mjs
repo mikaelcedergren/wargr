@@ -93,8 +93,7 @@ test('automatic content publication can change only its tracked browser snapshot
     'public/robots.txt',
     'public/sitemap.xml',
     'src/app/app.routes.ts',
-    'src/app/pages/home.component.ts',
-    'src/app/pages/not-found.component.ts',
+    'src/app/pages/blog.component.ts',
   ]);
   assert.deepEqual(allowlist.pathPatterns, [
     '^public/assets/articles/[a-z0-9]+(?:-[a-z0-9]+)*(?:-og)?\\.jpg$',
