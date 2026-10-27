@@ -10,7 +10,7 @@ export const ADMIN_SESSION_APPLICATION_ID = 'wargr';
 export const ADMIN_SESSION_SIGNING_KEY_ID = 'primary';
 export const ADMIN_SESSION_DEFAULT_TTL_SECONDS = 8 * 60 * 60;
 export const ADMIN_SESSION_MAXIMUM_TTL_SECONDS = 24 * 60 * 60;
-// Essay bodies are long-form markdown; the largest published essays are tens of kilobytes, so the
+// Story bodies are long-form markdown; the largest published stories are tens of kilobytes, so the
 // budget leaves head-room for the complete structured record without admitting unbounded payloads.
 export const ADMIN_REQUEST_BODY_LIMIT = '256kb';
 

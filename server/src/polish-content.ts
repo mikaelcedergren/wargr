@@ -27,7 +27,7 @@ export interface StructuredGenerationSpec<Result> {
 export type ValidationResult<Result> =
   { readonly ok: true; readonly value: Result } | { readonly error: string; readonly ok: false };
 
-// Long essays need generous budgets: the complete document returns in one response, and the
+// Long stories need generous budgets: the complete document returns in one response, and the
 // provider runs it as a background response that can take several minutes at full reasoning depth.
 const POLISH_MAX_OUTPUT_TOKENS = 32_000;
 const POLISH_POLL_DEADLINE_MS = 10 * 60 * 1_000;
@@ -98,7 +98,7 @@ export const ARTICLE_DOCUMENT_FORMAT: JsonSchemaFormat = Object.freeze({
 
 const DOCUMENT_FIELD_CONTRACT = `## Output contract
 
-Return the complete rewritten essay as one JSON document with these fields. Every field is part of the work; none is filler.
+Return the complete rewritten story as one JSON document with these fields. Every field is part of the work; none is filler.
 
 - \`title\`: a clear title that creates curiosity and remains findable through search.
 - \`topic\`: one sentence describing what the article is really about. Internal alignment metadata, never shown to readers, not promotional copy.
@@ -126,7 +126,7 @@ export function articlePolishSpec(
         ]),
   ].join('\n\n');
   const input = [
-    'Here is the current state of the essay, as a JSON document. Everything the author has written or kept is in it.',
+    'Here is the current state of the story, as a JSON document. Everything the author has written or kept is in it.',
     JSON.stringify(
       {
         title: document.title,
@@ -144,7 +144,7 @@ export function articlePolishSpec(
     ...(instruction === null
       ? []
       : [`The author added this instruction for the current round:\n\n${instruction}`]),
-    'Rewrite the essay now. The rewritten document is the response.',
+    'Rewrite the story now. The rewritten document is the response.',
   ].join('\n\n');
 
   return Object.freeze({

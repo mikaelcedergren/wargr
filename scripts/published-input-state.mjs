@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // The publication input digest for the scheduled content publisher. The digest covers the exact
-// published closure of the article database — every published essay's content-derived record hash
+// published closure of the article database — every published story's content-derived record hash
 // and publish date — plus the exact bytes of every canonical PNG image master. Draft edits, polish
 // runs, sessions, and other database activity stay outside the digest, so the publisher acts only
 // when the published site inputs actually change.

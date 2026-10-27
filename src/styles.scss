@@ -4,14 +4,6 @@
 @use '@mikaelcedergren/cx-framework/styles/editorial';
 @use '@mikaelcedergren/cx-framework/styles/utilities';
 
-:root {
-  color-scheme: light;
-}
-
-:root.theme-night {
-  color-scheme: dark;
-}
-
 .wg-shell {
   display: flex;
   flex-direction: column;

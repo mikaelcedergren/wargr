@@ -137,7 +137,7 @@ export function createArticleService({
         throw new HttpError({
           code: 'publish_format_incomplete',
           details: { problems: [...problems] },
-          message: 'The essay does not meet the publish format yet.',
+          message: 'The story does not meet the publish format yet.',
           status: 422,
         });
       }
@@ -252,7 +252,7 @@ function requestedSlug(input: UpdateArticleInput, stored: StoredArticle): string
   if (stored.record.state === 'published' && input.slug !== stored.record.slug) {
     throw new HttpError({
       code: 'published_slug_frozen',
-      message: 'A published essay keeps its slug. Unpublish it first to change the address.',
+      message: 'A published story keeps its slug. Unpublish it first to change the address.',
       status: 409,
     });
   }
@@ -309,28 +309,28 @@ function articleMutationError(error: unknown): unknown {
   if (error instanceof ArticleSlugConflictError) {
     return new HttpError({
       code: 'slug_conflict',
-      message: 'Another essay already uses that slug.',
+      message: 'Another story already uses that slug.',
       status: 409,
     });
   }
   if (error instanceof ArticleCapacityError) {
     return new HttpError({
       code: 'article_capacity_reached',
-      message: 'Article storage is full. Delete an essay before creating another.',
+      message: 'Article storage is full. Delete a story before creating another.',
       status: 503,
     });
   }
   if (error instanceof ArticleActivePolishError) {
     return new HttpError({
       code: 'article_polish_active',
-      message: 'A polish is still running for this essay. Wait for it to finish.',
+      message: 'A polish is still running for this story. Wait for it to finish.',
       status: 409,
     });
   }
   if (error instanceof ArticlePublishedDeleteError) {
     return new HttpError({
       code: 'article_published',
-      message: 'Unpublish the essay before deleting it.',
+      message: 'Unpublish the story before deleting it.',
       status: 409,
     });
   }

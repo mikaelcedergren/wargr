@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-test('the tracked essay snapshot is internally complete without its external authoring source', async () => {
+test('the tracked story snapshot is internally complete without its external authoring source', async () => {
   const [articleEntries, imageEntries, routes, blog, sitemap, feed] = await Promise.all([
     readdir(path.join(repoRoot, 'src', 'app', 'articles')),
     readdir(path.join(repoRoot, 'public', 'assets', 'articles')),
@@ -21,18 +21,18 @@ test('the tracked essay snapshot is internally complete without its external aut
       .filter((name) => name.endsWith('.component.ts'))
       .map((name) => name.slice(0, -'.component.ts'.length)),
   );
-  assert.ok(articleSlugs.length > 0, 'The tracked snapshot must contain at least one essay.');
+  assert.ok(articleSlugs.length > 0, 'The tracked snapshot must contain at least one story.');
 
-  // Public section routes and Admin are outside the essay slug set.
+  // Public section routes and Admin are outside the story slug set.
   const routeSlugs = sorted(
     [...routes.matchAll(/^\s+path: '([^']+)',$/gm)]
       .map((match) => match[1])
-      .filter((slug) => !['**', 'admin', 'blog', 'about'].includes(slug)),
+      .filter((slug) => !['**', 'admin', 'blog', 'videos', 'about'].includes(slug)),
   );
-  for (const page of ['admin', 'blog', 'about']) {
+  for (const page of ['admin', 'blog', 'videos', 'about']) {
     assert.ok(routes.includes(`path: '${page}',`), `The generated routes must keep ${page}.`);
   }
-  for (const page of ['blog', 'about']) {
+  for (const page of ['videos', 'about']) {
     assert.ok(sitemap.includes(`<loc>https://wargr.com/${page}/</loc>`));
   }
   const blogSlugs = sorted([...blog.matchAll(/"slug":"([^"]+)"/g)].map((match) => match[1]));
@@ -49,12 +49,12 @@ test('the tracked essay snapshot is internally complete without its external aut
   const sitemapSlugs = sorted(
     [...sitemap.matchAll(/<loc>https:\/\/wargr\.com\/([^<]*)<\/loc>/g)]
       .map((match) => match[1].replace(/\/$/, ''))
-      .filter((slug) => slug && !['blog', 'about'].includes(slug)),
+      .filter((slug) => slug && !['videos', 'about'].includes(slug)),
   );
   const feedSlugs = sorted(
     [...feed.matchAll(/<link>https:\/\/wargr\.com\/([^<]*)<\/link>/g)]
       .map((match) => match[1].replace(/\/$/, ''))
-      .filter((slug) => slug && !['blog', 'about'].includes(slug)),
+      .filter((slug) => slug && !['videos', 'about'].includes(slug)),
   );
 
   for (const [label, slugs] of [
@@ -65,7 +65,7 @@ test('the tracked essay snapshot is internally complete without its external aut
     ['sitemap', sitemapSlugs],
     ['RSS feed', feedSlugs],
   ]) {
-    assert.deepEqual(slugs, articleSlugs, `${label} must exactly match the tracked essay set`);
+    assert.deepEqual(slugs, articleSlugs, `${label} must exactly match the tracked story set`);
   }
 });
 

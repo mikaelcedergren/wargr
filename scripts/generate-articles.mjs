@@ -7,7 +7,7 @@
 // published closure changes, or manually via pnpm generate:content). It is idempotent and fully
 // regenerates src/app/articles/*, the blog index, app.routes.ts, sitemap.xml, robots.txt and the
 // RSS feed. It also derives reading-time, renders the structured pull-quotes, and wires every
-// essay to its related + previous/next neighbours so the article pages link into a dense internal
+// story to its related + previous/next neighbours so the article pages link into a dense internal
 // graph.
 import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -35,7 +35,7 @@ const SITE_ORIGIN = 'https://wargr.com';
 const SITE_NAME = 'Wargr';
 const AUTHOR = 'Michael Wargr';
 const BLOG_DESCRIPTION =
-  'Essays by Michael Wargr on philosophy, ethics, fear, self-deception, conformity, purpose, pain, and human nature.';
+  'Stories by Michael Wargr on philosophy, ethics, fear, self-deception, conformity, purpose, pain, and human nature.';
 const WORDS_PER_MINUTE = 200; // dense, reflective prose reads a little slower than news copy.
 const RELATED_COUNT = 3;
 
@@ -56,7 +56,7 @@ const SEO_BY_SLUG = {
   'wtf-is-self-love': {
     title: 'WTF is self-love? — Michael Wargr',
     description:
-      'A sharp essay on self-love, negative self-talk, loneliness, and learning to speak to yourself with the kindness you give other people.',
+      'A sharp story on self-love, negative self-talk, loneliness, and learning to speak to yourself with the kindness you give other people.',
     phrases: [
       'self-love',
       'negative self-talk',
@@ -68,12 +68,12 @@ const SEO_BY_SLUG = {
       'how to talk to yourself',
     ],
     imageAlt:
-      'A face reflected in dark glass, matching an essay on self-love and negative self-talk.',
+      'A face reflected in dark glass, matching a story on self-love and negative self-talk.',
   },
   'whom-to-listen-to': {
     title: 'Who to listen to when everyone agrees — Michael Wargr',
     description:
-      'An essay on consensus, dissent, expertise, and why the lone voice is sometimes worth hearing before everyone else catches up.',
+      'A story on consensus, dissent, expertise, and why the lone voice is sometimes worth hearing before everyone else catches up.',
     phrases: [
       'who to listen to',
       'consensus and dissent',
@@ -84,12 +84,12 @@ const SEO_BY_SLUG = {
       'medical history',
       'paradigm shifts',
     ],
-    imageAlt: 'A microphone on an empty lecture table, matching an essay on consensus and dissent.',
+    imageAlt: 'A microphone on an empty lecture table, matching a story on consensus and dissent.',
   },
   'stop-the-pain': {
     title: 'How to stop emotional pain — Michael Wargr',
     description:
-      'An essay on emotional pain, avoidance, numbing, and why healing begins when you stop running from what needs to be heard.',
+      'A story on emotional pain, avoidance, numbing, and why healing begins when you stop running from what needs to be heard.',
     phrases: [
       'how to stop emotional pain',
       'emotional pain',
@@ -100,12 +100,12 @@ const SEO_BY_SLUG = {
       'pain and addiction',
       'mental health',
     ],
-    imageAlt: 'A dark, quiet scene matching an essay on emotional pain, avoidance, and healing.',
+    imageAlt: 'A dark, quiet scene matching a story on emotional pain, avoidance, and healing.',
   },
   'stop-chasing-purpose': {
     title: 'Stop chasing purpose — Michael Wargr',
     description:
-      'An essay on purpose anxiety, meaning, and the quiet freedom of putting down the search for a life-defining mission.',
+      'A story on purpose anxiety, meaning, and the quiet freedom of putting down the search for a life-defining mission.',
     phrases: [
       'stop chasing purpose',
       'purpose anxiety',
@@ -117,12 +117,12 @@ const SEO_BY_SLUG = {
       'quiet purpose',
     ],
     imageAlt:
-      'A quiet path through open landscape, matching an essay on purpose, meaning, and letting go.',
+      'A quiet path through open landscape, matching a story on purpose, meaning, and letting go.',
   },
   slaughterhouse: {
     title: 'Herd mentality and the slaughterhouse — Michael Wargr',
     description:
-      'An essay on herd mentality, conformity, propaganda, and the invisible ways people choose the stories that lead them.',
+      'A story on herd mentality, conformity, propaganda, and the invisible ways people choose the stories that lead them.',
     phrases: [
       'herd mentality',
       'conformity',
@@ -134,12 +134,12 @@ const SEO_BY_SLUG = {
       'groupthink',
     ],
     imageAlt:
-      'Meat on a table in a slaughterhouse, matching an essay on conformity and herd mentality.',
+      'Meat on a table in a slaughterhouse, matching a story on conformity and herd mentality.',
   },
   'meant-well': {
     title: "I'm sorry. I meant well. — Michael Wargr",
     description:
-      'An essay on good intentions, harm, accountability, and why meaning well does not undo the damage people cause.',
+      'A story on good intentions, harm, accountability, and why meaning well does not undo the damage people cause.',
     phrases: [
       'good intentions',
       'intentions versus impact',
@@ -150,12 +150,12 @@ const SEO_BY_SLUG = {
       'moral philosophy',
       'relationships',
     ],
-    imageAlt: 'A tense human scene matching an essay on good intentions, harm, and accountability.',
+    imageAlt: 'A tense human scene matching a story on good intentions, harm, and accountability.',
   },
   corruption: {
     title: 'How fear turns good people into corruption — Michael Wargr',
     description:
-      'An essay on corruption, moral compromise, fear, integrity, and how good people become what they once opposed.',
+      'A story on corruption, moral compromise, fear, integrity, and how good people become what they once opposed.',
     phrases: [
       'how good people become corrupt',
       'corruption',
@@ -167,13 +167,13 @@ const SEO_BY_SLUG = {
       'character',
     ],
     imageAlt:
-      'A solitary figure in a dark room, matching an essay on fear, integrity, and corruption.',
+      'A solitary figure in a dark room, matching a story on fear, integrity, and corruption.',
   },
 };
 
 // Every published article requires the optimized pair generated by prepare-article-images.mjs:
 //   <slug>.jpg     -> article hero photo
-//   <slug>-og.jpg  -> 1200x630 social card for that essay
+//   <slug>-og.jpg  -> 1200x630 social card for that story
 // Source masters (full-res, pre-optimisation) live in article-images and are NOT deployed.
 const ARTICLE_IMG_DIR = join(OUTPUT_ROOT, 'public', 'assets', 'articles');
 const articleImages = existsSync(ARTICLE_IMG_DIR) ? readdirSync(ARTICLE_IMG_DIR) : [];
@@ -192,8 +192,8 @@ marked.setOptions({ gfm: true, breaks: false });
 // The rendered body is injected via [innerHTML] (bypassSecurityTrustHtml in the generated
 // components), so the HTML is sanitized ONCE here at import time — never in the Angular runtime.
 // The allowlist is exactly what the shared editorial typography supports plus the rest of marked's plain
-// essay output; scripts, iframes, event handlers and javascript: URLs are stripped. The text filter
-// re-applies marked's quote escaping so legitimate essays pass through byte-identical.
+// story output; scripts, iframes, event handlers and javascript: URLs are stripped. The text filter
+// re-applies marked's quote escaping so legitimate stories pass through byte-identical.
 const SANITIZE_OPTIONS = {
   allowedTags: [
     'p',
@@ -234,7 +234,7 @@ function pascal(slug) {
     .map((w) => w[0].toUpperCase() + w.slice(1))
     .join('');
 }
-// The record's own publish date is the date of record: it travels with the essay, so every machine
+// The record's own publish date is the date of record: it travels with the story, so every machine
 // builds the same dates. The record's modified date is Admin's last accepted write. A date-only
 // value normalises to noon UTC so it renders as the same calendar day in every timezone.
 function articleDates(record) {
@@ -286,20 +286,20 @@ function seoForArticle({ slug, title, dek, tags }) {
   const topic = tags[0] || '';
   const phrases = unique([
     ...(configured.phrases ?? []),
-    `${title.replace(/[“”"]/g, '').trim()} essay`,
-    topic && `${topic} essay`,
+    `${title.replace(/[“”"]/g, '').trim()} story`,
+    topic && `${topic} story`,
     ...tags,
     'Michael Wargr',
-    'Wargr essays',
-    'philosophy essays',
-    'essays on human nature',
+    'Wargr stories',
+    'philosophy stories',
+    'stories on human nature',
   ]);
 
   return {
     title: configured.title ?? `${title} — ${AUTHOR}`,
-    description: configured.description ?? (dek || `${title}, an essay by ${AUTHOR}.`),
+    description: configured.description ?? (dek || `${title}, a story by ${AUTHOR}.`),
     phrases,
-    imageAlt: configured.imageAlt ?? `${title}, an essay by ${AUTHOR}.`,
+    imageAlt: configured.imageAlt ?? `${title}, a story by ${AUTHOR}.`,
   };
 }
 
@@ -344,7 +344,7 @@ function fromRecord({ slug, record }) {
 }
 
 /**
- * For each essay, rank the others by weighted shared-tag overlap. Tags that appear in more than half
+ * For each story, rank the others by weighted shared-tag overlap. Tags that appear in more than half
  * the corpus (e.g. "philosophy", "human nature") carry no weight, so "related" stays topically
  * specific instead of degrading to "all of them". Ties break by recency; thin matches backfill with
  * the most recent others so the block is never empty.
@@ -413,8 +413,9 @@ type WgRelated = { slug: string; title: string; dek: string };
   selector: 'wg-a-${a.slug}',
   imports: [RouterLink, CxHeroComponent, CxStackComponent],
   template: \`
-    <cx-hero [heading]="title" layout="split">
-      <a context class="cx-text-ink" routerLink="/blog">Blog</a>
+    <cx-stack gap="2xl">
+    <cx-hero [heading]="title" layout="cover" [overlayOpacity]="60">
+      <a context class="cx-text-ink" routerLink="/">Home</a>
       @if (dek) { <p body>{{ dek }}</p> }
       <p meta><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
       <img media [src]="hero" [alt]="imageAlt" fetchpriority="high" />
@@ -422,17 +423,18 @@ type WgRelated = { slug: string; title: string; dek: string };
     <article class="cx-container wg-section">
       <div class="cx-editorial cx-measure-md" [innerHTML]="body"></div>
     </article>
+    </cx-stack>
     @if (related.length) {
-      <aside class="cx-container wg-section" aria-label="Related essays">
+      <aside class="cx-container wg-section" aria-label="Related stories">
         <cx-stack class="cx-measure-md" gap="lg">
-          <h2>Related essays</h2>
+          <h2>Related stories</h2>
           @for (r of related; track r.slug) {
             <div class="cx-editorial">
               <h3><a [routerLink]="['/', r.slug]">{{ r.title }}</a></h3>
               <p>{{ r.dek }}</p>
             </div>
           }
-          <a routerLink="/blog">All blog posts</a>
+          <a routerLink="/">All stories</a>
         </cx-stack>
       </aside>
     }
@@ -468,19 +470,31 @@ function writeBlog(articles) {
     metaRest: ` · ${a.readingTime} min read`,
   }));
   const src = `import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CxHeroComponent, CxCardComponent, CxGridComponent, CxStackComponent, CxImageComponent } from '@mikaelcedergren/cx-framework';
+import { CxHeroComponent, CxButtonComponent, CxCardComponent, CxGridComponent, CxStackComponent, CxImageComponent } from '@mikaelcedergren/cx-framework';
 
 // Generated by scripts/generate-articles.mjs. Do not edit by hand.
 @Component({
   selector: 'wg-blog',
-  imports: [CxHeroComponent, CxCardComponent, CxGridComponent, CxStackComponent, CxImageComponent],
+  imports: [CxHeroComponent, CxButtonComponent, CxCardComponent, CxGridComponent, CxStackComponent, CxImageComponent],
   template: \`
-    <cx-hero heading="Blog">
-      <p body>Essays on philosophy, ethics, and human nature.</p>
-    </cx-hero>
-    <section class="cx-container wg-section" aria-label="Blog posts">
+    <cx-stack gap="2xl">
+    @if (latest; as a) {
+      <cx-hero [heading]="a.title" layout="cover" [overlayOpacity]="60">
+        <span context>Latest story</span>
+        @if (a.dek) { <p body>{{ a.dek }}</p> }
+        <cx-button actions text="Read the story" [href]="'/' + a.slug + '/'" [ariaLabel]="'Read ' + a.title" />
+        <p meta><time [attr.datetime]="a.monthDatetime">{{ a.monthYear }}</time>{{ a.metaRest }}</p>
+        <img media [src]="a.image" [alt]="a.imageAlt" fetchpriority="high" />
+      </cx-hero>
+    } @else {
+      <cx-hero heading="Home">
+        <p body>No stories published yet.</p>
+      </cx-hero>
+    }
+    @if (remaining.length) {
+    <section class="cx-container wg-section" aria-label="Stories">
       <cx-grid [columns]="2" [columnsMobile]="1" gap="xl">
-        @for (a of articles; track a.slug; let index = $index) {
+        @for (a of remaining; track a.slug; let index = $index) {
           <cx-card variant="discreet" [href]="'/' + a.slug + '/'" [ariaLabel]="'Read ' + a.title">
             <cx-stack gap="lg">
               <cx-image [image]="{ src: a.image, alt: a.imageAlt, loading: index < 2 ? 'eager' : 'lazy' }" />
@@ -491,16 +505,18 @@ import { CxHeroComponent, CxCardComponent, CxGridComponent, CxStackComponent, Cx
               </div>
             </cx-stack>
           </cx-card>
-        } @empty {
-          <p>No essays published yet.</p>
         }
       </cx-grid>
     </section>
+    }
+    </cx-stack>
   \`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BlogComponent {
   protected readonly articles = ${JSON.stringify(feed)};
+  protected readonly latest = this.articles[0];
+  protected readonly remaining = this.articles.slice(1);
 }
 `;
   mkdirSync(PAGES_DIR, { recursive: true });
@@ -535,9 +551,9 @@ function writeRoutes(articles, classes) {
   },`;
   });
   const blogSeo = {
-    path: '/blog/',
+    path: '/',
     description: BLOG_DESCRIPTION,
-    headline: 'Essays by Michael Wargr',
+    headline: 'Stories by Michael Wargr',
     about: AUTHOR_KNOWS_ABOUT,
     itemList: articles.map((a) => ({ url: `${SITE_ORIGIN}/${a.slug}/`, name: a.title })),
   };
@@ -548,21 +564,27 @@ import { PageSeo } from './shared/seo';
 export const routes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./pages/home.component').then((m) => m.HomeComponent),
-    title: 'Michael Wargr — videos and essays',
-    data: { section: 'videos', seo: { path: '/', description: 'Videos and essays by Michael Wargr on philosophy, ethics, and human nature.' } satisfies PageSeo },
+    pathMatch: 'full',
+    loadComponent: () => import('./pages/blog.component').then((m) => m.BlogComponent),
+    title: 'Home — Michael Wargr',
+    data: { section: 'blog', seo: ${JSON.stringify(blogSeo)} satisfies PageSeo },
+  },
+  {
+    path: 'videos',
+    loadComponent: () => import('./pages/videos.component').then((m) => m.VideosComponent),
+    title: 'Videos — Michael Wargr',
+    data: { section: 'videos', seo: { path: '/videos/', description: 'Videos by Michael Wargr on philosophy, ethics, and human nature.' } satisfies PageSeo },
   },
   {
     path: 'blog',
-    loadComponent: () => import('./pages/blog.component').then((m) => m.BlogComponent),
-    title: 'Blog — Michael Wargr',
-    data: { section: 'blog', seo: ${JSON.stringify(blogSeo)} satisfies PageSeo },
+    pathMatch: 'full',
+    redirectTo: '',
   },
   {
     path: 'about',
     loadComponent: () => import('./pages/about.component').then((m) => m.AboutComponent),
     title: 'About — Michael Wargr',
-    data: { section: 'about', seo: { path: '/about/', description: 'About Michael Wargr, who makes videos and writes essays on philosophy, ethics, and human nature.' } satisfies PageSeo },
+    data: { section: 'about', seo: { path: '/about/', description: 'About Michael Wargr, who makes videos and writes stories on philosophy, ethics, and human nature.' } satisfies PageSeo },
   },
   {
     path: 'admin',
@@ -601,8 +623,8 @@ function writeFeed(articles) {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>${SITE_NAME} — essays by ${AUTHOR}</title>
-    <link>${SITE_ORIGIN}/blog/</link>
+    <title>${SITE_NAME} — stories by ${AUTHOR}</title>
+    <link>${SITE_ORIGIN}/</link>
     <atom:link href="${SITE_ORIGIN}/feed.xml" rel="self" type="application/rss+xml" />
     <description>${escapeXml(BLOG_DESCRIPTION)}</description>
     <language>en-us</language>
@@ -617,10 +639,10 @@ ${items}
 
 function writeSitemapAndRobots(articles) {
   // Section pages have no authoritative content-modification timestamp. Omit lastmod
-  // rather than report build time or the date of an unrelated essay.
+  // rather than report build time or the date of an unrelated story.
   const pages = [
     { path: '/' },
-    { path: '/blog/' },
+    { path: '/videos/' },
     { path: '/about/' },
     ...articles.map((article) => ({
       path: `/${article.slug}/`,
@@ -671,7 +693,7 @@ const published = inventory
 
 buildRelated(published);
 
-// Only replace generated output after every published essay has parsed and passed image validation.
+// Only replace generated output after every published story has parsed and passed image validation.
 rmSync(ARTICLES_DIR, { recursive: true, force: true });
 
 const classes = published.map(writeArticleComponent);
@@ -680,7 +702,7 @@ writeRoutes(published, classes);
 writeFeed(published);
 writeSitemapAndRobots(published);
 
-console.log(`[generate] published ${published.length} essays:`);
+console.log(`[generate] published ${published.length} stories:`);
 for (const a of published) {
   console.log(
     `  - /${a.slug}/  "${a.title}"  (${a.date}, ${a.readingTime} min, ${a.tags.length} tags, ${a.pullQuotes.length} quotes, ${a.related.length} related)`,

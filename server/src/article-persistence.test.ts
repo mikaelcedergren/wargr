@@ -51,7 +51,7 @@ function record(slug: string, overrides: Partial<ArticleRecord> = {}): ArticleRe
     socialPosts: [],
     state: 'draft',
     tags: [],
-    title: 'An essay',
+    title: 'A story',
     topic: '',
     updatedAt: '2026-01-01T00:00:00.000Z',
     ...overrides,
@@ -62,10 +62,10 @@ test('articles round-trip with revisions, slugs, and bounded version history', (
   const persistence = openFixturePersistence(t);
   const { articles } = persistence;
 
-  const created = articles.create(record('first-essay'), 'author');
+  const created = articles.create(record('first-story'), 'author');
   assert.equal(created.revision, 1);
-  assert.equal(articles.getBySlug('first-essay')?.record.id, created.record.id);
-  assert.throws(() => articles.create(record('first-essay'), 'author'), ArticleSlugConflictError);
+  assert.equal(articles.getBySlug('first-story')?.record.id, created.record.id);
+  assert.throws(() => articles.create(record('first-story'), 'author'), ArticleSlugConflictError);
 
   const updated = articles.replaceDocument({
     expectedRevision: 1,
@@ -177,7 +177,7 @@ test('a polish run is admitted once, finalises atomically, and survives author c
   const run = accepted.run;
   assert.equal(run.state, 'queued');
 
-  // A second concurrent run for the same essay is refused while the first is active.
+  // A second concurrent run for the same story is refused while the first is active.
   assert.throws(() => admit(nextUuid(), 1, inputSha256));
 
   const running = polish.transitionRun({
@@ -192,7 +192,7 @@ test('a polish run is admitted once, finalises atomically, and survives author c
         body: 'The ghostwritten body.',
         imagePrompts: ['Create a photograph.', 'Create a second one.', 'Create a third one.'],
         ingress:
-          'An ingress that creates tension without revealing the conclusion of the essay at all.',
+          'An ingress that creates tension without revealing the conclusion of the story at all.',
         pullQuotes: [
           { expansion: 'An expansion.', hook: 'A hook.' },
           { expansion: 'Another expansion.', hook: 'Another hook.' },
@@ -200,7 +200,7 @@ test('a polish run is admitted once, finalises atomically, and survives author c
         socialPosts: ['One.', 'Two.', 'Three.'],
         tags: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'],
         title: 'A ghostwritten title',
-        topic: 'What the essay is really about.',
+        topic: 'What the story is really about.',
       },
       state: 'succeeded',
     },

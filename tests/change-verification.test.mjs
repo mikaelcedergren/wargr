@@ -83,9 +83,9 @@ test('options have stable meanings and reject unknown or duplicate arguments', (
 
 test('documentation, interface, E2E, and high-risk paths select their owning proofs', () => {
   assert.deepEqual(classifyChanges(['README.md']).checks, ['format']);
-  const ui = classifyChanges(['src/app/pages/home.component.ts']);
+  const ui = classifyChanges(['src/app/pages/videos.component.ts']);
   assert.deepEqual(ui.checks, ['format', 'typecheck', 'build-browser', 'visual']);
-  assert.deepEqual(ui.routes, ['/']);
+  assert.deepEqual(ui.routes, ['/videos/']);
   const article = classifyChanges(['src/app/articles/corruption.component.ts']);
   assert.deepEqual(article.checks, [
     'format',
@@ -142,7 +142,7 @@ test('route mapping is bounded and product-owned', () => {
     routeForSourcePath('src/app/articles/mercy-of-death.component.ts'),
     '/mercy-of-death/',
   );
-  assert.equal(routeForSourcePath('src/app/pages/home.component.ts'), '/');
+  assert.equal(routeForSourcePath('src/app/pages/videos.component.ts'), '/videos/');
   assert.equal(routeForSourcePath('src/app/admin/admin.component.ts'), '/admin');
   assert.equal(routeForSourcePath('src/styles.scss'), '/');
   assert.equal(safeEvidenceName('/mercy-of-death/'), 'mercy-of-death');

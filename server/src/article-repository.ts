@@ -1223,7 +1223,7 @@ export function createPolishRepository(
             finalizedRun: finalize(
               'failed',
               'article_revision_conflict',
-              'The essay changed while the polish ran. Run the polish again from the current text.',
+              'The story changed while the polish ran. Run the polish again from the current text.',
             ),
           });
         }

@@ -33,9 +33,9 @@ test('admin sign-in rejects a wrong password and survives reload until logout', 
   expect((await page.request.get('/api/admin/articles')).status()).toBe(401);
 });
 
-test('framework navigation returns to essays and closes its compact menu', async ({ page }) => {
+test('framework navigation returns to stories and closes its compact menu', async ({ page }) => {
   const [article] = await openWorkspace(page);
-  await openEssay(page, article.title);
+  await openStory(page, article.title);
   await page.setViewportSize({ width: 390, height: 844 });
   const toggle = page.getByRole('button', { name: 'Open menu', exact: true });
   await toggle.click();
@@ -43,10 +43,10 @@ test('framework navigation returns to essays and closes its compact menu', async
   await page.keyboard.press('Escape');
   await expect(toggle).toBeFocused();
   await toggle.click();
-  await page.getByRole('link', { name: 'Essays', exact: true }).filter({ visible: true }).click();
+  await page.getByRole('link', { name: 'Stories', exact: true }).filter({ visible: true }).click();
   await expect(page.getByRole('textbox', { name: 'Title', exact: true })).toHaveCount(0);
   await expect(toggle).toBeVisible();
-  await expect(page.getByRole('button', { name: 'New essay', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'New story', exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );
@@ -93,18 +93,18 @@ test('the retired CMS routes no longer serve a login or API', async ({ page, req
   expect((await request.get('/api/studio/session')).status()).toBe(404);
 });
 
-test('a delayed save cannot replace the essay opened afterward', async ({ page }) => {
+test('a delayed save cannot replace the story opened afterward', async ({ page }) => {
   const [first, second] = await openWorkspace(page);
-  await openEssay(page, first.title);
-  await page.getByRole('textbox', { name: 'Topic', exact: true }).fill('First essay edit');
+  await openStory(page, first.title);
+  await page.getByRole('textbox', { name: 'Topic', exact: true }).fill('First story edit');
   const held = await holdResponse(page, `**/api/admin/articles/${first.id}`, 'PUT');
   try {
     await page.getByRole('button', { name: 'Save', exact: true }).click();
     await held.received;
-    await page.getByRole('button', { name: 'Essays', exact: true }).click();
-    await openEssay(page, second.title);
+    await page.getByRole('button', { name: 'Stories', exact: true }).click();
+    await openStory(page, second.title);
     held.release();
-    await page.getByRole('textbox', { name: 'Topic', exact: true }).fill('Second essay edit');
+    await page.getByRole('textbox', { name: 'Topic', exact: true }).fill('Second story edit');
     await page.getByRole('button', { name: 'Save', exact: true }).click();
     await expect(page.getByText('Saved.', { exact: true })).toBeVisible();
     const [savedFirst, savedSecond] = await Promise.all([
@@ -112,9 +112,9 @@ test('a delayed save cannot replace the essay opened afterward', async ({ page }
       readArticle(page, second.id),
     ]);
     expect(savedFirst.title).toBe(first.title);
-    expect(savedFirst.topic).toBe('First essay edit');
+    expect(savedFirst.topic).toBe('First story edit');
     expect(savedSecond.title).toBe(second.title);
-    expect(savedSecond.topic).toBe('Second essay edit');
+    expect(savedSecond.topic).toBe('Second story edit');
   } finally {
     held.release();
   }
@@ -124,7 +124,7 @@ test('a save preserves address and document edits made while its response is pen
   page,
 }) => {
   const [article] = await openWorkspace(page);
-  await openEssay(page, article.title);
+  await openStory(page, article.title);
   await page.getByRole('textbox', { name: 'Address', exact: true }).fill('submitted-address');
   const held = await holdResponse(page, `**/api/admin/articles/${article.id}`, 'PUT');
   try {
@@ -147,16 +147,16 @@ test('a save preserves address and document edits made while its response is pen
   }
 });
 
-test('a delayed version response cannot replace the newly opened essay draft', async ({ page }) => {
+test('a delayed version response cannot replace the newly opened story draft', async ({ page }) => {
   const [first, second] = await openWorkspace(page);
-  await openEssay(page, first.title);
+  await openStory(page, first.title);
   await page.getByRole('button', { name: 'Rounds', exact: true }).click();
   const held = await holdResponse(page, `**/api/admin/articles/${first.id}/versions/1`, 'GET');
   try {
     await page.getByRole('button', { name: 'Load into editor', exact: true }).click();
     await held.received;
-    await page.getByRole('button', { name: 'Essays', exact: true }).click();
-    await openEssay(page, second.title);
+    await page.getByRole('button', { name: 'Stories', exact: true }).click();
+    await openStory(page, second.title);
     const completed = page.waitForResponse((response) =>
       response.url().endsWith(`/articles/${first.id}/versions/1`),
     );
@@ -173,21 +173,21 @@ test('a delayed version response cannot replace the newly opened essay draft', a
 
 test('a delayed publication refusal stays with its original editor', async ({ page }) => {
   const [first, second] = await openWorkspace(page);
-  await openEssay(page, first.title);
+  await openStory(page, first.title);
   const held = await holdResponse(page, `**/api/admin/articles/${first.id}/publish`, 'POST');
   try {
-    await page.getByRole('button', { name: 'Essay actions', exact: true }).click();
-    await page.getByRole('menuitem', { name: 'Publish essay', exact: true }).click();
+    await page.getByRole('button', { name: 'Story actions', exact: true }).click();
+    await page.getByRole('menuitem', { name: 'Publish story', exact: true }).click();
     await held.received;
-    await page.getByRole('button', { name: 'Essays', exact: true }).click();
-    await openEssay(page, second.title);
+    await page.getByRole('button', { name: 'Stories', exact: true }).click();
+    await openStory(page, second.title);
     const completed = page.waitForResponse((response) =>
       response.url().endsWith(`/articles/${first.id}/publish`),
     );
     held.release();
     await completed;
     await page.evaluate(() => new Promise<void>((resolve) => setTimeout(resolve, 0)));
-    await expect(page.getByText('The essay does not meet the publish format yet.')).toHaveCount(0);
+    await expect(page.getByText('The story does not meet the publish format yet.')).toHaveCount(0);
   } finally {
     held.release();
   }
@@ -197,7 +197,7 @@ test('polish admission stops when its prerequisite save finishes in another edit
   page,
 }) => {
   const [first, second] = await openWorkspace(page);
-  await openEssay(page, first.title);
+  await openStory(page, first.title);
   await page.getByRole('textbox', { name: 'Topic', exact: true }).fill('Save before polishing');
   const admissions: string[] = [];
   page.on('request', (request) => {
@@ -209,10 +209,10 @@ test('polish admission stops when its prerequisite save finishes in another edit
   try {
     await page.getByRole('button', { name: 'Run the ghostwriter', exact: true }).click();
     await held.received;
-    await page.getByRole('button', { name: 'Essays', exact: true }).click();
-    await openEssay(page, second.title);
+    await page.getByRole('button', { name: 'Stories', exact: true }).click();
+    await openStory(page, second.title);
     held.release();
-    await page.getByRole('textbox', { name: 'Topic', exact: true }).fill('Second essay edit');
+    await page.getByRole('textbox', { name: 'Topic', exact: true }).fill('Second story edit');
     await page.getByRole('button', { name: 'Save', exact: true }).click();
     await expect(page.getByText('Saved.', { exact: true })).toBeVisible();
     expect(admissions).toEqual([]);
@@ -224,13 +224,13 @@ test('polish admission stops when its prerequisite save finishes in another edit
 
 test('a delayed polish refusal stays with its original editor', async ({ page }) => {
   const [first, second] = await openWorkspace(page);
-  await openEssay(page, first.title);
+  await openStory(page, first.title);
   const held = await holdResponse(page, `**/api/admin/articles/${first.id}/polish`, 'POST');
   try {
     await page.getByRole('button', { name: 'Run the ghostwriter', exact: true }).click();
     await held.received;
-    await page.getByRole('button', { name: 'Essays', exact: true }).click();
-    await openEssay(page, second.title);
+    await page.getByRole('button', { name: 'Stories', exact: true }).click();
+    await openStory(page, second.title);
     const completed = page.waitForResponse((response) =>
       response.url().endsWith(`/articles/${first.id}/polish`),
     );
@@ -248,11 +248,11 @@ test('a delayed polish refusal stays with its original editor', async ({ page })
   }
 });
 
-test('a conflict reload cannot replace an essay opened while the reload was pending', async ({
+test('a conflict reload cannot replace a story opened while the reload was pending', async ({
   page,
 }) => {
   const [first, second] = await openWorkspace(page);
-  await openEssay(page, first.title);
+  await openStory(page, first.title);
   const read = await page.request.get(`/api/admin/articles/${first.id}`);
   const { article } = await read.json();
   const changed = await page.request.put(`/api/admin/articles/${first.id}`, {
@@ -277,14 +277,14 @@ test('a conflict reload cannot replace an essay opened while the reload was pend
   try {
     await page.getByRole('button', { name: 'Save', exact: true }).click();
     await held.received;
-    await page.getByRole('button', { name: 'Essays', exact: true }).click();
-    await openEssay(page, second.title);
+    await page.getByRole('button', { name: 'Stories', exact: true }).click();
+    await openStory(page, second.title);
     held.release();
-    await page.getByRole('textbox', { name: 'Topic', exact: true }).fill('Second essay edit');
+    await page.getByRole('textbox', { name: 'Topic', exact: true }).fill('Second story edit');
     await page.getByRole('button', { name: 'Save', exact: true }).click();
     await expect(page.getByText('Saved.', { exact: true })).toBeVisible();
     expect((await readArticle(page, first.id)).title).toBe(first.title);
-    expect((await readArticle(page, second.id)).topic).toBe('Second essay edit');
+    expect((await readArticle(page, second.id)).topic).toBe('Second story edit');
   } finally {
     held.release();
   }
@@ -302,7 +302,7 @@ for (const receipt of ['recovered', 'failed', 'http-error', 'succeeded'] as cons
       if (statusRequests > 1 && receipt === 'http-error') {
         await route.fulfill({
           status: 503,
-          json: { error: { message: 'Original essay polish unavailable.' } },
+          json: { error: { message: 'Original story polish unavailable.' } },
         });
         return;
       }
@@ -313,7 +313,7 @@ for (const receipt of ['recovered', 'failed', 'http-error', 'succeeded'] as cons
             mode: 'developed',
             state:
               statusRequests === 1 ? 'running' : receipt === 'succeeded' ? 'succeeded' : 'failed',
-            error: { code: 'synthetic_failure', message: 'Original essay polish failed.' },
+            error: { code: 'synthetic_failure', message: 'Original story polish failed.' },
           },
         },
       });
@@ -324,18 +324,18 @@ for (const receipt of ['recovered', 'failed', 'http-error', 'succeeded'] as cons
       receipt === 'recovered' ? 1 : 2,
     );
     try {
-      await openEssay(page, first.title);
+      await openStory(page, first.title);
       await body.received();
-      await page.getByRole('button', { name: 'Essays', exact: true }).click();
-      await openEssay(page, second.title);
+      await page.getByRole('button', { name: 'Stories', exact: true }).click();
+      await openStory(page, second.title);
       await body.release();
       await expect(page.getByRole('textbox', { name: 'Title', exact: true })).toHaveValue(
         second.title,
       );
       await expect(page.getByRole('textbox', { name: 'Topic', exact: true })).toBeEnabled();
-      await expect(page.getByText('Original essay polish failed.', { exact: true })).toHaveCount(0);
+      await expect(page.getByText('Original story polish failed.', { exact: true })).toHaveCount(0);
       await expect(
-        page.getByText('Original essay polish unavailable.', { exact: true }),
+        page.getByText('Original story polish unavailable.', { exact: true }),
       ).toHaveCount(0);
     } finally {
       await body.release();
@@ -394,7 +394,7 @@ for (const failure of ['http', 'network'] as const) {
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
     const [article] = await openWorkspace(page);
-    await openEssay(page, article.title);
+    await openStory(page, article.title);
     await page.getByRole('textbox', { name: 'Topic', exact: true }).fill('Unsaved author text');
     let rejected = false;
     await page.route('**/api/admin/logout', async (route) => {
@@ -458,7 +458,7 @@ async function openWorkspace(page: Page): Promise<[Article, Article]> {
   return articles as [Article, Article];
 }
 
-async function openEssay(page: Page, title: string): Promise<void> {
+async function openStory(page: Page, title: string): Promise<void> {
   await page.getByText(title, { exact: true }).click();
   await expect(page.getByRole('textbox', { name: 'Title', exact: true })).toHaveValue(title);
 }

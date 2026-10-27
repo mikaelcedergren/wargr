@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Wargr — essays by Michael Wargr</title>
-    <link>https://wargr.com/blog/</link>
+    <title>Wargr — stories by Michael Wargr</title>
+    <link>https://wargr.com/</link>
     <atom:link href="https://wargr.com/feed.xml" rel="self" type="application/rss+xml" />
-    <description>Essays by Michael Wargr on philosophy, ethics, fear, self-deception, conformity, purpose, pain, and human nature.</description>
+    <description>Stories by Michael Wargr on philosophy, ethics, fear, self-deception, conformity, purpose, pain, and human nature.</description>
     <language>en-us</language>
     <lastBuildDate>Tue, 21 Jul 2026 13:55:38 GMT</lastBuildDate>
     <item>
@@ -36,7 +36,7 @@
       <link>https://wargr.com/slaughterhouse/</link>
       <guid isPermaLink="true">https://wargr.com/slaughterhouse/</guid>
       <pubDate>Sun, 24 May 2026 18:51:15 GMT</pubDate>
-      <description>An essay on herd mentality, conformity, propaganda, and the invisible ways people choose the stories that lead them.</description>
+      <description>A story on herd mentality, conformity, propaganda, and the invisible ways people choose the stories that lead them.</description>
       <category>philosophy</category><category>conformity</category><category>herd</category><category>society</category><category>propaganda</category><category>consensus</category><category>truth</category><category>courage</category><category>manipulation</category><category>mass psychology</category><category>dissent</category><category>media</category><category>narrative</category><category>awakening</category><category>human nature</category>
     </item>
     <item>
@@ -44,7 +44,7 @@
       <link>https://wargr.com/corruption/</link>
       <guid isPermaLink="true">https://wargr.com/corruption/</guid>
       <pubDate>Sat, 23 May 2026 14:18:02 GMT</pubDate>
-      <description>An essay on corruption, moral compromise, fear, integrity, and how good people become what they once opposed.</description>
+      <description>A story on corruption, moral compromise, fear, integrity, and how good people become what they once opposed.</description>
       <category>ethics</category><category>corruption</category><category>integrity</category><category>character</category><category>business</category><category>power</category><category>self-deception</category><category>philosophy</category><category>human nature</category><category>leadership</category><category>responsibility</category><category>identity</category><category>courage</category><category>morality</category><category>decision-making</category>
     </item>
   </channel>

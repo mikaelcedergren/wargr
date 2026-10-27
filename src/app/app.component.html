@@ -4,25 +4,20 @@
   @if (!bare()) {
     <cx-masthead [items]="navigation()">
       <a brand routerLink="/" aria-label="Michael Wargr — home">
-        <cx-inline gap="sm" align="center">
-          <img
-            class="wg-logo-light"
-            src="/assets/brand/mark-light.png"
-            alt=""
-            width="74"
-            height="32"
-          />
-          <img
-            class="wg-logo-night"
-            src="/assets/brand/mark-dark.png"
-            alt=""
-            width="74"
-            height="32"
-          />
-          <span class="cx-text-title-3 cx-font-regular">
-            Michael <span class="cx-font-bold">Wargr</span>
-          </span>
-        </cx-inline>
+        <img
+          class="wg-logo-light"
+          src="/assets/brand/mark-light.png"
+          alt=""
+          width="74"
+          height="32"
+        />
+        <img
+          class="wg-logo-night"
+          src="/assets/brand/mark-dark.png"
+          alt=""
+          width="74"
+          height="32"
+        />
       </a>
     </cx-masthead>
   }

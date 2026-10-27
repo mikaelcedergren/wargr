@@ -199,7 +199,7 @@ export function createArticlePolishHandlers({
     if (!stored) {
       terminalizeRun(run, {
         errorCode: 'article_not_found',
-        errorMessage: 'The essay no longer exists for this polish run.',
+        errorMessage: 'The story no longer exists for this polish run.',
         state: 'failed',
       });
     }
@@ -209,7 +209,7 @@ export function createArticlePolishHandlers({
     ) {
       terminalizeRun(run, {
         errorCode: 'article_revision_conflict',
-        errorMessage: 'The essay changed before this polish could run. Start a new polish round.',
+        errorMessage: 'The story changed before this polish could run. Start a new polish round.',
         state: 'failed',
       });
     }

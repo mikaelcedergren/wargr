@@ -18,7 +18,7 @@ const serverIdentityFile = path.join(
 );
 
 test(
-  'the compiled entrypoint pins its artifact manifest and serves the essay-site and Admin contract',
+  'the compiled entrypoint pins its artifact manifest and serves the story-site and Admin contract',
   { timeout: 20_000 },
   async (t) => {
     const entrypointSource = await readFile(

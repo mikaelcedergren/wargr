@@ -17,7 +17,7 @@ import { articlePolishSpec } from './polish-content.js';
 import { createPolishService } from './polish-service.js';
 import { createArticlePolishWorker } from './polish-worker.js';
 
-test('polish traces admission, recovered provider polling and durable completion without essay content', async (t) => {
+test('polish traces admission, recovered provider polling and durable completion without story content', async (t) => {
   const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'wargr-PRIVATE-polish-')));
   const records: LogRecord[] = [];
   const logger = configureWargrLogging('jobs', { NODE_ENV: 'test' }, 'fixture', {
@@ -42,14 +42,14 @@ test('polish traces admission, recovered provider polling and durable completion
   const initial: ArticleRecord = {
     id: randomUUID(),
     title: 'PRIVATE working title',
-    body: 'PRIVATE essay draft.',
+    body: 'PRIVATE story draft.',
     ingress: '',
     topic: '',
     imagePrompts: [],
     pullQuotes: [],
     socialPosts: [],
     tags: [],
-    slug: 'synthetic-essay',
+    slug: 'synthetic-story',
     state: 'draft',
     revision: 1,
     createdAt: '2026-01-01T00:00:00.000Z',
@@ -58,11 +58,11 @@ test('polish traces admission, recovered provider polling and durable completion
   };
   persistence.articles.create(initial, 'author');
   const document: ArticleDocument = {
-    body: 'PRIVATE finished essay.',
+    body: 'PRIVATE finished story.',
     title: 'PRIVATE finished title',
     topic: 'PRIVATE topic',
     ingress:
-      'An ingress that creates tension without revealing the conclusion of the synthetic essay at all.',
+      'An ingress that creates tension without revealing the conclusion of the synthetic story at all.',
     tags: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'],
     socialPosts: ['One.', 'Two.', 'Three.'],
     pullQuotes: [

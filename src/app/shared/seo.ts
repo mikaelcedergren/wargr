@@ -7,7 +7,7 @@ export const SITE_ORIGIN = 'https://wargr.com';
 export const SITE_NAME = 'Wargr';
 export const AUTHOR = 'Michael Wargr';
 export const AUTHOR_DESCRIPTION =
-  'Michael Wargr makes videos and writes reflective essays on philosophy, ethics, fear, self-deception, conformity, purpose, pain, and human nature.';
+  'Michael Wargr makes videos and writes reflective stories on philosophy, ethics, fear, self-deception, conformity, purpose, pain, and human nature.';
 export const AUTHOR_KNOWS_ABOUT = [
   'Philosophy',
   'Ethics',
@@ -46,12 +46,12 @@ export interface PageSeo {
   /** Reading time in minutes → emitted as ISO-8601 duration timeRequired. */
   readingTime?: number;
   articleSection?: string;
-  /** Slugs of related essays, turned into absolute relatedLink URLs in the BlogPosting graph. */
+  /** Slugs of related stories, turned into absolute relatedLink URLs in the BlogPosting graph. */
   relatedSlugs?: string[];
   /** Chronological neighbours → <link rel="prev"/"next"> for crawlers and browsers. */
   prevPath?: string;
   nextPath?: string;
-  /** Blog index: the essay index, emitted as a schema.org ItemList. */
+  /** Blog index: the story index, emitted as a schema.org ItemList. */
   itemList?: { url: string; name: string }[];
   /** Extra JSON-LD @graph nodes (e.g. a BlogPosting) appended after Person/WebSite/WebPage. */
   graph?: object[];
@@ -115,7 +115,7 @@ export class SeoTitleStrategy extends TitleStrategy {
       this.meta.removeTag("property='article:section'");
       this.meta.removeTag("property='article:author'");
     }
-    // Every share card in this project — the default brand card and the per-essay cards — is a
+    // Every share card in this project — the default brand card and the per-story cards — is a
     // 1200×630 JPEG, so the dimensions/type can be declared statically (lets scrapers skip a fetch).
     const ogImage = seo.ogImage ?? DEFAULT_OG_IMAGE;
     this.meta.updateTag({ property: 'og:image', content: ogImage });
@@ -175,7 +175,7 @@ export class SeoTitleStrategy extends TitleStrategy {
       headline: seo.headline ?? title,
       description: seo.description,
       inLanguage: 'en-US',
-      isPartOf: { '@id': isArticle ? `${SITE_ORIGIN}/blog/#blog` : `${SITE_ORIGIN}/#website` },
+      isPartOf: { '@id': isArticle ? `${SITE_ORIGIN}/#blog` : `${SITE_ORIGIN}/#website` },
       author: { '@id': `${SITE_ORIGIN}/#person` },
       publisher: { '@id': `${SITE_ORIGIN}/#person` },
       mainEntityOfPage: canonical,
@@ -219,9 +219,9 @@ export class SeoTitleStrategy extends TitleStrategy {
       },
       {
         '@type': 'Blog',
-        '@id': `${SITE_ORIGIN}/blog/#blog`,
-        url: `${SITE_ORIGIN}/blog/`,
-        name: 'Blog — Michael Wargr',
+        '@id': `${SITE_ORIGIN}/#blog`,
+        url: `${SITE_ORIGIN}/`,
+        name: 'Stories by Michael Wargr',
         isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
         author: { '@id': `${SITE_ORIGIN}/#person` },
       },
@@ -233,7 +233,7 @@ export class SeoTitleStrategy extends TitleStrategy {
         '@type': 'BreadcrumbList',
         '@id': `${canonical}#breadcrumb`,
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Blog', item: `${SITE_ORIGIN}/blog/` },
+          { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_ORIGIN}/` },
           { '@type': 'ListItem', position: 2, name: title, item: canonical },
         ],
       });
@@ -242,8 +242,8 @@ export class SeoTitleStrategy extends TitleStrategy {
     if (seo.itemList?.length) {
       graph.push({
         '@type': 'ItemList',
-        '@id': `${SITE_ORIGIN}/blog/#essays`,
-        name: 'Essays',
+        '@id': `${SITE_ORIGIN}/#stories`,
+        name: 'Stories',
         itemListElement: seo.itemList.map((it, i) => ({
           '@type': 'ListItem',
           position: i + 1,

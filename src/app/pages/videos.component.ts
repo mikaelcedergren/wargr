@@ -8,7 +8,7 @@ import {
 } from '@mikaelcedergren/cx-framework';
 
 @Component({
-  selector: 'wg-home',
+  selector: 'wg-videos',
   imports: [RouterLink, CxButtonComponent, CxHeroComponent, CxInlineComponent, CxImageComponent],
   template: `
     <cx-hero heading="What the mirror doesn’t show you" layout="split">
@@ -29,10 +29,10 @@ import {
           icon="play"
           href="https://www.youtube.com/watch?v=iG-Tg92NOH4"
         />
-        <a routerLink="/blog">Read the blog</a>
+        <a routerLink="/">Read the stories</a>
       </cx-inline>
     </cx-hero>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomeComponent {}
+export class VideosComponent {}

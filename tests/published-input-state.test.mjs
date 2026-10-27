@@ -22,7 +22,7 @@ test('the publication digest binds the published closure and image bytes but ign
   assert.equal(capturePublishedInputDigest(fixture), first);
 
   // A same-size in-place image mutation must change the digest through its content hash.
-  const master = path.join(fixture.imagesRoot, 'essay.png');
+  const master = path.join(fixture.imagesRoot, 'story.png');
   const bytes = fs.readFileSync(master);
   const mutated = Buffer.from(bytes);
   mutated[mutated.length - 1] ^= 0xff;
@@ -31,11 +31,11 @@ test('the publication digest binds the published closure and image bytes but ign
   assert.notEqual(afterImage, first);
 
   // A changed published record — a new content hash for the same slug — must change the digest.
-  replaceRow(fixture.databasePath, publishedRow('essay', { body: 'A revised published body.' }));
+  replaceRow(fixture.databasePath, publishedRow('story', { body: 'A revised published body.' }));
   const afterRecord = capturePublishedInputDigest(fixture);
   assert.notEqual(afterRecord, afterImage);
 
-  // Publishing another essay changes the closure and therefore the digest.
+  // Publishing another story changes the closure and therefore the digest.
   insertRow(fixture.databasePath, publishedRow('another'));
   fs.writeFileSync(path.join(fixture.imagesRoot, 'another.png'), 'png-two');
   assert.notEqual(capturePublishedInputDigest(fixture), afterRecord);
@@ -43,15 +43,15 @@ test('the publication digest binds the published closure and image bytes but ign
 
 test('an empty published closure refuses to produce a digest', (t) => {
   const fixture = createFixture(t, { rows: [] });
-  assert.throws(() => capturePublishedInputDigest(fixture), /at least one published essay/);
+  assert.throws(() => capturePublishedInputDigest(fixture), /at least one published story/);
 });
 
-test('a published essay without its canonical image master fails closed', (t) => {
+test('a published story without its canonical image master fails closed', (t) => {
   const fixture = createFixture(t);
-  fs.unlinkSync(path.join(fixture.imagesRoot, 'essay.png'));
+  fs.unlinkSync(path.join(fixture.imagesRoot, 'story.png'));
   assert.throws(
     () => capturePublishedInputDigest(fixture),
-    /article-images\/essay\.png is missing/,
+    /article-images\/story\.png is missing/,
   );
 });
 
@@ -98,9 +98,9 @@ function createFixture(t, { rows } = {}) {
   } finally {
     database.close();
   }
-  for (const row of rows ?? [publishedRow('essay')]) insertRow(databasePath, row);
-  if ((rows ?? [publishedRow('essay')]).length > 0) {
-    fs.writeFileSync(path.join(imagesRoot, 'essay.png'), 'png-bytes');
+  for (const row of rows ?? [publishedRow('story')]) insertRow(databasePath, row);
+  if ((rows ?? [publishedRow('story')]).length > 0) {
+    fs.writeFileSync(path.join(imagesRoot, 'story.png'), 'png-bytes');
   }
   return { databasePath, imagesRoot, repoRoot };
 }
@@ -119,8 +119,8 @@ function publishedRow(slug, overrides = {}) {
     socialPosts: ['One.', 'Two.', 'Three.'],
     state: 'published',
     tags: ['one', 'two'],
-    title: 'Essay',
-    topic: 'What the essay is really about.',
+    title: 'Story',
+    topic: 'What the story is really about.',
     updatedAt: '2026-01-03T00:00:00.000Z',
     ...overrides,
   };

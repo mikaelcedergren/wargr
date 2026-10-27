@@ -21,11 +21,11 @@ function draftRecord(overrides: Partial<ArticleRecord> = {}): ArticleRecord {
     publishedAt: null,
     pullQuotes: [],
     revision: 1,
-    slug: 'an-essay',
+    slug: 'an-story',
     socialPosts: [],
     state: 'draft',
     tags: [],
-    title: 'An essay',
+    title: 'A story',
     topic: '',
     updatedAt: '2026-01-02T00:00:00.000Z',
     ...overrides,
@@ -34,7 +34,7 @@ function draftRecord(overrides: Partial<ArticleRecord> = {}): ArticleRecord {
 
 test('a raw draft validates with nothing but a title and body', () => {
   const record = validateArticleRecord(draftRecord());
-  assert.equal(record.slug, 'an-essay');
+  assert.equal(record.slug, 'an-story');
   const canonical = canonicalArticle(record);
   assert.equal(canonical.sha256, canonicalArticle(record).sha256, 'hashing is deterministic');
 });
@@ -43,6 +43,7 @@ test('reserved and malformed slugs are rejected', () => {
   for (const slug of [
     'about',
     'blog',
+    'videos',
     'admin',
     'api',
     'healthz',
@@ -68,14 +69,14 @@ test('publishing requires the complete editorial format', () => {
   const complete = draftRecord({
     imagePrompts: ['Create a photograph.', 'Create a second one.', 'Create a third one.'],
     ingress:
-      'An ingress that creates tension without revealing the conclusion of the essay at all.',
+      'An ingress that creates tension without revealing the conclusion of the story at all.',
     pullQuotes: [
       { expansion: 'An expansion.', hook: 'A hook.' },
       { expansion: 'Another expansion.', hook: 'Another hook.' },
     ],
     socialPosts: ['One.', 'Two.', 'Three.'],
     tags: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'],
-    topic: 'What the essay is really about.',
+    topic: 'What the story is really about.',
   });
   assert.deepEqual(publishFormatProblems(complete), []);
 });

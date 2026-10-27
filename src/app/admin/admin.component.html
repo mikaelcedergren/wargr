@@ -20,19 +20,19 @@
           description: topBarDescription(),
         }"
         [menuItems]="view() === 'editor' ? editorMenu() : undefined"
-        menuAriaLabel="Essay actions"
+        menuAriaLabel="Story actions"
         (menuItemSelect)="onEditorMenu($event)"
       >
         <cx-inline actions gap="sm" align="center">
           @switch (view()) {
             @case ('list') {
               @if (articles().length > 0) {
-                <cx-button text="New essay" icon="new" mood="primary" (pressed)="startNewEssay()" />
+                <cx-button text="New story" icon="new" mood="primary" (pressed)="startNewStory()" />
               }
             }
             @case ('editor') {
               <cx-button
-                text="Essays"
+                text="Stories"
                 icon="arrow-left"
                 [transparent]="true"
                 (pressed)="showList()"
@@ -59,11 +59,11 @@
 
             @if (articles().length === 0) {
               <cx-state-message
-                heading="No essays yet"
+                heading="No stories yet"
                 description="Start with a working title. Rough notes are enough; the ghostwriter does the first full pass."
                 icon="edit"
-                [action]="newEssayAction"
-                (action)="startNewEssay()"
+                [action]="newStoryAction"
+                (action)="startNewStory()"
               />
             } @else {
               <cx-table
@@ -97,7 +97,7 @@
                     <cx-alert mood="success" [heading]="editorNotice()" />
                   }
 
-                  <section class="wg-admin-section" aria-label="Essay">
+                  <section class="wg-admin-section" aria-label="Story">
                     <cx-stack gap="lg">
                       <cx-text-field
                         label="Title"
@@ -108,7 +108,7 @@
                       />
                       <cx-text-field
                         label="Topic"
-                        hint="One sentence on what the essay is really about. Internal only, never shown to readers."
+                        hint="One sentence on what the story is really about. Internal only, never shown to readers."
                         [value]="draft().topic"
                         [disabled]="polishing()"
                         (valueChange)="updateDraftField('topic', $event)"
@@ -126,7 +126,7 @@
                         <span class="wg-admin-field-label">Body</span>
                         <div class="wg-admin-body-editor">
                           <cx-markdown-editor
-                            ariaLabel="Essay body"
+                            ariaLabel="Story body"
                             presentation="document"
                             placeholder="Write whatever you have, however raw."
                             [value]="draft().body"
@@ -139,7 +139,7 @@
                         label="Address"
                         [hint]="
                           current.state === 'published'
-                            ? 'A published essay keeps its address.'
+                            ? 'A published story keeps its address.'
                             : 'Lowercase words separated by hyphens: wargr.com/<address>/'
                         "
                         [value]="slugDraft()"
@@ -152,7 +152,7 @@
                   <section class="wg-admin-section" aria-label="Publishing furniture">
                     <h2>Publishing furniture</h2>
                     <p class="wg-admin-prose">
-                      The ghostwriter writes all of this alongside the essay. Publishing requires
+                      The ghostwriter writes all of this alongside the story. Publishing requires
                       10–20 tags, three social posts, two or three pull quotes and three image
                       prompts.
                     </p>
@@ -286,12 +286,12 @@
                         <cx-state-message
                           state="pending"
                           heading="The ghostwriter is writing"
-                          description="The round is safely queued and survives leaving this page. The result replaces the essay when it lands."
+                          description="The round is safely queued and survives leaving this page. The result replaces the story when it lands."
                         />
                       } @else {
                         <p class="wg-admin-prose">
                           Pick how settled the current text is, then run a round. Your edits are
-                          read as meaning, not wording; run round after round until the essay is
+                          read as meaning, not wording; run round after round until the story is
                           true.
                         </p>
                         <cx-dropdown
@@ -357,17 +357,17 @@
 
   <cx-dialog
     variant="confirm"
-    heading="New essay"
+    heading="New story"
     description="A working title is enough. Everything else can arrive as rough notes."
-    [open]="newEssayOpen()"
-    primaryText="Create essay"
+    [open]="newStoryOpen()"
+    primaryText="Create story"
     [primaryLoading]="creating()"
     [primaryDisabled]="creating()"
     secondaryText="Cancel"
     [closeOnPrimary]="false"
-    (primary)="createEssay()"
-    (secondary)="closeNewEssay()"
-    (dismiss)="closeNewEssay()"
+    (primary)="createStory()"
+    (secondary)="closeNewStory()"
+    (dismiss)="closeNewStory()"
   >
     <cx-stack body gap="md">
       <cx-text-field
@@ -384,7 +384,7 @@
   <cx-dialog
     variant="confirm"
     mood="danger"
-    heading="Delete essay"
+    heading="Delete story"
     [open]="pendingDelete() !== undefined"
     [description]="
       pendingDelete()
@@ -393,8 +393,8 @@
           '” is removed with its complete round history. This cannot be undone.'
         : ''
     "
-    primaryText="Delete essay"
-    secondaryText="Keep essay"
+    primaryText="Delete story"
+    secondaryText="Keep story"
     (primary)="confirmDelete()"
     (secondary)="cancelDelete()"
     (dismiss)="cancelDelete()"

@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 
 /**
- * The structured essay record. Admin replaced the retired ghostwriter markdown files as the
+ * The structured story record. Admin replaced the retired ghostwriter markdown files as the
  * authoring source: one record carries the same content the markdown format carried — title,
  * internal topic line, ingress, body markdown, tags, social posts, pull quotes, and thumbnail
  * prompts. Draft validation enforces only bounded shapes so raw notes stay welcome; the publish
@@ -23,7 +23,7 @@ export const ARTICLE_VERSION_SOURCES = Object.freeze(['author', 'polish', 'impor
 export type ArticleVersionSource = (typeof ARTICLE_VERSION_SOURCES)[number];
 
 export const RESERVED_ARTICLE_SLUGS = Object.freeze(
-  new Set(['about', 'api', 'assets', 'blog', 'healthz', 'admin']),
+  new Set(['about', 'api', 'assets', 'blog', 'videos', 'healthz', 'admin']),
 );
 
 export const MAX_TITLE_CHARACTERS = 300;
@@ -64,7 +64,7 @@ export interface PullQuote {
   readonly hook: string;
 }
 
-/** The editable content of one essay — the fields the author and the polish worker rewrite. */
+/** The editable content of one story — the fields the author and the polish worker rewrite. */
 export interface ArticleDocument {
   readonly body: string;
   readonly imagePrompts: readonly string[];
@@ -236,7 +236,7 @@ export class ArticleValidationError extends Error {
 
 /**
  * The publish contract — the mechanical half of the retired ghostwriter format checker, applied to
- * the structured record instead of a markdown file. Voice, truth, and the decision that an essay is
+ * the structured record instead of a markdown file. Voice, truth, and the decision that a story is
  * finished remain human editorial gates; this proves only the structural furniture the site needs.
  */
 export function publishFormatProblems(document: ArticleDocument): readonly string[] {

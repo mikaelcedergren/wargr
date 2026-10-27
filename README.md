@@ -1,17 +1,17 @@
 # wargr.com
 
-Operational diagnostics follow the [shared logging policy](../SERVER-STANDARD.md#logs-and-bounded-storage). Web requests, admitted polish runs, provider receipts and committed results use opaque references. Polling emits bounded summaries, and storage health logs only failure and recovery transitions. Essay drafts, instructions, credentials and provider bodies stay out of logs. The [implementation plan](../LOGGING-IMPLEMENTATION-PLAN.md) tracks host capture activation separately from producer code.
+Operational diagnostics follow the [shared logging policy](../SERVER-STANDARD.md#logs-and-bounded-storage). Web requests, admitted polish runs, provider receipts and committed results use opaque references. Polling emits bounded summaries, and storage health logs only failure and recovery transitions. Story drafts, instructions, credentials and provider bodies stay out of logs. The [implementation plan](../LOGGING-IMPLEMENTATION-PLAN.md) tracks host capture activation separately from producer code.
 
-Michael Wargr's personal site — videos, essays, and an about page. Angular 22 SSG on cx-framework plus the private Admin, served by one
+Michael Wargr's personal site — videos, stories, and an about page. Angular 22 SSG on cx-framework plus the private Admin, served by one
 compiled TypeScript/Express web process on the Mac mini (port 3060) with a separate listener-free
-AI polish worker. Essays are authored in the Admin at `/admin` and stored in the article
+AI polish worker. Stories are authored in the Admin at `/admin` and stored in the article
 database (`data/wargr.db`); the sealed publisher regenerates the tracked presentation snapshot
 from the database's published closure. See [AGENTS.md](AGENTS.md).
 
 ```bash
 pnpm install
 pnpm dev              # Angular on 4260, API on 4261 + worker, real data/wargr.db
-pnpm generate:content # explicitly regenerate the snapshot from published essays and image masters
+pnpm generate:content # explicitly regenerate the snapshot from published stories and image masters
 pnpm build            # prerender the tracked snapshot and compile the production web/worker
 pnpm build:server:release # internal self-contained server-artifact build
 pnpm check            # platform, formatting, typecheck, Node contracts, and production build
@@ -29,31 +29,34 @@ Admin database lives under `data/owner-development/`; private files and AI polis
 
 ## Public site
 
-The start page (`/`) features video episodes linking to YouTube. `/blog/` holds the published
-essay collection; individual essays retain their existing root URLs. `/about/` introduces Michael
-Wargr. The original logo sits in the framework masthead with Videos, Blog, and About navigation.
+The start page (`/`) features the latest published story in a cover hero, followed by the remaining
+stories in the existing card grid. Each story opens with its image and title in a framework cover
+hero, followed by the article content. `/videos/` features video episodes
+linking to YouTube, and `/blog/` redirects to the start page; individual stories retain their existing root URLs. `/about/` introduces Michael
+Wargr. The original logo sits in the framework masthead with Home, Videos, and About navigation.
 There is no contact or subscription funnel.
 
 The public pages compose the installed framework's masthead, hero, cards, layout primitives, and
 editorial typography. Local styles own only shell placement, reading width, footer spacing, and
 selection of the original logo asset for each theme. Components and tokens are consumed as-is.
+Night is the default appearance; the footer switch preserves a reader's explicit light/night choice.
 The document root selects the framework's `cx-corners-square` profile for the site's square identity.
 
-Home, About, and the missing-page view are authored source. The publisher generates the blog
-index, essay components, routes, RSS, sitemap, and article images. Update the generator when
-changing those templates; never edit the generated essay content. Video thumbnails are checked-in
+Videos, About, and the missing-page view are authored source. The publisher generates the blog
+index, story components, routes, RSS, sitemap, and article images. Update the generator when
+changing those templates; never edit the generated story content. Video thumbnails are checked-in
 public assets, so viewing the site makes no YouTube request until a visitor follows the watch link.
 
-`/sitemap.xml` lists the canonical public pages and published essay hero images, and is advertised
-in `robots.txt`. Essay modification times come from the published records; section pages omit
+`/sitemap.xml` lists the canonical public pages and published story hero images, and is advertised
+in `robots.txt`. Story modification times come from the published records; section pages omit
 `lastmod` because they have no authoritative modification timestamp. Admin, API, and error routes
 are excluded. The isolated browser check verifies every entry against its prerendered canonical
 URL, indexability, and image response.
 
 ## Admin
 
-`/admin` is the owner's writing room: essay drafts, the ghostwriter polish loop (four rewrite
-intensities carrying the ported voice contract), a bounded round history per essay, and the
+`/admin` is the owner's writing room: story drafts, the ghostwriter polish loop (four rewrite
+intensities carrying the ported voice contract), a bounded round history per story, and the
 publish/unpublish switch. It authenticates one owner (scrypt-hashed password in the web role's
 `.env.web`), runs over the typed `/api/admin` contract with compare-and-swap revisions, and is
 never indexed. AI rounds run as durable jobs in the worker process, which alone holds

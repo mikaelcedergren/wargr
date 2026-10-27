@@ -146,7 +146,7 @@ export function createOpenAiResponsesProvider(
       if (ordinal === 2) {
         throw new GenerationProviderTerminalError(
           'structured_output_invalid',
-          'The provider returned an invalid structured essay document twice.',
+          'The provider returned an invalid structured story document twice.',
           'failed',
         );
       }
@@ -325,7 +325,7 @@ export function createOpenAiResponsesProvider(
             effect = repository.transitionEffect({
               effectId,
               errorCode: 'provider_create_rejected',
-              errorMessage: `The provider rejected essay polishing with HTTP ${String(response.status)}.`,
+              errorMessage: `The provider rejected story polishing with HTTP ${String(response.status)}.`,
               expectedRevision: effect.revision,
               state: 'rejected',
             });
@@ -445,7 +445,7 @@ export function createOpenAiResponsesProvider(
           effect = repository.transitionEffect({
             effectId: effect.effectId,
             errorCode: `provider_${state}`,
-            errorMessage: `The provider ended essay polishing with status ${state}.`,
+            errorMessage: `The provider ended story polishing with status ${state}.`,
             expectedRevision: effect.revision,
             state: 'rejected',
           });
@@ -608,7 +608,7 @@ function assertEffectIdentity(
   ) {
     throw new GenerationProviderTerminalError(
       'provider_effect_conflict',
-      'The durable provider receipt does not match the requested essay polish.',
+      'The durable provider receipt does not match the requested story polish.',
       'ambiguous',
     );
   }
@@ -674,7 +674,7 @@ function ambiguousEffect(effect: ProviderEffect): GenerationProviderTerminalErro
 function rejectedEffect(effect: ProviderEffect): GenerationProviderTerminalError {
   return new GenerationProviderTerminalError(
     effect.errorCode ?? 'provider_generation_failed',
-    effect.errorMessage ?? 'The provider could not complete the essay polish.',
+    effect.errorMessage ?? 'The provider could not complete the story polish.',
     'failed',
   );
 }

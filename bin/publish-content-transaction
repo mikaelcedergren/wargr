@@ -53,7 +53,7 @@ fi
 
 "$NODE" "$PUBLISH_LOG" generating
 ts() { date -u +%FT%TZ }
-echo "[$(ts)] published essays or article images changed — rebuilding wargr.com"
+echo "[$(ts)] published stories or article images changed — rebuilding wargr.com"
 baseline_state=$(
   "$NODE" "$SOURCE_GUARD" \
     --repo "$REPO" \

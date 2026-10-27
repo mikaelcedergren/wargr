@@ -41,8 +41,13 @@ export class AppComponent {
   protected readonly year = new Date().getFullYear();
   private readonly page = signal(this.pageData());
   protected readonly navigation = computed<CxMastheadItem[]>(() => [
-    { id: 'videos', label: 'Videos', href: '/', active: this.page()['section'] === 'videos' },
-    { id: 'blog', label: 'Blog', href: '/blog/', active: this.page()['section'] === 'blog' },
+    { id: 'blog', label: 'Home', href: '/', active: this.page()['section'] === 'blog' },
+    {
+      id: 'videos',
+      label: 'Videos',
+      href: '/videos/',
+      active: this.page()['section'] === 'videos',
+    },
     { id: 'about', label: 'About', href: '/about/', active: this.page()['section'] === 'about' },
   ]);
 

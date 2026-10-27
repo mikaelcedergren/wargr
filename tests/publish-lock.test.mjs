@@ -219,9 +219,9 @@ function writeSnapshot(root, marker) {
     ['public/sitemap.xml', `sitemap-${marker}`],
     ['src/app/app.routes.ts', `routes-${marker}`],
     ['src/app/pages/blog.component.ts', `home-${marker}`],
-    ['src/app/articles/essay.component.ts', `article-${marker}`],
-    ['public/assets/articles/essay.jpg', `hero-${marker}`],
-    ['public/assets/articles/essay-og.jpg', `social-${marker}`],
+    ['src/app/articles/story.component.ts', `article-${marker}`],
+    ['public/assets/articles/story.jpg', `hero-${marker}`],
+    ['public/assets/articles/story-og.jpg', `social-${marker}`],
   ]);
   for (const [relativePath, value] of values) {
     const target = path.join(root, relativePath);
@@ -246,10 +246,10 @@ function captureOutputRoots(repo) {
 function readRepresentative(repo, relativePath) {
   const target = path.join(repo, relativePath);
   if (relativePath === 'src/app/articles') {
-    return fs.readFileSync(path.join(target, 'essay.component.ts'), 'utf8');
+    return fs.readFileSync(path.join(target, 'story.component.ts'), 'utf8');
   }
   if (relativePath === 'public/assets/articles') {
-    return fs.readFileSync(path.join(target, 'essay.jpg'), 'utf8');
+    return fs.readFileSync(path.join(target, 'story.jpg'), 'utf8');
   }
   return fs.readFileSync(target, 'utf8');
 }

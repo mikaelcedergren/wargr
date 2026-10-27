@@ -144,7 +144,7 @@ const POLISH_MODE_OPTIONS: CxDropdownOption[] = [
 
 const ARTICLE_COLUMNS: CxTableColumn[] = [
   { id: 'status', label: 'Status', size: 'content', hideable: false, pinnable: false },
-  { id: 'title', label: 'Essay', key: true, size: 'flex', hideable: false, pinnable: false },
+  { id: 'title', label: 'Story', key: true, size: 'flex', hideable: false, pinnable: false },
   {
     id: 'updated',
     label: 'Updated',
@@ -156,7 +156,7 @@ const ARTICLE_COLUMNS: CxTableColumn[] = [
 ];
 
 const LIST_MENU: CxMenuItem[] = [
-  { id: 'delete', label: 'Delete essay', prependIcon: 'delete', danger: true },
+  { id: 'delete', label: 'Delete story', prependIcon: 'delete', danger: true },
 ];
 
 const VERSION_SOURCE_LABELS: Record<ArticleVersionSummary['source'], string> = {
@@ -263,7 +263,7 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   protected readonly versions = signal<ArticleVersionSummary[]>([]);
 
-  protected readonly newEssayOpen = signal(false);
+  protected readonly newStoryOpen = signal(false);
   protected readonly newTitle = signal('');
   protected readonly newTitleValidation = signal<CxFieldValidation | undefined>(undefined);
   protected readonly creating = signal(false);
@@ -271,8 +271,8 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   protected readonly polishModeOptions = POLISH_MODE_OPTIONS;
   protected readonly articleColumns = ARTICLE_COLUMNS;
-  protected readonly newEssayAction: CxStateMessageAction = {
-    text: 'New essay',
+  protected readonly newStoryAction: CxStateMessageAction = {
+    text: 'New story',
     mood: 'primary',
     icon: 'new',
   };
@@ -319,14 +319,14 @@ export class AdminComponent implements OnInit, OnDestroy {
     const current = this.article();
     const items: CxMenuItem[] = [];
     if (current?.state === 'draft') {
-      items.push({ id: 'publish', label: 'Publish essay', prependIcon: 'send' });
+      items.push({ id: 'publish', label: 'Publish story', prependIcon: 'send' });
     }
     if (current?.state === 'published') {
-      items.push({ id: 'unpublish', label: 'Unpublish essay', prependIcon: 'reset' });
+      items.push({ id: 'unpublish', label: 'Unpublish story', prependIcon: 'reset' });
     }
     items.push({
       id: 'delete',
-      label: 'Delete essay',
+      label: 'Delete story',
       prependIcon: 'delete',
       danger: true,
       dividerBefore: true,
@@ -335,8 +335,8 @@ export class AdminComponent implements OnInit, OnDestroy {
   });
 
   protected readonly topBarHeading = computed(() => {
-    if (this.view() === 'editor') return this.article()?.title || 'Essay';
-    return 'Essays';
+    if (this.view() === 'editor') return this.article()?.title || 'Story';
+    return 'Stories';
   });
 
   protected readonly topBarDescription = computed(() => {
@@ -373,7 +373,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   });
 
   protected readonly navigation: CxMastheadItem[] = [
-    { id: 'essays', label: 'Essays', routerLink: ['/admin'] },
+    { id: 'stories', label: 'Stories', routerLink: ['/admin'] },
   ];
 
   public ngOnInit(): void {
@@ -486,15 +486,15 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   /* List */
 
-  protected startNewEssay(): void {
+  protected startNewStory(): void {
     this.newTitle.set('');
     this.newTitleValidation.set(undefined);
-    this.newEssayOpen.set(true);
+    this.newStoryOpen.set(true);
     queueMicrotask(() => this.newTitleField?.focus());
   }
 
-  protected closeNewEssay(): void {
-    this.newEssayOpen.set(false);
+  protected closeNewStory(): void {
+    this.newStoryOpen.set(false);
   }
 
   protected updateNewTitle(value: string): void {
@@ -502,11 +502,11 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.newTitleValidation.set(undefined);
   }
 
-  protected async createEssay(): Promise<void> {
+  protected async createStory(): Promise<void> {
     if (this.creating()) return;
     const title = this.newTitle().trim();
     if (title.length === 0) {
-      this.newTitleValidation.set('Give the essay a working title.');
+      this.newTitleValidation.set('Give the story a working title.');
       queueMicrotask(() => this.newTitleField?.focus());
       return;
     }
@@ -522,12 +522,12 @@ export class AdminComponent implements OnInit, OnDestroy {
       }
       if (!response.ok) {
         this.newTitleValidation.set(
-          await this.apiErrorMessage(response, 'The essay could not be created. Try again.'),
+          await this.apiErrorMessage(response, 'The story could not be created. Try again.'),
         );
         return;
       }
       const payload = (await response.json()) as { article?: Article };
-      this.newEssayOpen.set(false);
+      this.newStoryOpen.set(false);
       await this.refreshArticles();
       if (payload.article) this.openLoadedArticle(payload.article);
     } catch {
@@ -575,7 +575,7 @@ export class AdminComponent implements OnInit, OnDestroy {
       if (!response.ok) {
         const message = await this.apiErrorMessage(
           response,
-          'That essay could not be opened. Try again.',
+          'That story could not be opened. Try again.',
         );
         if (sequence !== this.pollSequence) return;
         this.listError.set(message);
@@ -584,7 +584,7 @@ export class AdminComponent implements OnInit, OnDestroy {
       const payload = (await response.json()) as { article?: Article };
       if (sequence !== this.pollSequence) return;
       if (!payload.article) {
-        this.listError.set('That essay could not be opened. Try again.');
+        this.listError.set('That story could not be opened. Try again.');
         return;
       }
       this.openLoadedArticle(payload.article);
@@ -711,7 +711,7 @@ export class AdminComponent implements OnInit, OnDestroy {
       if (!response.ok) {
         const message = await this.apiErrorMessage(
           response,
-          'The essay could not be saved. Try again.',
+          'The story could not be saved. Try again.',
         );
         if (!this.isCurrentEditor(saved.id, sequence)) return;
         this.editorError.set(message);
@@ -853,7 +853,7 @@ export class AdminComponent implements OnInit, OnDestroy {
       const response = await this.request(`/api/admin/articles/${articleId}`);
       if (sequence !== this.pollSequence) return;
       if (!response.ok) {
-        this.polishError.set('The polished essay could not be loaded. Reload the page.');
+        this.polishError.set('The polished story could not be loaded. Reload the page.');
         return;
       }
       const payload = (await response.json()) as { article?: Article };
@@ -950,7 +950,7 @@ export class AdminComponent implements OnInit, OnDestroy {
         const problems = payload.error?.details?.problems;
         if (response.status === 422 && Array.isArray(problems)) {
           this.publishProblems.set(problems);
-          this.editorError.set('The essay does not meet the publish format yet.');
+          this.editorError.set('The story does not meet the publish format yet.');
         } else {
           this.editorError.set(
             payload.error?.message ?? 'That change could not be made. Try again.',
@@ -966,8 +966,8 @@ export class AdminComponent implements OnInit, OnDestroy {
         if (this.slugDraft().trim() === saved.slug) this.slugDraft.set(payload.article.slug);
         this.editorNotice.set(
           action === 'publish'
-            ? 'Published. The essay is now marked for the next site release.'
-            : 'Unpublished. The essay returns to drafts.',
+            ? 'Published. The story is now marked for the next site release.'
+            : 'Unpublished. The story returns to drafts.',
         );
       }
       await this.refreshArticles();
@@ -996,14 +996,14 @@ export class AdminComponent implements OnInit, OnDestroy {
         return;
       }
       if (!response.ok) {
-        const message = await this.apiErrorMessage(response, 'That essay could not be deleted.');
+        const message = await this.apiErrorMessage(response, 'That story could not be deleted.');
         if (this.view() === 'editor') this.editorError.set(message);
         else this.listError.set(message);
         return;
       }
       deleted = true;
     } catch {
-      this.listError.set('That essay could not be deleted. Check the connection.');
+      this.listError.set('That story could not be deleted. Check the connection.');
     } finally {
       if (deleted && this.article()?.id === target.id) {
         this.showList();
@@ -1149,7 +1149,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.polishError.set('');
     this.polishInstruction.set('');
     this.polishMode.set('developed');
-    this.newEssayOpen.set(false);
+    this.newStoryOpen.set(false);
     this.newTitle.set('');
     this.creating.set(false);
     this.pendingDelete.set(undefined);

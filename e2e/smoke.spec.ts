@@ -116,20 +116,61 @@ test('the Admin stays private: noindexed shell, anonymous session, guarded API',
   expect(articles.status()).toBe(401);
 });
 
-test('the checked-in essay snapshot renders from the tracked presentation source alone', async ({
+test('the checked-in story snapshot renders from the tracked presentation source alone', async ({
   page,
 }) => {
   const response = await page.goto('/blog/');
   expect(response?.ok()).toBeTruthy();
-  await expect(page).toHaveTitle('Blog — Michael Wargr');
+  await expect(page).toHaveURL(new URL('/', OWNED_ORIGIN).href);
+  await expect(page).toHaveTitle('Home — Michael Wargr');
   await expect(page.getByRole('link', { name: 'Read The strange mercy of death' })).toBeVisible();
 });
 
-test('a prerendered essay route remains readable', async ({ page }) => {
+test('a prerendered story route remains readable', async ({ page }) => {
   const response = await page.goto('/corruption/');
   expect(response?.ok()).toBeTruthy();
   await expect(page).toHaveTitle(/How fear turns good people into corruption/);
   await expect(page.getByRole('heading', { level: 1 })).toContainText('How fear turns the good');
+});
+
+test('Home features the latest story once and every story opens with an image-backed title', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const featured = page.locator('cx-hero');
+  await expect(featured.getByRole('heading', { level: 1 })).toHaveText(
+    'The strange mercy of death',
+  );
+  const latest = featured.getByRole('link', { name: 'Read The strange mercy of death' });
+  const cards = page.getByRole('region', { name: 'Stories', exact: true }).getByRole('link');
+  await expect(cards).toHaveCount(4);
+  const paths = [
+    await latest.getAttribute('href'),
+    ...(await cards.evaluateAll((links) => links.map((link) => link.getAttribute('href')))),
+  ];
+  expect(new Set(paths).size).toBe(5);
+
+  for (const route of ['/', ...paths]) {
+    await page.goto(route!);
+    const hero = page.locator('cx-hero');
+    const image = hero.locator('img');
+    await expect(image).toBeVisible();
+    await expect(image).toHaveJSProperty('complete', true);
+    expect(
+      await image.evaluate((element: HTMLImageElement) => element.naturalWidth),
+    ).toBeGreaterThan(0);
+    const imageBounds = (await image.boundingBox())!;
+    const titleBounds = (await hero.getByRole('heading', { level: 1 }).boundingBox())!;
+    expect(titleBounds.x).toBeGreaterThanOrEqual(imageBounds.x);
+    expect(titleBounds.y).toBeGreaterThanOrEqual(imageBounds.y);
+    expect(titleBounds.x + titleBounds.width).toBeLessThanOrEqual(
+      imageBounds.x + imageBounds.width,
+    );
+    expect(titleBounds.y + titleBounds.height).toBeLessThanOrEqual(
+      imageBounds.y + imageBounds.height,
+    );
+    if (route !== '/') await expect(page.locator('article .cx-editorial')).toBeVisible();
+  }
 });
 
 test('a missing browser asset returns a real non-cacheable 404', async ({ request }) => {
@@ -153,9 +194,19 @@ function requiredEnvironment(name: string): string {
   return value;
 }
 
-test('the personal site leads with video and connects all three sections', async ({ page }) => {
+test('the personal site leads with the blog and connects all three sections', async ({ page }) => {
   await page.goto('/');
-  await expect(page).toHaveTitle('Michael Wargr — videos and essays');
+  await expect(page).toHaveTitle('Home — Michael Wargr');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('The strange mercy of death');
+  const navigation = page.getByRole('navigation', { name: 'Primary' });
+  await expect(navigation.getByRole('link')).toHaveText(['Home', 'Videos', 'About']);
+  await expect(navigation.getByRole('link', { name: 'Home', exact: true })).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
+  await navigation.getByRole('link', { name: 'Videos', exact: true }).click();
+  await expect(page).toHaveURL(/\/videos\/?$/);
+  await expect(page).toHaveTitle('Videos — Michael Wargr');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'What the mirror doesn’t show you',
   );
@@ -173,33 +224,39 @@ test('the personal site leads with video and connects all three sections', async
   const bounds = await video.boundingBox();
   expect(bounds).not.toBeNull();
   expect(bounds!.width / bounds!.height).toBeCloseTo(16 / 9, 1);
-  await page.getByRole('link', { name: 'Read the blog' }).click();
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Blog');
+  await page.getByRole('link', { name: 'Read the stories' }).click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('The strange mercy of death');
   await page.getByRole('link', { name: 'Read The strange mercy of death' }).click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('The strange mercy of death');
   await expect(
     page
       .getByRole('navigation', { name: 'Primary' })
-      .getByRole('link', { name: 'Blog', exact: true }),
+      .getByRole('link', { name: 'Home', exact: true }),
   ).toHaveAttribute('aria-current', 'page');
   const prose = await page.locator('article .cx-editorial').boundingBox();
   expect(prose?.width).toBeLessThanOrEqual(640);
   await page.getByRole('link', { name: 'About', exact: true }).click();
   await expect(page).toHaveTitle('About — Michael Wargr');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Michael Wargr');
+  await page.getByRole('link', { name: 'Watch the videos', exact: true }).click();
+  await expect(page).toHaveURL(/\/videos\/?$/);
+  await expect(page).toHaveTitle('Videos — Michael Wargr');
   await page.getByRole('link', { name: 'Michael Wargr — home' }).click();
-  await expect(page).toHaveTitle('Michael Wargr — videos and essays');
+  await expect(page).toHaveTitle('Home — Michael Wargr');
 });
 
 test('public navigation and the logo remain usable in the night theme', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Switch to night theme' }).click();
   await expect(page.locator('html')).toHaveClass(/theme-night/);
   await expect(page.locator('.wg-logo-night')).toBeVisible();
-  await page.reload();
-  await expect(page.locator('html')).toHaveClass(/theme-night/);
   await page.getByRole('button', { name: 'Switch to light theme' }).click();
   await expect(page.locator('.wg-logo-light')).toBeVisible();
+  await page.reload();
+  await expect(page.locator('html')).toHaveClass(/theme-light/);
+  await page.getByRole('button', { name: 'Switch to night theme' }).click();
+  await page.reload();
+  await expect(page.locator('html')).toHaveClass(/theme-night/);
+  await expect(page.locator('.wg-logo-night')).toBeVisible();
 });
 
 test('the masthead menu supports section navigation and Escape', async ({ page }) => {
@@ -209,9 +266,11 @@ test('the masthead menu supports section navigation and Escape', async ({ page }
   await expect(page.getByRole('dialog', { name: 'Menu' })).toBeVisible();
   await page
     .getByRole('dialog', { name: 'Menu' })
-    .getByRole('link', { name: 'Blog', exact: true })
+    .getByRole('link', { name: 'Videos', exact: true })
     .click();
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Blog');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    'What the mirror doesn’t show you',
+  );
   await expect(page.getByRole('dialog', { name: 'Menu' })).toHaveCount(0);
   await page.getByRole('button', { name: 'Open menu' }).click();
   await page.keyboard.press('Escape');
@@ -245,7 +304,7 @@ test('the sitemap exposes only canonical, prerendered public pages and crawlable
   expect(urls).toEqual(
     expect.arrayContaining([
       'https://wargr.com/',
-      'https://wargr.com/blog/',
+      'https://wargr.com/videos/',
       'https://wargr.com/about/',
     ]),
   );

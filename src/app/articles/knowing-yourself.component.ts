@@ -12,8 +12,9 @@ type WgRelated = { slug: string; title: string; dek: string };
   selector: 'wg-a-knowing-yourself',
   imports: [RouterLink, CxHeroComponent, CxStackComponent],
   template: `
-    <cx-hero [heading]="title" layout="split">
-      <a context class="cx-text-ink" routerLink="/blog">Blog</a>
+    <cx-stack gap="2xl">
+    <cx-hero [heading]="title" layout="cover" [overlayOpacity]="60">
+      <a context class="cx-text-ink" routerLink="/">Home</a>
       @if (dek) { <p body>{{ dek }}</p> }
       <p meta><time [attr.datetime]="datetime">{{ date }}</time>{{ metaRest }}</p>
       <img media [src]="hero" [alt]="imageAlt" fetchpriority="high" />
@@ -21,17 +22,18 @@ type WgRelated = { slug: string; title: string; dek: string };
     <article class="cx-container wg-section">
       <div class="cx-editorial cx-measure-md" [innerHTML]="body"></div>
     </article>
+    </cx-stack>
     @if (related.length) {
-      <aside class="cx-container wg-section" aria-label="Related essays">
+      <aside class="cx-container wg-section" aria-label="Related stories">
         <cx-stack class="cx-measure-md" gap="lg">
-          <h2>Related essays</h2>
+          <h2>Related stories</h2>
           @for (r of related; track r.slug) {
             <div class="cx-editorial">
               <h3><a [routerLink]="['/', r.slug]">{{ r.title }}</a></h3>
               <p>{{ r.dek }}</p>
             </div>
           }
-          <a routerLink="/blog">All blog posts</a>
+          <a routerLink="/">All stories</a>
         </cx-stack>
       </aside>
     }
@@ -44,7 +46,7 @@ export class ArticleKnowingYourselfComponent {
   protected readonly date = "July 9, 2026";
   protected readonly datetime = "2026-07-09";
   protected readonly metaRest = " · 5 min read";
-  protected readonly imageAlt = "The side effect of knowing yourself, an essay by Michael Wargr.";
+  protected readonly imageAlt = "The side effect of knowing yourself, a story by Michael Wargr.";
   protected readonly related: WgRelated[] = [{"slug":"babylons-whore","title":"The whore of Babylon was always us","dek":"I thought religion was a trick for gullible people. Then the old stories started looking less like superstition and more like a report on the crowd, and on me."},{"slug":"mercy-of-death","title":"The strange mercy of death","dek":"I was fifteen when death moved out of the distance and into the bed beside me, and it took years before I stopped seeing it as an enemy."},{"slug":"corruption","title":"How fear turns the good in us into corruption","dek":"Corruption rarely starts with a bad person. It starts with a good one who learns to use goodness as an alibi."}];
   protected readonly hero = "/assets/articles/knowing-yourself.jpg";
   protected readonly body = inject(DomSanitizer).bypassSecurityTrustHtml(HTML);

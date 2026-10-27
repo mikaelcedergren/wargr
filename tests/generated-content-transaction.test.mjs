@@ -334,7 +334,7 @@ test('invalid slug inventories perform zero mutation and start no generator', (t
           },
         }),
       kind === 'empty'
-        ? /at least one published essay/
+        ? /at least one published story/
         : kind === 'empty-slug'
           ? /invalid or reserved/
           : kind === 'collision'
@@ -414,8 +414,8 @@ function createGenerationFixture(t, kind) {
   writeSnapshot(repo, 'original');
   const rows = [];
   if (kind === 'valid') {
-    rows.push(publishedRow('essay'));
-    fs.writeFileSync(path.join(repo, 'article-images/essay.png'), 'png');
+    rows.push(publishedRow('story'));
+    fs.writeFileSync(path.join(repo, 'article-images/story.png'), 'png');
   } else if (kind === 'empty-slug') {
     rows.push(publishedRow('!!!'));
   } else if (kind === 'collision') {
@@ -443,8 +443,8 @@ function publishedRow(slug) {
     socialPosts: ['One.', 'Two.', 'Three.'],
     state: 'published',
     tags: ['one', 'two'],
-    title: 'Essay',
-    topic: 'What the essay is really about.',
+    title: 'Story',
+    topic: 'What the story is really about.',
     updatedAt: '2026-01-03T00:00:00.000Z',
   };
   const bytes = Buffer.from(JSON.stringify(record), 'utf8');
@@ -498,9 +498,9 @@ function writeSnapshot(root, marker) {
     ['public/sitemap.xml', `sitemap-${marker}`],
     ['src/app/app.routes.ts', `routes-${marker}`],
     ['src/app/pages/blog.component.ts', `home-${marker}`],
-    ['src/app/articles/essay.component.ts', `article-${marker}`],
-    ['public/assets/articles/essay.jpg', `hero-${marker}`],
-    ['public/assets/articles/essay-og.jpg', `social-${marker}`],
+    ['src/app/articles/story.component.ts', `article-${marker}`],
+    ['public/assets/articles/story.jpg', `hero-${marker}`],
+    ['public/assets/articles/story-og.jpg', `social-${marker}`],
   ]);
   for (const [relativePath, value] of values) {
     const target = path.join(root, relativePath);
@@ -585,10 +585,10 @@ function readTransactionJournal(repo) {
 function readRepresentative(repo, relativePath) {
   const target = path.join(repo, relativePath);
   if (relativePath === 'src/app/articles') {
-    return fs.readFileSync(path.join(target, 'essay.component.ts'), 'utf8');
+    return fs.readFileSync(path.join(target, 'story.component.ts'), 'utf8');
   }
   if (relativePath === 'public/assets/articles') {
-    return fs.readFileSync(path.join(target, 'essay.jpg'), 'utf8');
+    return fs.readFileSync(path.join(target, 'story.jpg'), 'utf8');
   }
   return fs.readFileSync(target, 'utf8');
 }

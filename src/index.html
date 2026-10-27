@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="theme-light cx-corners-square">
+<html lang="en" class="theme-night cx-corners-square">
   <head>
     <meta charset="utf-8" />
     <base href="/" />
@@ -8,11 +8,9 @@
     <meta name="author" content="Michael Wargr" />
     <meta
       name="description"
-      content="Videos and essays by Michael Wargr on philosophy, ethics, and human nature."
+      content="Videos and stories by Michael Wargr on philosophy, ethics, and human nature."
     />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
     <link rel="icon" type="image/png" href="/assets/brand/favicon.png" />
     <link
       rel="icon"
@@ -24,16 +22,16 @@
     <link
       rel="alternate"
       type="application/rss+xml"
-      title="Wargr — essays by Michael Wargr"
+      title="Wargr — stories by Michael Wargr"
       href="/feed.xml"
     />
-    <!-- Apply the reader's saved theme before first paint so the page never flashes. Light is the default. -->
+    <!-- Apply the reader's saved theme before first paint so the page never flashes. Night is the default. -->
     <script>
       try {
         var savedTheme = localStorage.getItem('wg-theme');
-        if (savedTheme === 'night') {
-          document.documentElement.classList.remove('theme-light');
-          document.documentElement.classList.add('theme-night');
+        if (savedTheme === 'light') {
+          document.documentElement.classList.remove('theme-night');
+          document.documentElement.classList.add('theme-light');
         }
       } catch (e) {}
     </script>

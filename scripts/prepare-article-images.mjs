@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Builds the deployed hero and social-card JPEGs from the canonical per-essay PNG masters.
-// Every published essay must have article-images/<slug>.png; a missing or undersized master is a
+// Builds the deployed hero and social-card JPEGs from the canonical per-story PNG masters.
+// Every published story must have article-images/<slug>.png; a missing or undersized master is a
 // publishing error, not an optional presentation state.
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, renameSync, rmSync, statSync } from 'node:fs';
@@ -114,7 +114,7 @@ function render(master, slug, specification) {
   }
 }
 
-// Slug identity and the complete essay/master inventory are proved before the first directory
+// Slug identity and the complete story/master inventory are proved before the first directory
 // creation, stale-output deletion, or image render. Article and route generation consume this same
 // authority, so two records can never silently address one deployed URL or image pair.
 const inventory = preflightPublishedArticleInventory({
@@ -125,7 +125,7 @@ if (!existsSync(SIPS)) throw new Error(`Required macOS image tool not found: ${S
 
 mkdirSync(OUTPUT_DIR, { recursive: true });
 
-console.log(`[images] preparing ${inventory.length} published essay images`);
+console.log(`[images] preparing ${inventory.length} published story images`);
 for (const { slug, masterPath: master } of inventory) {
   const hero = render(master, slug, HERO);
   const social = render(master, slug, SOCIAL);

@@ -108,6 +108,7 @@ export function routeForSourcePath(file) {
   const article = /^src\/app\/articles\/([^/]+)\.component\.ts$/u.exec(file)?.[1];
   if (article) return `/${article}/`;
   if (/^src\/app\/admin\//u.test(file)) return '/admin';
+  if (file === 'src/app/pages/videos.component.ts') return '/videos/';
   return '/';
 }
 

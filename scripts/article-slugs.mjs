@@ -5,7 +5,15 @@ import { DatabaseSync } from 'node:sqlite';
 
 const MAX_PUBLISHED_ARTICLES = 2_048;
 const MAX_RECORD_BYTES = 1024 * 1024;
-const RESERVED_ARTICLE_SLUGS = new Set(['about', 'api', 'assets', 'blog', 'healthz', 'admin']);
+const RESERVED_ARTICLE_SLUGS = new Set([
+  'about',
+  'api',
+  'assets',
+  'blog',
+  'videos',
+  'healthz',
+  'admin',
+]);
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
 const SHA256_PATTERN = /^[a-f0-9]{64}$/u;
 const PUBLISHED_AT_PATTERN =
@@ -25,24 +33,24 @@ export function isValidArticleSlug(slug) {
  * The one slug and inventory authority for site generation. It reads the published closure from
  * the article database — the authoring source that replaced the retired ghostwriter repository —
  * verifies each stored record against its content hash, and requires the canonical PNG master for
- * every published essay. Image preparation, article generation, route generation, and the
+ * every published story. Image preparation, article generation, route generation, and the
  * publication input digest all consume this same exact identity set.
  */
 export function preflightPublishedArticleInventory({ databasePath, imagesRoot }) {
   const images = requireCanonicalDirectory(imagesRoot, 'Wargr article-image masters');
   const rows = readPublishedRows(databasePath);
   if (rows.length === 0) {
-    throw new Error('Wargr publication inventory must contain at least one published essay.');
+    throw new Error('Wargr publication inventory must contain at least one published story.');
   }
   if (rows.length > MAX_PUBLISHED_ARTICLES) {
-    throw new Error(`Wargr publication exceeds ${MAX_PUBLISHED_ARTICLES} published essays.`);
+    throw new Error(`Wargr publication exceeds ${MAX_PUBLISHED_ARTICLES} published stories.`);
   }
 
   const bySlug = new Map();
   const inventory = rows.map((row) => {
     const record = parsePublishedRecord(row);
     if (bySlug.has(record.slug)) {
-      throw new Error(`Published essay slug collision for "${record.slug}".`);
+      throw new Error(`Published story slug collision for "${record.slug}".`);
     }
     bySlug.set(record.slug, record);
     const masterPath = path.join(images, `${record.slug}.png`);
@@ -76,50 +84,50 @@ export function readPublishedRows(databasePath) {
 
 function parsePublishedRecord(row) {
   if (!isValidArticleSlug(row.slug)) {
-    throw new Error(`Published essay slug is invalid or reserved: ${String(row.slug)}`);
+    throw new Error(`Published story slug is invalid or reserved: ${String(row.slug)}`);
   }
   if (typeof row.record_sha256 !== 'string' || !SHA256_PATTERN.test(row.record_sha256)) {
-    throw new Error(`Published essay ${row.slug} has an invalid stored record hash.`);
+    throw new Error(`Published story ${row.slug} has an invalid stored record hash.`);
   }
   const bytes = Buffer.from(row.record_json);
   if (bytes.length < 2 || bytes.length > MAX_RECORD_BYTES) {
-    throw new Error(`Published essay ${row.slug} has an out-of-bounds stored record.`);
+    throw new Error(`Published story ${row.slug} has an out-of-bounds stored record.`);
   }
   const digest = createHash('sha256').update(bytes).digest('hex');
   if (digest !== row.record_sha256) {
-    throw new Error(`Published essay ${row.slug} record hash does not match its stored bytes.`);
+    throw new Error(`Published story ${row.slug} record hash does not match its stored bytes.`);
   }
   let record;
   try {
     record = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes));
   } catch (error) {
-    throw new Error(`Published essay ${row.slug} record is not valid JSON.`, { cause: error });
+    throw new Error(`Published story ${row.slug} record is not valid JSON.`, { cause: error });
   }
   if (!record || typeof record !== 'object' || Array.isArray(record)) {
-    throw new Error(`Published essay ${row.slug} record must be a JSON object.`);
+    throw new Error(`Published story ${row.slug} record must be a JSON object.`);
   }
   if (record.slug !== row.slug || record.state !== 'published') {
-    throw new Error(`Published essay ${row.slug} record does not mirror its row identity.`);
+    throw new Error(`Published story ${row.slug} record does not mirror its row identity.`);
   }
-  requireText(record.title, `Published essay ${row.slug} title`, 1);
-  requireText(record.ingress, `Published essay ${row.slug} ingress`, 1);
-  requireText(record.body, `Published essay ${row.slug} body`, 1);
+  requireText(record.title, `Published story ${row.slug} title`, 1);
+  requireText(record.ingress, `Published story ${row.slug} ingress`, 1);
+  requireText(record.body, `Published story ${row.slug} body`, 1);
   if (
     typeof record.publishedAt !== 'string' ||
     !PUBLISHED_AT_PATTERN.test(record.publishedAt) ||
     record.publishedAt !== row.published_at
   ) {
-    throw new Error(`Published essay ${row.slug} has an invalid publish date of record.`);
+    throw new Error(`Published story ${row.slug} has an invalid publish date of record.`);
   }
   if (typeof record.updatedAt !== 'string' || Number.isNaN(Date.parse(record.updatedAt))) {
-    throw new Error(`Published essay ${row.slug} has an invalid modified date.`);
+    throw new Error(`Published story ${row.slug} has an invalid modified date.`);
   }
   if (
     !Array.isArray(record.tags) ||
     record.tags.length < 1 ||
     record.tags.some((tag) => typeof tag !== 'string' || !tag)
   ) {
-    throw new Error(`Published essay ${row.slug} must carry its tags.`);
+    throw new Error(`Published story ${row.slug} must carry its tags.`);
   }
   if (
     !Array.isArray(record.pullQuotes) ||
@@ -131,7 +139,7 @@ function parsePublishedRecord(row) {
         typeof quote.expansion !== 'string',
     )
   ) {
-    throw new Error(`Published essay ${row.slug} pull quotes are invalid.`);
+    throw new Error(`Published story ${row.slug} pull quotes are invalid.`);
   }
   return Object.freeze({
     slug: row.slug,

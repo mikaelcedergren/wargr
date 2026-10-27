@@ -7,7 +7,7 @@ import { isCxThemeMode, type CxThemeMode } from '@mikaelcedergren/cx-framework';
 export class Appearance {
   private readonly document = inject(DOCUMENT);
   private readonly readerValue = signal<'light' | 'night'>(
-    this.read('wg-theme') === 'night' ? 'night' : 'light',
+    this.read('wg-theme') === 'light' ? 'light' : 'night',
   );
   private readonly adminValue = signal<CxThemeMode>(this.readAdmin());
   public readonly reader = this.readerValue.asReadonly();
