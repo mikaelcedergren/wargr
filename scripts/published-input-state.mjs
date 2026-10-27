@@ -100,7 +100,7 @@ export function capturePublishedInputDigest({ databasePath, imagesRoot }) {
   if (!bufferArraysEqual(inventoryFiles.names, namesAfter)) {
     throw new Error('article-images input inventory changed while it was captured.');
   }
-  // The published closure is re-read after the image capture so a concurrent Studio publish or
+  // The published closure is re-read after the image capture so a concurrent Admin publish or
   // unpublish during capture refuses this digest instead of silently binding a mixed state.
   const closureAfter = preflightPublishedArticleInventory({
     databasePath,

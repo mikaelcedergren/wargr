@@ -23,13 +23,13 @@ test('the tracked essay snapshot is internally complete without its external aut
   );
   assert.ok(articleSlugs.length > 0, 'The tracked snapshot must contain at least one essay.');
 
-  // Public section routes and Studio are outside the essay slug set.
+  // Public section routes and Admin are outside the essay slug set.
   const routeSlugs = sorted(
     [...routes.matchAll(/^\s+path: '([^']+)',$/gm)]
       .map((match) => match[1])
-      .filter((slug) => !['**', 'studio', 'blog', 'about'].includes(slug)),
+      .filter((slug) => !['**', 'admin', 'blog', 'about'].includes(slug)),
   );
-  for (const page of ['studio', 'blog', 'about']) {
+  for (const page of ['admin', 'blog', 'about']) {
     assert.ok(routes.includes(`path: '${page}',`), `The generated routes must keep ${page}.`);
   }
   for (const page of ['blog', 'about']) {

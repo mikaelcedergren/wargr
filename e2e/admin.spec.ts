@@ -3,11 +3,43 @@ import { expect, test, type Page, type Route } from '@playwright/test';
 
 const origin = requiredEnvironment('CX_E2E_BASE_URL');
 
+test('admin sign-in rejects a wrong password and survives reload until logout', async ({
+  page,
+}) => {
+  await page.goto('/admin');
+  await expect(page).toHaveTitle('Admin — Wargr');
+  await page.getByRole('textbox', { name: 'Username', exact: true }).fill('admin');
+  await page.getByLabel('Password', { exact: true }).fill('incorrect-password');
+  const refused = page.waitForResponse((response) => response.url().endsWith('/api/admin/login'));
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  expect((await refused).status()).toBe(401);
+  await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toBeVisible();
+
+  await page.getByLabel('Password', { exact: true }).fill('dev');
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await expect(page.getByText('Wargr admin', { exact: true })).toBeVisible();
+  await page.reload();
+  await expect(page.getByText('Wargr admin', { exact: true })).toBeVisible();
+  expect(await (await page.request.get('/api/admin/session')).json()).toEqual({
+    authenticated: true,
+  });
+  await logout(page);
+  await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toBeVisible();
+  expect((await page.request.get('/api/admin/articles')).status()).toBe(401);
+});
+
+test('the retired CMS routes no longer serve a login or API', async ({ page, request }) => {
+  const response = await page.goto('/studio');
+  expect(response?.status()).toBe(404);
+  await expect(page.getByRole('heading', { name: 'Page not found' })).toBeVisible();
+  expect((await request.get('/api/studio/session')).status()).toBe(404);
+});
+
 test('a delayed save cannot replace the essay opened afterward', async ({ page }) => {
   const [first, second] = await openWorkspace(page);
   await openEssay(page, first.title);
   await page.getByRole('textbox', { name: 'Topic', exact: true }).fill('First essay edit');
-  const held = await holdResponse(page, `**/api/studio/articles/${first.id}`, 'PUT');
+  const held = await holdResponse(page, `**/api/admin/articles/${first.id}`, 'PUT');
   try {
     await page.getByRole('button', { name: 'Save', exact: true }).click();
     await held.received;
@@ -36,7 +68,7 @@ test('a save preserves address and document edits made while its response is pen
   const [article] = await openWorkspace(page);
   await openEssay(page, article.title);
   await page.getByRole('textbox', { name: 'Address', exact: true }).fill('submitted-address');
-  const held = await holdResponse(page, `**/api/studio/articles/${article.id}`, 'PUT');
+  const held = await holdResponse(page, `**/api/admin/articles/${article.id}`, 'PUT');
   try {
     await page.getByRole('button', { name: 'Save', exact: true }).click();
     await held.received;
@@ -61,7 +93,7 @@ test('a delayed version response cannot replace the newly opened essay draft', a
   const [first, second] = await openWorkspace(page);
   await openEssay(page, first.title);
   await page.getByRole('button', { name: 'Rounds', exact: true }).click();
-  const held = await holdResponse(page, `**/api/studio/articles/${first.id}/versions/1`, 'GET');
+  const held = await holdResponse(page, `**/api/admin/articles/${first.id}/versions/1`, 'GET');
   try {
     await page.getByRole('button', { name: 'Load into editor', exact: true }).click();
     await held.received;
@@ -84,7 +116,7 @@ test('a delayed version response cannot replace the newly opened essay draft', a
 test('a delayed publication refusal stays with its original editor', async ({ page }) => {
   const [first, second] = await openWorkspace(page);
   await openEssay(page, first.title);
-  const held = await holdResponse(page, `**/api/studio/articles/${first.id}/publish`, 'POST');
+  const held = await holdResponse(page, `**/api/admin/articles/${first.id}/publish`, 'POST');
   try {
     await page.getByRole('button', { name: 'Essay actions', exact: true }).click();
     await page.getByRole('menuitem', { name: 'Publish essay', exact: true }).click();
@@ -115,7 +147,7 @@ test('polish admission stops when its prerequisite save finishes in another edit
       admissions.push(request.url());
     }
   });
-  const held = await holdResponse(page, `**/api/studio/articles/${first.id}`, 'PUT');
+  const held = await holdResponse(page, `**/api/admin/articles/${first.id}`, 'PUT');
   try {
     await page.getByRole('button', { name: 'Run the ghostwriter', exact: true }).click();
     await held.received;
@@ -135,7 +167,7 @@ test('polish admission stops when its prerequisite save finishes in another edit
 test('a delayed polish refusal stays with its original editor', async ({ page }) => {
   const [first, second] = await openWorkspace(page);
   await openEssay(page, first.title);
-  const held = await holdResponse(page, `**/api/studio/articles/${first.id}/polish`, 'POST');
+  const held = await holdResponse(page, `**/api/admin/articles/${first.id}/polish`, 'POST');
   try {
     await page.getByRole('button', { name: 'Run the ghostwriter', exact: true }).click();
     await held.received;
@@ -163,9 +195,9 @@ test('a conflict reload cannot replace an essay opened while the reload was pend
 }) => {
   const [first, second] = await openWorkspace(page);
   await openEssay(page, first.title);
-  const read = await page.request.get(`/api/studio/articles/${first.id}`);
+  const read = await page.request.get(`/api/admin/articles/${first.id}`);
   const { article } = await read.json();
-  const changed = await page.request.put(`/api/studio/articles/${first.id}`, {
+  const changed = await page.request.put(`/api/admin/articles/${first.id}`, {
     headers: { Origin: origin },
     data: {
       expectedRevision: article.revision,
@@ -183,7 +215,7 @@ test('a conflict reload cannot replace an essay opened while the reload was pend
   });
   expect(changed.status()).toBe(200);
   await page.getByRole('textbox', { name: 'Topic', exact: true }).fill('Outdated edit');
-  const held = await holdResponse(page, `**/api/studio/articles/${first.id}`, 'GET');
+  const held = await holdResponse(page, `**/api/admin/articles/${first.id}`, 'GET');
   try {
     await page.getByRole('button', { name: 'Save', exact: true }).click();
     await held.received;
@@ -205,7 +237,7 @@ type Article = { id: string; title: string; topic: string; slug: string };
 for (const receipt of ['recovered', 'failed', 'http-error', 'succeeded'] as const) {
   test(`a delayed ${receipt} polish JSON receipt cannot alter another editor`, async ({ page }) => {
     const [first, second] = await openWorkspace(page);
-    const statusPath = `/api/studio/articles/${first.id}/polish/status`;
+    const statusPath = `/api/admin/articles/${first.id}/polish/status`;
     let statusRequests = 0;
     await page.route(`**${statusPath}`, async (route) => {
       statusRequests += 1;
@@ -230,7 +262,7 @@ for (const receipt of ['recovered', 'failed', 'http-error', 'succeeded'] as cons
     });
     const body = await holdJsonBody(
       page,
-      receipt === 'succeeded' ? `/api/studio/articles/${first.id}` : statusPath,
+      receipt === 'succeeded' ? `/api/admin/articles/${first.id}` : statusPath,
       receipt === 'recovered' ? 1 : 2,
     );
     try {
@@ -258,12 +290,12 @@ type JsonBodyGate = { ready: boolean; release: () => void };
 async function holdJsonBody(page: Page, path: string, occurrence: number) {
   await page.evaluate(
     ({ path, occurrence }) => {
-      const browser = window as typeof window & { studioJsonBodyGate?: JsonBodyGate };
+      const browser = window as typeof window & { adminJsonBodyGate?: JsonBodyGate };
       const originalFetch = browser.fetch.bind(browser);
       let release = () => {};
       const pending = new Promise<void>((resolve) => (release = resolve));
       const gate = { ready: false, release };
-      browser.studioJsonBodyGate = gate;
+      browser.adminJsonBodyGate = gate;
       let received = 0;
       browser.fetch = async (...args) => {
         const response = await originalFetch(...args);
@@ -284,14 +316,14 @@ async function holdJsonBody(page: Page, path: string, occurrence: number) {
     received: () =>
       page.waitForFunction(
         () =>
-          (window as typeof window & { studioJsonBodyGate?: JsonBodyGate }).studioJsonBodyGate
+          (window as typeof window & { adminJsonBodyGate?: JsonBodyGate }).adminJsonBodyGate
             ?.ready === true,
       ),
     release: () =>
       page.evaluate(async () => {
         (
-          window as typeof window & { studioJsonBodyGate?: JsonBodyGate }
-        ).studioJsonBodyGate?.release();
+          window as typeof window & { adminJsonBodyGate?: JsonBodyGate }
+        ).adminJsonBodyGate?.release();
         await new Promise<void>((resolve) => setTimeout(resolve, 0));
       }),
   };
@@ -307,7 +339,7 @@ for (const failure of ['http', 'network'] as const) {
     await openEssay(page, article.title);
     await page.getByRole('textbox', { name: 'Topic', exact: true }).fill('Unsaved author text');
     let rejected = false;
-    await page.route('**/api/studio/logout', async (route) => {
+    await page.route('**/api/admin/logout', async (route) => {
       if (rejected) {
         await route.fallback();
         return;
@@ -323,19 +355,19 @@ for (const failure of ['http', 'network'] as const) {
     await logout(page);
     await expect(
       page.getByText(
-        failure === 'http' ? 'Synthetic logout refusal.' : 'Studio could not sign out. Try again.',
+        failure === 'http' ? 'Synthetic logout refusal.' : 'Admin could not sign out. Try again.',
         { exact: true },
       ),
     ).toBeVisible();
     await expect(page.getByRole('textbox', { name: 'Topic', exact: true })).toHaveValue(
       'Unsaved author text',
     );
-    expect(await (await page.request.get('/api/studio/session')).json()).toEqual({
+    expect(await (await page.request.get('/api/admin/session')).json()).toEqual({
       authenticated: true,
     });
     await logout(page);
     await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toBeVisible();
-    expect(await (await page.request.get('/api/studio/session')).json()).toEqual({
+    expect(await (await page.request.get('/api/admin/session')).json()).toEqual({
       authenticated: false,
     });
     expect(errors).toEqual([]);
@@ -350,21 +382,21 @@ async function logout(page: Page): Promise<void> {
 }
 
 async function openWorkspace(page: Page): Promise<[Article, Article]> {
-  const login = await page.request.post('/api/studio/login', {
+  const login = await page.request.post('/api/admin/login', {
     headers: { Origin: origin },
-    data: { username: 'dev', password: 'dev' },
+    data: { username: 'admin', password: 'dev' },
   });
   expect(login.status()).toBe(200);
   const articles: Article[] = [];
   for (const name of ['First', 'Second']) {
-    const response = await page.request.post('/api/studio/articles', {
+    const response = await page.request.post('/api/admin/articles', {
       headers: { Origin: origin },
       data: { title: `${name} synthetic ${randomUUID()}` },
     });
     expect(response.status()).toBe(201);
     articles.push((await response.json()).article);
   }
-  await page.goto('/studio');
+  await page.goto('/admin');
   return articles as [Article, Article];
 }
 
@@ -374,7 +406,7 @@ async function openEssay(page: Page, title: string): Promise<void> {
 }
 
 async function readArticle(page: Page, id: string): Promise<Article> {
-  const response = await page.request.get(`/api/studio/articles/${id}`);
+  const response = await page.request.get(`/api/admin/articles/${id}`);
   expect(response.status()).toBe(200);
   return (await response.json()).article;
 }

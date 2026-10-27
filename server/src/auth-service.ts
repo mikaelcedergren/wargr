@@ -6,12 +6,12 @@ import { createSessionTokenCodec } from '@mikaelcedergren/cx-framework/server/se
 import { sha256Hex } from '@mikaelcedergren/cx-framework/server/signing';
 
 import {
-  STUDIO_SESSION_APPLICATION_ID,
-  STUDIO_SESSION_COOKIE,
-  STUDIO_SESSION_MAXIMUM_TTL_SECONDS,
-  STUDIO_SESSION_SIGNING_KEY_ID,
+  ADMIN_SESSION_APPLICATION_ID,
+  ADMIN_SESSION_COOKIE,
+  ADMIN_SESSION_MAXIMUM_TTL_SECONDS,
+  ADMIN_SESSION_SIGNING_KEY_ID,
 } from './constants.js';
-import { parseStudioPasswordHash, verifyStudioPassword } from './password-hash.js';
+import { parseAdminPasswordHash, verifyAdminPassword } from './password-hash.js';
 
 export interface PersistedOwnerSession {
   readonly createdAt: number;
@@ -81,19 +81,19 @@ export function createOwnerAuthService({
   sessionTtlSeconds,
 }: OwnerAuthServiceOptions): OwnerAuthService {
   validateCredential(expectedUsername, 'Expected owner username');
-  // The stored credential is the complete scrypt hash produced by `pnpm studio:password-hash`; the
+  // The stored credential is the complete scrypt hash produced by `pnpm admin:password-hash`; the
   // plaintext never reaches configuration or this service's construction.
-  parseStudioPasswordHash(expectedPasswordHash);
+  parseAdminPasswordHash(expectedPasswordHash);
   if (typeof cookieSecure !== 'boolean') {
     throw new Error('Owner session cookieSecure must be a boolean.');
   }
   if (
     !Number.isSafeInteger(sessionTtlSeconds) ||
     sessionTtlSeconds < 1 ||
-    sessionTtlSeconds > STUDIO_SESSION_MAXIMUM_TTL_SECONDS
+    sessionTtlSeconds > ADMIN_SESSION_MAXIMUM_TTL_SECONDS
   ) {
     throw new Error(
-      `Owner session ttlSeconds must be between 1 and ${String(STUDIO_SESSION_MAXIMUM_TTL_SECONDS)}.`,
+      `Owner session ttlSeconds must be between 1 and ${String(ADMIN_SESSION_MAXIMUM_TTL_SECONDS)}.`,
     );
   }
   if (!repository || typeof repository !== 'object') {
@@ -101,9 +101,9 @@ export function createOwnerAuthService({
   }
 
   const codec = createSessionTokenCodec({
-    activeKeyId: STUDIO_SESSION_SIGNING_KEY_ID,
-    applicationId: STUDIO_SESSION_APPLICATION_ID,
-    keys: [{ id: STUDIO_SESSION_SIGNING_KEY_ID, secret: sessionSecret }],
+    activeKeyId: ADMIN_SESSION_SIGNING_KEY_ID,
+    applicationId: ADMIN_SESSION_APPLICATION_ID,
+    keys: [{ id: ADMIN_SESSION_SIGNING_KEY_ID, secret: sessionSecret }],
     maximumTtlSeconds: sessionTtlSeconds,
     now,
   });
@@ -118,7 +118,7 @@ export function createOwnerAuthService({
       boundedCredential(username) &&
       boundedCredential(password) &&
       safeEqual(username, expectedUsername) &&
-      verifyStudioPassword(password, expectedPasswordHash);
+      verifyAdminPassword(password, expectedPasswordHash);
     if (!credentialsMatch) {
       const recorded = await repository.recordLoginFailure(clientKeyHash, currentTime);
       throwForThrottle(recorded);
@@ -144,7 +144,7 @@ export function createOwnerAuthService({
     if (created !== 'created') throwSessionCapacityError();
 
     return Object.freeze({
-      setCookie: serializeCookie(STUDIO_SESSION_COOKIE, issued.token, {
+      setCookie: serializeCookie(ADMIN_SESSION_COOKIE, issued.token, {
         httpOnly: true,
         maxAgeSeconds: sessionTtlSeconds,
         path: '/',
@@ -155,7 +155,7 @@ export function createOwnerAuthService({
   }
 
   async function resolve(header: CookieHeader): Promise<AuthenticatedOwnerSession | null> {
-    const claims = codec.readCookie(header, STUDIO_SESSION_COOKIE);
+    const claims = codec.readCookie(header, ADMIN_SESSION_COOKIE);
     if (!claims) return null;
     const sessionIdHash = hashSessionId(claims.sessionId);
     const stored = await repository.findSession(sessionIdHash);
@@ -210,10 +210,10 @@ export function createOwnerAuthService({
   }
 
   async function logout(header: CookieHeader): Promise<{ readonly setCookie: string }> {
-    const claims = codec.readCookie(header, STUDIO_SESSION_COOKIE);
+    const claims = codec.readCookie(header, ADMIN_SESSION_COOKIE);
     if (claims) await repository.deleteSession(hashSessionId(claims.sessionId));
     return Object.freeze({
-      setCookie: serializeCookie(STUDIO_SESSION_COOKIE, '', {
+      setCookie: serializeCookie(ADMIN_SESSION_COOKIE, '', {
         expires: new Date(0),
         httpOnly: true,
         maxAgeSeconds: 0,

@@ -143,7 +143,7 @@ test('route mapping is bounded and product-owned', () => {
     '/mercy-of-death/',
   );
   assert.equal(routeForSourcePath('src/app/pages/home.component.ts'), '/');
-  assert.equal(routeForSourcePath('src/app/studio/studio.component.ts'), '/studio');
+  assert.equal(routeForSourcePath('src/app/admin/admin.component.ts'), '/admin');
   assert.equal(routeForSourcePath('src/styles.scss'), '/');
   assert.equal(safeEvidenceName('/mercy-of-death/'), 'mercy-of-death');
 });

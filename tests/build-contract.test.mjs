@@ -14,7 +14,7 @@ test('clean development and production builds compile the tracked presentation s
   assert.equal(scripts.start, 'pnpm run start:web');
   assert.equal(scripts['start:web'], 'node server/dist/index.js');
   assert.equal(scripts['start:worker'], 'node server/dist/worker.js');
-  assert.equal(scripts['studio:password-hash'], 'node scripts/studio-password-hash.mjs');
+  assert.equal(scripts['admin:password-hash'], 'node scripts/admin-password-hash.mjs');
   assert.equal(scripts.build, 'pnpm run build:browser && pnpm run build:server');
   assert.equal(scripts['build:browser'], 'ng build --configuration prod');
   assert.equal(

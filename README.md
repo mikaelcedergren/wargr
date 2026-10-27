@@ -2,9 +2,9 @@
 
 Operational diagnostics follow the [shared logging policy](../SERVER-STANDARD.md#logs-and-bounded-storage). Web requests, admitted polish runs, provider receipts and committed results use opaque references. Polling emits bounded summaries, and storage health logs only failure and recovery transitions. Essay drafts, instructions, credentials and provider bodies stay out of logs. The [implementation plan](../LOGGING-IMPLEMENTATION-PLAN.md) tracks host capture activation separately from producer code.
 
-Michael Wargr's personal site — videos, essays, and an about page. Angular 22 SSG on cx-framework plus the private Studio, served by one
+Michael Wargr's personal site — videos, essays, and an about page. Angular 22 SSG on cx-framework plus the private Admin, served by one
 compiled TypeScript/Express web process on the Mac mini (port 3060) with a separate listener-free
-AI polish worker. Essays are authored in the Studio at `/studio` and stored in the article
+AI polish worker. Essays are authored in the Admin at `/admin` and stored in the article
 database (`data/wargr.db`); the sealed publisher regenerates the tracked presentation snapshot
 from the database's published closure. See [AGENTS.md](AGENTS.md).
 
@@ -25,7 +25,7 @@ polish results use separate execution scopes; neither dev startup nor a database
 the public site. Shared startup verifies the existing schema without seeding or migrating it.
 
 On the personal Mac, `cx wargr` selects `pnpm dev:owner` on the same ports. Its separate local
-Studio database lives under `data/owner-development/`; private files and AI polishing are disabled.
+Admin database lives under `data/owner-development/`; private files and AI polishing are disabled.
 
 ## Public site
 
@@ -46,23 +46,30 @@ public assets, so viewing the site makes no YouTube request until a visitor foll
 
 `/sitemap.xml` lists the canonical public pages and published essay hero images, and is advertised
 in `robots.txt`. Essay modification times come from the published records; section pages omit
-`lastmod` because they have no authoritative modification timestamp. Studio, API, and error routes
+`lastmod` because they have no authoritative modification timestamp. Admin, API, and error routes
 are excluded. The isolated browser check verifies every entry against its prerendered canonical
 URL, indexability, and image response.
 
-## The Studio
+## Admin
 
-`/studio` is the owner's writing room: essay drafts, the ghostwriter polish loop (four rewrite
+`/admin` is the owner's writing room: essay drafts, the ghostwriter polish loop (four rewrite
 intensities carrying the ported voice contract), a bounded round history per essay, and the
 publish/unpublish switch. It authenticates one owner (scrypt-hashed password in the web role's
-`.env.web`), runs over the typed `/api/studio` contract with compare-and-swap revisions, and is
+`.env.web`), runs over the typed `/api/admin` contract with compare-and-swap revisions, and is
 never indexed. AI rounds run as durable jobs in the worker process, which alone holds
 `OPENAI_API_KEY` (in `.env.worker`); paid provider work is fenced by idempotent effect receipts so
 a crash never buys the same round twice.
 
+Sign in as `admin` using the password configured in `.env.web`. Set
+`WARGR_STUDIO_USERNAME=admin` and generate `WARGR_STUDIO_PASSWORD_HASH` with
+`pnpm admin:password-hash`. These credential key names remain stable because development and
+installed production roles share the file. The generic `.env` file is not loaded.
+After changing credentials, restart the registered development service to load them;
+production adopts them on its next explicitly authorized restart or release.
+
 ## Publishing
 
-Publishing in the Studio changes only the database. The site changes through the sealed publisher:
+Publishing in the Admin changes only the database. The site changes through the sealed publisher:
 its input digest covers exactly the published records (content-derived hashes and publish dates)
 and the canonical `article-images/<slug>.png` master bytes — drafts, polish rounds, and session
 writes never trigger a rebuild. The locked transaction renders the complete image/source snapshot

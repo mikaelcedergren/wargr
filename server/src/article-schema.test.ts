@@ -43,7 +43,7 @@ test('reserved and malformed slugs are rejected', () => {
   for (const slug of [
     'about',
     'blog',
-    'studio',
+    'admin',
     'api',
     'healthz',
     'assets',

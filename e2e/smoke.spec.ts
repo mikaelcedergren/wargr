@@ -97,22 +97,22 @@ test('the server identity endpoint reports the selected synthetic release', asyn
   });
 });
 
-test('the Studio stays private: noindexed shell, anonymous session, guarded API', async ({
+test('the Admin stays private: noindexed shell, anonymous session, guarded API', async ({
   page,
   request,
 }) => {
-  const shell = await page.goto('/studio');
+  const shell = await page.goto('/admin');
   expect(shell?.ok()).toBeTruthy();
   expect(shell?.headers()['x-robots-tag']).toBe('noindex, nofollow');
-  await expect(page).toHaveTitle('Studio — Wargr');
+  await expect(page).toHaveTitle('Admin — Wargr');
   await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Primary' })).toHaveCount(0);
 
-  const session = await request.get('/api/studio/session');
+  const session = await request.get('/api/admin/session');
   expect(session.ok()).toBeTruthy();
   expect(await session.json()).toEqual({ authenticated: false });
 
-  const articles = await request.get('/api/studio/articles', { failOnStatusCode: false });
+  const articles = await request.get('/api/admin/articles', { failOnStatusCode: false });
   expect(articles.status()).toBe(401);
 });
 
@@ -253,7 +253,7 @@ test('the sitemap exposes only canonical, prerendered public pages and crawlable
     const url = new URL(entry.url);
     expect(url.origin).toBe('https://wargr.com');
     expect(url.pathname).toMatch(/\/$/);
-    expect(url.pathname).not.toMatch(/^\/(studio|api|healthz)(\/|$)/);
+    expect(url.pathname).not.toMatch(/^\/(admin|api|healthz)(\/|$)/);
     const documentResponse = await request.get(url.pathname, { maxRedirects: 0 });
     expect(documentResponse.status(), entry.url).toBe(200);
     expect(documentResponse.headers()['x-robots-tag'] ?? '').not.toContain('noindex');

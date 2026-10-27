@@ -107,7 +107,7 @@ function uniqueRoutes(routes, fallback = '/') {
 export function routeForSourcePath(file) {
   const article = /^src\/app\/articles\/([^/]+)\.component\.ts$/u.exec(file)?.[1];
   if (article) return `/${article}/`;
-  if (/^src\/app\/studio\//u.test(file)) return '/studio';
+  if (/^src\/app\/admin\//u.test(file)) return '/admin';
   return '/';
 }
 

@@ -2,10 +2,10 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { createOwnerAuthService, type PersistentOwnerAuthRepository } from './auth-service.js';
-import { hashStudioPassword } from './password-hash.js';
+import { hashAdminPassword } from './password-hash.js';
 
 const password = 'Synthetic password-()!';
-const passwordHash = hashStudioPassword(password);
+const passwordHash = hashAdminPassword(password);
 
 function fixture(expectedUsername = 'synthetic-owner') {
   const calls = { reads: 0, failures: 0, sessions: 0 };
@@ -50,7 +50,7 @@ test('owner authentication accepts hyphenated usernames and safe password punctu
     password,
     clientKey: 'validation-client',
   });
-  assert.match(response.setCookie, /^wg_studio_session=/);
+  assert.match(response.setCookie, /^wg_admin_session=/);
   assert.deepEqual(calls, { reads: 1, failures: 0, sessions: 1 });
 });
 

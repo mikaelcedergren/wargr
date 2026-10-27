@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Generates the Angular pages + routes for wargr.com from the article database — the Studio
+// Generates the Angular pages + routes for wargr.com from the article database — the Admin
 // authoring source that replaced the retired ghostwriter repository. Only articles in the
 // published state enter the site; drafts and their round history never leave the database.
 //
@@ -235,7 +235,7 @@ function pascal(slug) {
     .join('');
 }
 // The record's own publish date is the date of record: it travels with the essay, so every machine
-// builds the same dates. The record's modified date is Studio's last accepted write. A date-only
+// builds the same dates. The record's modified date is Admin's last accepted write. A date-only
 // value normalises to noon UTC so it renders as the same calendar day in every timezone.
 function articleDates(record) {
   let published = record.publishedAt;
@@ -565,10 +565,10 @@ export const routes: Routes = [
     data: { section: 'about', seo: { path: '/about/', description: 'About Michael Wargr, who makes videos and writes essays on philosophy, ethics, and human nature.' } satisfies PageSeo },
   },
   {
-    path: 'studio',
-    loadComponent: () => import('./studio/studio.component').then((m) => m.StudioComponent),
-    title: 'Studio — Wargr',
-    data: { chrome: 'bare', seo: { path: '/studio', description: 'Wargr Studio.', noindex: true } satisfies PageSeo },
+    path: 'admin',
+    loadComponent: () => import('./admin/admin.component').then((m) => m.AdminComponent),
+    title: 'Admin — Wargr',
+    data: { chrome: 'bare', seo: { path: '/admin', description: 'Wargr admin.', noindex: true } satisfies PageSeo },
   },
 ${entries.join('\n')}
   {
@@ -646,7 +646,7 @@ function writeSitemapAndRobots(articles) {
   writeFileSync(join(OUTPUT_ROOT, 'public', 'sitemap.xml'), sitemap);
   writeFileSync(
     join(OUTPUT_ROOT, 'public', 'robots.txt'),
-    `User-agent: *\nAllow: /\nDisallow: /studio\nDisallow: /api/\nSitemap: ${SITE_ORIGIN}/sitemap.xml\n`,
+    `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nSitemap: ${SITE_ORIGIN}/sitemap.xml\n`,
   );
 }
 

@@ -119,7 +119,7 @@ type ApiError = {
 };
 
 const DEFAULT_THEME: CxThemeMode = 'night';
-const THEME_STORAGE_KEY = 'wg-studio-theme';
+const THEME_STORAGE_KEY = 'wg-admin-theme';
 
 const POLISH_MODE_OPTIONS: CxDropdownOption[] = [
   {
@@ -194,7 +194,7 @@ function emptyDocument(): ArticleDocument {
 }
 
 @Component({
-  selector: 'wg-studio',
+  selector: 'wg-admin',
   imports: [
     CxAccountControlComponent,
     CxAlertComponent,
@@ -218,12 +218,12 @@ function emptyDocument(): ArticleDocument {
     CxTextFieldComponent,
     CxTopBarComponent,
   ],
-  templateUrl: './studio.component.html',
-  styleUrl: './studio.component.scss',
+  templateUrl: './admin.component.html',
+  styleUrl: './admin.component.scss',
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StudioComponent implements OnInit, OnDestroy {
+export class AdminComponent implements OnInit, OnDestroy {
   private readonly document = inject(DOCUMENT);
   private readonly browser = isPlatformBrowser(inject(PLATFORM_ID));
   private pollSequence = 0;
@@ -376,9 +376,9 @@ export class StudioComponent implements OnInit, OnDestroy {
 
   protected readonly navGroups: CxSideNavGroup[] = [
     {
-      id: 'studio',
-      label: 'Studio',
-      items: [{ id: 'essays', label: 'Essays', icon: 'edit', routerLink: ['/studio'] }],
+      id: 'admin',
+      label: 'Admin',
+      items: [{ id: 'essays', label: 'Essays', icon: 'edit', routerLink: ['/admin'] }],
     },
   ];
 
@@ -438,7 +438,7 @@ export class StudioComponent implements OnInit, OnDestroy {
 
     this.submitting.set(true);
     try {
-      const response = await this.request('/api/studio/login', {
+      const response = await this.request('/api/admin/login', {
         method: 'POST',
         body: { username, password },
       });
@@ -452,7 +452,7 @@ export class StudioComponent implements OnInit, OnDestroy {
               ? 'Too many sign-in attempts. Try again later.'
               : await this.apiErrorMessage(
                   response,
-                  'Studio cannot be reached right now. Try again.',
+                  'Admin cannot be reached right now. Try again.',
                 ),
         );
         return;
@@ -461,7 +461,7 @@ export class StudioComponent implements OnInit, OnDestroy {
       this.password.set('');
       await this.loadWorkspace();
     } catch {
-      this.requestError.set('Studio cannot be reached right now. Try again.');
+      this.requestError.set('Admin cannot be reached right now. Try again.');
     } finally {
       this.submitting.set(false);
     }
@@ -471,11 +471,11 @@ export class StudioComponent implements OnInit, OnDestroy {
     if (this.submitting()) return;
     this.submitting.set(true);
     try {
-      const response = await this.request('/api/studio/logout', { method: 'POST' });
+      const response = await this.request('/api/admin/logout', { method: 'POST' });
       if (!response.ok) {
         const message = await this.apiErrorMessage(
           response,
-          'Studio could not sign out. Try again.',
+          'Admin could not sign out. Try again.',
         );
         (this.view() === 'editor' ? this.editorError : this.listError).set(message);
         return;
@@ -485,11 +485,11 @@ export class StudioComponent implements OnInit, OnDestroy {
       this.username.set('');
       this.password.set('');
       this.requestError.set('');
-      this.resetStudio();
+      this.resetAdmin();
       queueMicrotask(() => this.usernameField?.focus());
     } catch {
       (this.view() === 'editor' ? this.editorError : this.listError).set(
-        'Studio could not sign out. Try again.',
+        'Admin could not sign out. Try again.',
       );
     } finally {
       this.submitting.set(false);
@@ -524,7 +524,7 @@ export class StudioComponent implements OnInit, OnDestroy {
     }
     this.creating.set(true);
     try {
-      const response = await this.request('/api/studio/articles', {
+      const response = await this.request('/api/admin/articles', {
         method: 'POST',
         body: { title },
       });
@@ -543,7 +543,7 @@ export class StudioComponent implements OnInit, OnDestroy {
       await this.refreshArticles();
       if (payload.article) this.openLoadedArticle(payload.article);
     } catch {
-      this.newTitleValidation.set('Studio cannot be reached right now. Try again.');
+      this.newTitleValidation.set('Admin cannot be reached right now. Try again.');
     } finally {
       this.creating.set(false);
     }
@@ -578,7 +578,7 @@ export class StudioComponent implements OnInit, OnDestroy {
     const sequence = ++this.pollSequence;
     this.listError.set('');
     try {
-      const response = await this.request(`/api/studio/articles/${id}`);
+      const response = await this.request(`/api/admin/articles/${id}`);
       if (sequence !== this.pollSequence) return;
       if (response.status === 401) {
         this.expireSession();
@@ -603,7 +603,7 @@ export class StudioComponent implements OnInit, OnDestroy {
       await this.recoverPolishWork(payload.article.id);
     } catch {
       if (sequence !== this.pollSequence) return;
-      this.listError.set('Studio cannot be reached right now. Try again.');
+      this.listError.set('Admin cannot be reached right now. Try again.');
     }
   }
 
@@ -708,7 +708,7 @@ export class StudioComponent implements OnInit, OnDestroy {
     slug: string,
   ): Promise<void> {
     try {
-      const response = await this.request(`/api/studio/articles/${saved.id}`, {
+      const response = await this.request(`/api/admin/articles/${saved.id}`, {
         method: 'PUT',
         body:
           slug === saved.slug
@@ -741,13 +741,13 @@ export class StudioComponent implements OnInit, OnDestroy {
       }
     } catch {
       if (!this.isCurrentEditor(saved.id, sequence)) return;
-      this.editorError.set('Studio cannot be reached right now. The text stays here unsaved.');
+      this.editorError.set('Admin cannot be reached right now. The text stays here unsaved.');
     }
   }
 
   private async reloadArticle(id: string, sequence = this.pollSequence): Promise<void> {
     try {
-      const response = await this.request(`/api/studio/articles/${id}`);
+      const response = await this.request(`/api/admin/articles/${id}`);
       if (!response.ok) return;
       const payload = (await response.json()) as { article?: Article };
       if (!this.isCurrentEditor(id, sequence)) return;
@@ -787,7 +787,7 @@ export class StudioComponent implements OnInit, OnDestroy {
     this.polishing.set(true);
     try {
       const instruction = this.polishInstruction().trim();
-      const response = await this.request(`/api/studio/articles/${saved.id}/polish`, {
+      const response = await this.request(`/api/admin/articles/${saved.id}/polish`, {
         method: 'POST',
         body: {
           expectedRevision: saved.revision,
@@ -811,7 +811,7 @@ export class StudioComponent implements OnInit, OnDestroy {
       void this.pollPolish(saved.id, ++this.pollSequence);
     } catch {
       if (!this.isCurrentEditor(saved.id, sequence)) return;
-      this.polishError.set('Studio cannot be reached right now. Try again.');
+      this.polishError.set('Admin cannot be reached right now. Try again.');
       this.polishing.set(false);
     }
   }
@@ -819,7 +819,7 @@ export class StudioComponent implements OnInit, OnDestroy {
   private async pollPolish(articleId: string, sequence: number): Promise<void> {
     while (sequence === this.pollSequence) {
       try {
-        const response = await this.request(`/api/studio/articles/${articleId}/polish/status`);
+        const response = await this.request(`/api/admin/articles/${articleId}/polish/status`);
         if (sequence !== this.pollSequence) return;
         if (response.status === 401) {
           this.expireSession();
@@ -862,7 +862,7 @@ export class StudioComponent implements OnInit, OnDestroy {
 
   private async applyPolishedArticle(articleId: string, sequence: number): Promise<void> {
     try {
-      const response = await this.request(`/api/studio/articles/${articleId}`);
+      const response = await this.request(`/api/admin/articles/${articleId}`);
       if (sequence !== this.pollSequence) return;
       if (!response.ok) {
         this.polishError.set('The polished essay could not be loaded. Reload the page.');
@@ -887,7 +887,7 @@ export class StudioComponent implements OnInit, OnDestroy {
   private async recoverPolishWork(articleId: string): Promise<void> {
     const sequence = this.pollSequence;
     try {
-      const response = await this.request(`/api/studio/articles/${articleId}/polish/status`);
+      const response = await this.request(`/api/admin/articles/${articleId}/polish/status`);
       if (sequence !== this.pollSequence || !this.authenticated()) return;
       if (!response.ok) return;
       const payload = (await response.json()) as { status?: PolishStatus };
@@ -947,7 +947,7 @@ export class StudioComponent implements OnInit, OnDestroy {
     this.publishProblems.set([]);
     this.editorError.set('');
     try {
-      const response = await this.request(`/api/studio/articles/${saved.id}/${action}`, {
+      const response = await this.request(`/api/admin/articles/${saved.id}/${action}`, {
         method: 'POST',
         body: { expectedRevision: saved.revision },
       });
@@ -985,7 +985,7 @@ export class StudioComponent implements OnInit, OnDestroy {
       await this.refreshArticles();
     } catch {
       if (!this.isCurrentEditor(saved.id, sequence)) return;
-      this.editorError.set('Studio cannot be reached right now. Try again.');
+      this.editorError.set('Admin cannot be reached right now. Try again.');
     }
   }
 
@@ -999,7 +999,7 @@ export class StudioComponent implements OnInit, OnDestroy {
     if (!target) return;
     let deleted = false;
     try {
-      const response = await this.request(`/api/studio/articles/${target.id}`, {
+      const response = await this.request(`/api/admin/articles/${target.id}`, {
         method: 'DELETE',
         headers: { 'If-Match': `"${String(target.revision)}"` },
       });
@@ -1033,7 +1033,7 @@ export class StudioComponent implements OnInit, OnDestroy {
     const sequence = this.pollSequence;
     try {
       const response = await this.request(
-        `/api/studio/articles/${current.id}/versions/${String(version.articleVersion)}`,
+        `/api/admin/articles/${current.id}/versions/${String(version.articleVersion)}`,
       );
       if (!this.isCurrentEditor(current.id, sequence)) return;
       if (!response.ok) {
@@ -1051,7 +1051,7 @@ export class StudioComponent implements OnInit, OnDestroy {
       );
     } catch {
       if (!this.isCurrentEditor(current.id, sequence)) return;
-      this.editorError.set('Studio cannot be reached right now. Try again.');
+      this.editorError.set('Admin cannot be reached right now. Try again.');
     }
   }
 
@@ -1120,7 +1120,7 @@ export class StudioComponent implements OnInit, OnDestroy {
 
   private async restoreSession(): Promise<void> {
     try {
-      const response = await this.request('/api/studio/session');
+      const response = await this.request('/api/admin/session');
       if (!response.ok) return;
       const payload = (await response.json()) as AuthResponse;
       this.authenticated.set(payload.authenticated === true);
@@ -1136,7 +1136,7 @@ export class StudioComponent implements OnInit, OnDestroy {
 
   private async refreshArticles(): Promise<void> {
     try {
-      const response = await this.request('/api/studio/articles');
+      const response = await this.request('/api/admin/articles');
       if (!response.ok) return;
       const payload = (await response.json()) as { articles?: ArticleSummary[] };
       this.articles.set(payload.articles ?? []);
@@ -1147,7 +1147,7 @@ export class StudioComponent implements OnInit, OnDestroy {
 
   private async refreshVersions(articleId: string): Promise<void> {
     try {
-      const response = await this.request(`/api/studio/articles/${articleId}/versions`);
+      const response = await this.request(`/api/admin/articles/${articleId}/versions`);
       if (!response.ok || this.article()?.id !== articleId) return;
       const payload = (await response.json()) as { versions?: ArticleVersionSummary[] };
       if (this.article()?.id === articleId) this.versions.set(payload.versions ?? []);
@@ -1160,7 +1160,7 @@ export class StudioComponent implements OnInit, OnDestroy {
     this.pollSequence += 1;
     this.authenticated.set(false);
     this.requestError.set('Your session expired. Sign in again.');
-    this.resetStudio();
+    this.resetAdmin();
   }
 
   private async apiErrorMessage(response: Response, fallback: string): Promise<string> {
@@ -1176,7 +1176,7 @@ export class StudioComponent implements OnInit, OnDestroy {
     return 'The polish could not be started right now. Try again.';
   }
 
-  private resetStudio(): void {
+  private resetAdmin(): void {
     this.view.set('list');
     this.articles.set([]);
     this.article.set(undefined);

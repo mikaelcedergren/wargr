@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
-Disallow: /studio
+Disallow: /admin
 Disallow: /api/
 Sitemap: https://wargr.com/sitemap.xml

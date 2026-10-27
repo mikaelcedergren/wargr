@@ -5,7 +5,7 @@ import { DatabaseSync } from 'node:sqlite';
 
 const MAX_PUBLISHED_ARTICLES = 2_048;
 const MAX_RECORD_BYTES = 1024 * 1024;
-const RESERVED_ARTICLE_SLUGS = new Set(['about', 'api', 'assets', 'blog', 'healthz', 'studio']);
+const RESERVED_ARTICLE_SLUGS = new Set(['about', 'api', 'assets', 'blog', 'healthz', 'admin']);
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
 const SHA256_PATTERN = /^[a-f0-9]{64}$/u;
 const PUBLISHED_AT_PATTERN =

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Generate the scrypt hash for the Studio owner password. The plaintext is read interactively
+// Generate the scrypt hash for the Admin owner password. The plaintext is read interactively
 // from the terminal (never from arguments, so it stays out of shell history and process lists),
 // and the complete `scrypt$…` output is what belongs in `.env.web` as WARGR_STUDIO_PASSWORD_HASH.
 import { randomBytes, scryptSync } from 'node:crypto';
@@ -14,12 +14,12 @@ const KEY_BYTES = 32;
 
 if (argv.length > 2) {
   console.error(
-    'studio-password-hash reads the password interactively; do not pass it as an argument.',
+    'admin-password-hash reads the password interactively; do not pass it as an argument.',
   );
   exit(64);
 }
 
-const password = await readHidden('Studio password: ');
+const password = await readHidden('Admin password: ');
 if (!password || password.length > 256 || /[\u0000-\u001f\u007f]/u.test(password)) {
   console.error('The password must contain between 1 and 256 characters without control codes.');
   exit(65);

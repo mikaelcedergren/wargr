@@ -87,8 +87,8 @@ export async function startWargrServer({
   try {
     const authService = createOwnerAuthService({
       cookieSecure: environment.cookieSecure,
-      expectedPasswordHash: environment.studioPasswordHash,
-      expectedUsername: environment.studioUsername,
+      expectedPasswordHash: environment.adminPasswordHash,
+      expectedUsername: environment.adminUsername,
       repository: persistence.ownerAuth,
       sessionSecret: environment.sessionSecret,
       sessionTtlSeconds: environment.sessionTtlSeconds,

@@ -17,12 +17,12 @@ import { randomBase64UrlIdentifier } from '@mikaelcedergren/cx-framework/server/
 
 import {
   DEFAULT_OPENAI_MODEL,
-  STUDIO_SESSION_DEFAULT_TTL_SECONDS,
-  STUDIO_SESSION_MAXIMUM_TTL_SECONDS,
+  ADMIN_SESSION_DEFAULT_TTL_SECONDS,
+  ADMIN_SESSION_MAXIMUM_TTL_SECONDS,
   WARGR_PUBLIC_ORIGIN,
   WARGR_WWW_ORIGIN,
 } from './constants.js';
-import { hashStudioPassword, parseStudioPasswordHash } from './password-hash.js';
+import { hashAdminPassword, parseAdminPasswordHash } from './password-hash.js';
 
 export const WARGR_MANIFEST_FILE = fileURLToPath(new URL('../../cx-product.json', import.meta.url));
 export const WARGR_ARTIFACT_ROOT = path.dirname(WARGR_MANIFEST_FILE);
@@ -48,8 +48,8 @@ export interface WargrEnvironment extends WargrBaseEnvironment {
   readonly port: number;
   readonly sessionSecret: string;
   readonly sessionTtlSeconds: number;
-  readonly studioPasswordHash: string;
-  readonly studioUsername: string;
+  readonly adminPasswordHash: string;
+  readonly adminUsername: string;
 }
 
 export interface WargrWorkerEnvironment extends WargrBaseEnvironment {
@@ -61,8 +61,8 @@ export interface WargrWorkerEnvironment extends WargrBaseEnvironment {
 
 export type WargrEnvironmentRole = 'web' | 'worker';
 
-const DEVELOPMENT_STUDIO_USERNAME = 'dev';
-const DEVELOPMENT_STUDIO_PASSWORD = 'dev';
+const DEVELOPMENT_ADMIN_USERNAME = 'admin';
+const DEVELOPMENT_ADMIN_PASSWORD = 'dev';
 const DEVELOPMENT_SESSION_SECRET = 'wargr-local-development-session-secret';
 
 let developmentPasswordHash: string | undefined;
@@ -174,24 +174,24 @@ export function loadWargrEnvironment(
 
   // Validation owns no operator credential: fresh unreachable values keep the real auth stack
   // composable without turning development defaults into a release-validation bypass.
-  const studioUsername = releaseValidation
+  const adminUsername = releaseValidation
     ? randomBase64UrlIdentifier(32)
     : exactSecret(
         environment,
         'WARGR_STUDIO_USERNAME',
-        execution.dataMode === 'shared' ? undefined : DEVELOPMENT_STUDIO_USERNAME,
+        execution.dataMode === 'shared' ? undefined : DEVELOPMENT_ADMIN_USERNAME,
       );
-  if (studioUsername.length > 256) {
+  if (adminUsername.length > 256) {
     throw new Error('WARGR_STUDIO_USERNAME must contain at most 256 characters.');
   }
-  const studioPasswordHash = releaseValidation
-    ? hashStudioPassword(randomBase64UrlIdentifier(32))
+  const adminPasswordHash = releaseValidation
+    ? hashAdminPassword(randomBase64UrlIdentifier(32))
     : exactSecret(
         environment,
         'WARGR_STUDIO_PASSWORD_HASH',
-        execution.dataMode === 'shared' ? undefined : developmentStudioPasswordHash(),
+        execution.dataMode === 'shared' ? undefined : developmentAdminPasswordHash(),
       );
-  parseStudioPasswordHash(studioPasswordHash);
+  parseAdminPasswordHash(adminPasswordHash);
   const sessionSecret = releaseValidation
     ? randomBase64UrlIdentifier(32)
     : exactSecret(
@@ -202,10 +202,10 @@ export function loadWargrEnvironment(
   if (sessionSecret.length < 32) {
     throw new Error('WARGR_STUDIO_SESSION_SECRET must contain at least 32 characters.');
   }
-  const sessionTtlSeconds = integerEnvironmentValue(environment, 'STUDIO_SESSION_TTL_SECONDS', {
-    fallback: STUDIO_SESSION_DEFAULT_TTL_SECONDS,
+  const sessionTtlSeconds = integerEnvironmentValue(environment, 'ADMIN_SESSION_TTL_SECONDS', {
+    fallback: ADMIN_SESSION_DEFAULT_TTL_SECONDS,
     minimum: 1,
-    maximum: STUDIO_SESSION_MAXIMUM_TTL_SECONDS,
+    maximum: ADMIN_SESSION_MAXIMUM_TTL_SECONDS,
   });
   const browserDirectory = path.join(operationalRoot, 'dist', 'browser');
   const browserDirectoryOverride = optionalExactValue(environment, 'SITE_BROWSER_DIR');
@@ -236,8 +236,8 @@ export function loadWargrEnvironment(
     port: port!,
     sessionSecret,
     sessionTtlSeconds,
-    studioPasswordHash,
-    studioUsername,
+    adminPasswordHash,
+    adminUsername,
   });
 }
 
@@ -255,8 +255,8 @@ function developmentLoopbackOrigins(appOrigin: string): readonly string[] {
   return [appOrigin, normalizeHttpOrigin(sibling.origin)];
 }
 
-function developmentStudioPasswordHash(): string {
-  developmentPasswordHash ??= hashStudioPassword(DEVELOPMENT_STUDIO_PASSWORD);
+function developmentAdminPasswordHash(): string {
+  developmentPasswordHash ??= hashAdminPassword(DEVELOPMENT_ADMIN_PASSWORD);
   return developmentPasswordHash;
 }
 

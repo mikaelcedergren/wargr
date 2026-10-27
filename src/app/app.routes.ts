@@ -22,10 +22,10 @@ export const routes: Routes = [
     data: { section: 'about', seo: { path: '/about/', description: 'About Michael Wargr, who makes videos and writes essays on philosophy, ethics, and human nature.' } satisfies PageSeo },
   },
   {
-    path: 'studio',
-    loadComponent: () => import('./studio/studio.component').then((m) => m.StudioComponent),
-    title: 'Studio — Wargr',
-    data: { chrome: 'bare', seo: { path: '/studio', description: 'Wargr Studio.', noindex: true } satisfies PageSeo },
+    path: 'admin',
+    loadComponent: () => import('./admin/admin.component').then((m) => m.AdminComponent),
+    title: 'Admin — Wargr',
+    data: { chrome: 'bare', seo: { path: '/admin', description: 'Wargr admin.', noindex: true } satisfies PageSeo },
   },
   {
     path: 'mercy-of-death',

@@ -1,26 +1,22 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import {
-  hashStudioPassword,
-  parseStudioPasswordHash,
-  verifyStudioPassword,
-} from './password-hash.js';
+import { hashAdminPassword, parseAdminPasswordHash, verifyAdminPassword } from './password-hash.js';
 
 test('a hashed password verifies and every other password fails', () => {
-  const stored = hashStudioPassword('correct horse battery staple');
+  const stored = hashAdminPassword('correct horse battery staple');
   assert.match(stored, /^scrypt\$16384\$8\$1\$[A-Za-z0-9_-]+\$[A-Za-z0-9_-]+$/);
-  assert.equal(verifyStudioPassword('correct horse battery staple', stored), true);
-  assert.equal(verifyStudioPassword('correct horse battery stapl', stored), false);
-  assert.equal(verifyStudioPassword('', stored), false);
+  assert.equal(verifyAdminPassword('correct horse battery staple', stored), true);
+  assert.equal(verifyAdminPassword('correct horse battery stapl', stored), false);
+  assert.equal(verifyAdminPassword('', stored), false);
 });
 
 test('two hashes of one password differ by salt but both verify', () => {
-  const first = hashStudioPassword('dev');
-  const second = hashStudioPassword('dev');
+  const first = hashAdminPassword('dev');
+  const second = hashAdminPassword('dev');
   assert.notEqual(first, second);
-  assert.equal(verifyStudioPassword('dev', first), true);
-  assert.equal(verifyStudioPassword('dev', second), true);
+  assert.equal(verifyAdminPassword('dev', first), true);
+  assert.equal(verifyAdminPassword('dev', second), true);
 });
 
 test('malformed stored hashes are rejected before any comparison', () => {
@@ -31,6 +27,6 @@ test('malformed stored hashes are rejected before any comparison', () => {
     'bcrypt$whatever',
     '',
   ]) {
-    assert.throws(() => parseStudioPasswordHash(bad));
+    assert.throws(() => parseAdminPasswordHash(bad));
   }
 });

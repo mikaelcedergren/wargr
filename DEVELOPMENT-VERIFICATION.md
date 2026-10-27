@@ -18,11 +18,11 @@ pnpm verify:change --full
 
 - Documentation uses formatting only.
 - Presentation changes use formatting, types, a production browser build, and the affected real
-  article, Studio, or home route in the already-running local product on port `4260`.
+  article, Admin, or home route in the already-running local product on port `4260`.
 - Changes to the tracked generated article snapshot additionally run the repository's build and
   snapshot contracts. They never read the article database.
 - E2E changes run the isolated repository-owned E2E command.
-- Dependencies, repository authority, server and Studio server code, image masters, content
+- Dependencies, repository authority, server and Admin server code, image masters, content
   generation/transaction and publisher machinery, installers, service/release definitions, and
   this verifier's trust implementation use the complete `pnpm check` gate.
 - Unclassified source changes fail conservatively into the complete gate.

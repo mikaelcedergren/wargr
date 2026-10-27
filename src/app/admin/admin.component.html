@@ -1,26 +1,23 @@
 @if (authenticated()) {
-  <section class="wg-studio-workspace" aria-label="Wargr studio">
+  <section class="wg-admin-workspace" aria-label="Wargr admin">
     <button
-      class="wg-studio-workspace__scrim"
-      [class.wg-studio-workspace__scrim--visible]="mobileNavOpen()"
+      class="wg-admin-workspace__scrim"
+      [class.wg-admin-workspace__scrim--visible]="mobileNavOpen()"
       type="button"
-      aria-label="Dismiss studio menu"
+      aria-label="Dismiss admin menu"
       (click)="closeMobileNav()"
     ></button>
 
-    <div
-      class="wg-studio-workspace__nav"
-      [class.wg-studio-workspace__nav--visible]="mobileNavOpen()"
-    >
+    <div class="wg-admin-workspace__nav" [class.wg-admin-workspace__nav--visible]="mobileNavOpen()">
       <cx-side-nav [groups]="navGroups" (itemSelect)="closeMobileNav()">
-        <div header class="wg-studio-brand">
+        <div header class="wg-admin-brand">
           <cx-icon icon="edit" size="24" mood="primary" shape="square-subtle" />
-          <span>Wargr studio</span>
-          <span class="wg-studio-brand__close cx-hide-desktop">
+          <span>Wargr admin</span>
+          <span class="wg-admin-brand__close cx-hide-desktop">
             <cx-icon-button
               icon="sidebar-left"
               variant="transparent"
-              ariaLabel="Close studio menu"
+              ariaLabel="Close admin menu"
               (pressed)="closeMobileNav()"
             />
           </span>
@@ -37,7 +34,7 @@
       </cx-side-nav>
     </div>
 
-    <section class="wg-studio-workspace__main cx-page">
+    <section class="wg-admin-workspace__main cx-page">
       <cx-top-bar
         [pageTitle]="{
           kind: 'heading',
@@ -48,11 +45,11 @@
         menuAriaLabel="Essay actions"
         (menuItemSelect)="onEditorMenu($event)"
       >
-        <div actions class="wg-studio-top-bar-actions">
+        <div actions class="wg-admin-top-bar-actions">
           <span class="cx-hide-desktop">
             <cx-icon-button
               icon="sidebar-left"
-              ariaLabel="Open studio menu"
+              ariaLabel="Open admin menu"
               [selected]="mobileNavOpen()"
               [ariaPressed]="mobileNavOpen()"
               (pressed)="toggleMobileNav()"
@@ -85,7 +82,7 @@
         </div>
       </cx-top-bar>
 
-      <div class="cx-page__content wg-studio-content">
+      <div class="cx-page__content wg-admin-content">
         @switch (view()) {
           @case ('list') {
             @if (listError()) {
@@ -115,13 +112,13 @@
 
           @case ('editor') {
             @if (article(); as current) {
-              <div class="wg-studio-editor">
-                <div class="wg-studio-editor__main">
+              <div class="wg-admin-editor">
+                <div class="wg-admin-editor__main">
                   <cx-stack gap="xl" gapMobile="lg">
                     @if (editorError()) {
                       <cx-alert mood="danger" [heading]="editorError()">
                         @if (publishProblems().length > 0) {
-                          <ul class="wg-studio-problems">
+                          <ul class="wg-admin-problems">
                             @for (problem of publishProblems(); track $index) {
                               <li>{{ problem }}</li>
                             }
@@ -133,7 +130,7 @@
                       <cx-alert mood="success" [heading]="editorNotice()" />
                     }
 
-                    <section class="wg-studio-section" aria-label="Essay">
+                    <section class="wg-admin-section" aria-label="Essay">
                       <cx-stack gap="lg">
                         <cx-text-field
                           label="Title"
@@ -158,9 +155,9 @@
                           [disabled]="polishing()"
                           (valueChange)="updateDraftField('ingress', $event)"
                         />
-                        <div class="wg-studio-body-field">
-                          <span class="wg-studio-field-label">Body</span>
-                          <div class="wg-studio-body-editor">
+                        <div class="wg-admin-body-field">
+                          <span class="wg-admin-field-label">Body</span>
+                          <div class="wg-admin-body-editor">
                             <cx-markdown-editor
                               ariaLabel="Essay body"
                               presentation="document"
@@ -185,9 +182,9 @@
                       </cx-stack>
                     </section>
 
-                    <section class="wg-studio-section" aria-label="Publishing furniture">
+                    <section class="wg-admin-section" aria-label="Publishing furniture">
                       <h2>Publishing furniture</h2>
-                      <p class="wg-studio-prose">
+                      <p class="wg-admin-prose">
                         The ghostwriter writes all of this alongside the essay. Publishing requires
                         10–20 tags, three social posts, two or three pull quotes and three image
                         prompts.
@@ -203,9 +200,9 @@
                           (valuesChange)="updateTags($event)"
                         />
 
-                        <div class="wg-studio-list-block">
+                        <div class="wg-admin-list-block">
                           <cx-inline gap="sm" justify="between">
-                            <span class="wg-studio-field-label">Social posts</span>
+                            <span class="wg-admin-field-label">Social posts</span>
                             <cx-icon-button
                               icon="plus"
                               variant="transparent"
@@ -215,7 +212,7 @@
                             />
                           </cx-inline>
                           @for (post of draft().socialPosts; track $index) {
-                            <div class="wg-studio-list-row">
+                            <div class="wg-admin-list-row">
                               <cx-text-area
                                 [label]="'Post ' + ($index + 1)"
                                 hint="Within 280 characters. No numbering, no title."
@@ -236,9 +233,9 @@
                           }
                         </div>
 
-                        <div class="wg-studio-list-block">
+                        <div class="wg-admin-list-block">
                           <cx-inline gap="sm" justify="between">
-                            <span class="wg-studio-field-label">Pull quotes</span>
+                            <span class="wg-admin-field-label">Pull quotes</span>
                             <cx-icon-button
                               icon="plus"
                               variant="transparent"
@@ -248,7 +245,7 @@
                             />
                           </cx-inline>
                           @for (quote of draft().pullQuotes; track $index) {
-                            <div class="wg-studio-list-row">
+                            <div class="wg-admin-list-row">
                               <cx-stack gap="sm">
                                 <cx-text-field
                                   [label]="'Hook ' + ($index + 1)"
@@ -276,9 +273,9 @@
                           }
                         </div>
 
-                        <div class="wg-studio-list-block">
+                        <div class="wg-admin-list-block">
                           <cx-inline gap="sm" justify="between">
-                            <span class="wg-studio-field-label">Image prompts</span>
+                            <span class="wg-admin-field-label">Image prompts</span>
                             <cx-icon-button
                               icon="plus"
                               variant="transparent"
@@ -288,7 +285,7 @@
                             />
                           </cx-inline>
                           @for (prompt of draft().imagePrompts; track $index) {
-                            <div class="wg-studio-list-row">
+                            <div class="wg-admin-list-row">
                               <cx-text-area
                                 [label]="'Prompt ' + ($index + 1)"
                                 hint="Begins with “Create a”. Colour photography, no text in the image."
@@ -313,7 +310,7 @@
                   </cx-stack>
                 </div>
 
-                <aside class="wg-studio-editor__side" aria-label="The ghostwriter">
+                <aside class="wg-admin-editor__side" aria-label="The ghostwriter">
                   <cx-card heading="The ghostwriter" icon="ai">
                     <cx-stack gap="md">
                       @if (polishError()) {
@@ -326,7 +323,7 @@
                           description="The round is safely queued and survives leaving this page. The result replaces the essay when it lands."
                         />
                       } @else {
-                        <p class="wg-studio-prose">
+                        <p class="wg-admin-prose">
                           Pick how settled the current text is, then run a round. Your edits are
                           read as meaning, not wording; run round after round until the essay is
                           true.
@@ -350,7 +347,7 @@
                           (valueChange)="updatePolishInstruction($event)"
                         />
                         <cx-button
-                          class="wg-studio-run"
+                          class="wg-admin-run"
                           text="Run the ghostwriter"
                           icon="bolt"
                           mood="primary"
@@ -367,7 +364,7 @@
                       <cx-stack gap="sm">
                         @for (version of versions(); track version.articleVersion) {
                           <cx-inline gap="md" justify="between">
-                            <span class="wg-studio-meta">
+                            <span class="wg-admin-meta">
                               {{ version.articleVersion }} · {{ versionLabel(version) }}
                             </span>
                             <cx-button
@@ -437,10 +434,10 @@
     (dismiss)="cancelDelete()"
   />
 } @else {
-  <section class="wg-studio-login" aria-label="Wargr studio">
-    <cx-card class="wg-studio-login__panel" heading="Wargr studio" icon="lock">
+  <section class="wg-admin-login" aria-label="Wargr admin">
+    <cx-card class="wg-admin-login__panel" heading="Wargr admin" icon="lock">
       <cx-stack gap="lg">
-        <p class="wg-studio-prose">Sign in to write.</p>
+        <p class="wg-admin-prose">Sign in to write.</p>
 
         <form aria-label="Sign in" (submit)="onSubmit($event)">
           <cx-stack gap="md">
@@ -471,7 +468,7 @@
             />
 
             <cx-button
-              class="wg-studio-login__submit"
+              class="wg-admin-login__submit"
               text="Sign in"
               mood="primary"
               icon="lock-open"

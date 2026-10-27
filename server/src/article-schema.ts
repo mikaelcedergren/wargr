@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 
 /**
- * The structured essay record. Studio replaced the retired ghostwriter markdown files as the
+ * The structured essay record. Admin replaced the retired ghostwriter markdown files as the
  * authoring source: one record carries the same content the markdown format carried — title,
  * internal topic line, ingress, body markdown, tags, social posts, pull quotes, and thumbnail
  * prompts. Draft validation enforces only bounded shapes so raw notes stay welcome; the publish
@@ -23,7 +23,7 @@ export const ARTICLE_VERSION_SOURCES = Object.freeze(['author', 'polish', 'impor
 export type ArticleVersionSource = (typeof ARTICLE_VERSION_SOURCES)[number];
 
 export const RESERVED_ARTICLE_SLUGS = Object.freeze(
-  new Set(['about', 'api', 'assets', 'blog', 'healthz', 'studio']),
+  new Set(['about', 'api', 'assets', 'blog', 'healthz', 'admin']),
 );
 
 export const MAX_TITLE_CHARACTERS = 300;

@@ -18,7 +18,7 @@ const serverIdentityFile = path.join(
 );
 
 test(
-  'the compiled entrypoint pins its artifact manifest and serves the essay-site and Studio contract',
+  'the compiled entrypoint pins its artifact manifest and serves the essay-site and Admin contract',
   { timeout: 20_000 },
   async (t) => {
     const entrypointSource = await readFile(
@@ -47,11 +47,11 @@ test(
       path.join(articleDir, 'index.html'),
       '<!doctype html><title>Corruption fixture</title>',
     );
-    const studioDir = path.join(browserDir, 'studio');
-    await mkdir(studioDir, { recursive: true });
+    const adminDir = path.join(browserDir, 'admin');
+    await mkdir(adminDir, { recursive: true });
     await writeFile(
-      path.join(studioDir, 'index.html'),
-      '<!doctype html><title>Studio fixture</title>',
+      path.join(adminDir, 'index.html'),
+      '<!doctype html><title>Admin fixture</title>',
     );
     await writeFile(
       path.join(browserDir, 'main-0123456789abcdef.js'),
@@ -162,46 +162,46 @@ test(
     assert.match(missingProductRoute.headers.get('content-type') ?? '', /^text\/html/);
     assert.match(await missingProductRoute.text(), /wargr-product-404/);
 
-    // Studio is served but never indexed, and its API refuses anonymous access outright.
-    const studioRoute = await localFetch(`${origin}/studio`);
-    assert.equal(studioRoute.status, 200);
-    assert.equal(studioRoute.headers.get('x-robots-tag'), 'noindex, nofollow');
-    assert.match(await studioRoute.text(), /Studio fixture/);
+    // Admin is served but never indexed, and its API refuses anonymous access outright.
+    const adminRoute = await localFetch(`${origin}/admin`);
+    assert.equal(adminRoute.status, 200);
+    assert.equal(adminRoute.headers.get('x-robots-tag'), 'noindex, nofollow');
+    assert.match(await adminRoute.text(), /Admin fixture/);
 
-    const anonymousSession = await localFetch(`${origin}/api/studio/session`);
+    const anonymousSession = await localFetch(`${origin}/api/admin/session`);
     assert.equal(anonymousSession.status, 200);
     assert.equal(anonymousSession.headers.get('cache-control'), 'private, no-store');
     assert.equal(anonymousSession.headers.get('x-robots-tag'), 'noindex, nofollow');
     assert.deepEqual(await anonymousSession.json(), { authenticated: false });
 
-    const anonymousArticles = await localFetch(`${origin}/api/studio/articles`);
+    const anonymousArticles = await localFetch(`${origin}/api/admin/articles`);
     assert.equal(anonymousArticles.status, 401);
 
-    const wrongLogin = await localFetch(`${origin}/api/studio/login`, {
-      body: JSON.stringify({ password: 'wrong-password', username: 'dev' }),
+    const wrongLogin = await localFetch(`${origin}/api/admin/login`, {
+      body: JSON.stringify({ password: 'wrong-password', username: 'admin' }),
       headers: { 'Content-Type': 'application/json', Origin: origin },
       method: 'POST',
     });
     assert.equal(wrongLogin.status, 401);
 
-    const login = await localFetch(`${origin}/api/studio/login`, {
-      body: JSON.stringify({ password: 'dev', username: 'dev' }),
+    const login = await localFetch(`${origin}/api/admin/login`, {
+      body: JSON.stringify({ password: 'dev', username: 'admin' }),
       headers: { 'Content-Type': 'application/json', Origin: origin },
       method: 'POST',
     });
     assert.equal(login.status, 200);
     const setCookie = login.headers.get('set-cookie') ?? '';
-    assert.match(setCookie, /^wg_studio_session=/);
+    assert.match(setCookie, /^wg_admin_session=/);
     assert.match(setCookie, /HttpOnly/);
     assert.match(setCookie, /SameSite=Strict/);
     const cookie = setCookie.split(';')[0];
 
-    const session = await localFetch(`${origin}/api/studio/session`, {
+    const session = await localFetch(`${origin}/api/admin/session`, {
       headers: { Cookie: cookie },
     });
     assert.deepEqual(await session.json(), { authenticated: true });
 
-    const created = await localFetch(`${origin}/api/studio/articles`, {
+    const created = await localFetch(`${origin}/api/admin/articles`, {
       body: JSON.stringify({ title: 'A working title' }),
       headers: { 'Content-Type': 'application/json', Cookie: cookie, Origin: origin },
       method: 'POST',
@@ -212,14 +212,14 @@ test(
     assert.equal(createdPayload.article.state, 'draft');
     assert.equal(createdPayload.article.revision, 1);
 
-    const listed = await localFetch(`${origin}/api/studio/articles`, {
+    const listed = await localFetch(`${origin}/api/admin/articles`, {
       headers: { Cookie: cookie },
     });
     assert.equal(listed.status, 200);
     const listedPayload = await listed.json();
     assert.equal(listedPayload.articles.length, 1);
 
-    const updated = await localFetch(`${origin}/api/studio/articles/${createdPayload.article.id}`, {
+    const updated = await localFetch(`${origin}/api/admin/articles/${createdPayload.article.id}`, {
       body: JSON.stringify({
         document: {
           body: 'Something honest, however raw.',
@@ -241,7 +241,7 @@ test(
     assert.equal(updatedPayload.article.revision, 2);
 
     const staleUpdate = await localFetch(
-      `${origin}/api/studio/articles/${createdPayload.article.id}`,
+      `${origin}/api/admin/articles/${createdPayload.article.id}`,
       {
         body: JSON.stringify({
           document: {
@@ -263,7 +263,7 @@ test(
     assert.equal(staleUpdate.status, 409);
 
     const incompletePublish = await localFetch(
-      `${origin}/api/studio/articles/${createdPayload.article.id}/publish`,
+      `${origin}/api/admin/articles/${createdPayload.article.id}/publish`,
       {
         body: JSON.stringify({ expectedRevision: 2 }),
         headers: { 'Content-Type': 'application/json', Cookie: cookie, Origin: origin },
@@ -275,7 +275,7 @@ test(
     assert.ok(Array.isArray(publishPayload.error.details.problems));
 
     const polishUnavailable = await localFetch(
-      `${origin}/api/studio/articles/${createdPayload.article.id}/polish`,
+      `${origin}/api/admin/articles/${createdPayload.article.id}/polish`,
       {
         body: JSON.stringify({ expectedRevision: 2, mode: 'rough' }),
         headers: { 'Content-Type': 'application/json', Cookie: cookie, Origin: origin },
@@ -289,7 +289,7 @@ test(
       database.exec(
         "CREATE TRIGGER synthetic_insert_failure BEFORE INSERT ON articles BEGIN SELECT RAISE(ABORT, 'PRIVATE synthetic insert failed'); END",
       );
-      const failed = await localFetch(`${origin}/api/studio/articles`, {
+      const failed = await localFetch(`${origin}/api/admin/articles`, {
         body: JSON.stringify({ title: 'PRIVATE draft must not reach logs' }),
         headers: {
           'Content-Type': 'application/json',
