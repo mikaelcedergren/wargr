@@ -28,6 +28,7 @@ export function mountWargrBrowser(
   environment: WargrEnvironment,
   browserServing: BrowserServing,
 ): void {
+  app.get('/blog', (_request, response) => response.redirect(301, '/'));
   app.use(browserServing.staticMiddleware(staticFileOptions()));
   if (browserServing.useReleaseHistory) {
     app.use(retainedReleaseAssetMiddleware({ repoRoot: environment.operationalRoot }));

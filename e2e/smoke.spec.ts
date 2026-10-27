@@ -116,6 +116,14 @@ test('the Admin stays private: noindexed shell, anonymous session, guarded API',
   expect(articles.status()).toBe(401);
 });
 
+test('the former blog index redirects to Home at the server', async ({ request }) => {
+  for (const route of ['/blog', '/blog/']) {
+    const response = await request.get(route, { maxRedirects: 0 });
+    expect(response.status()).toBe(301);
+    expect(response.headers()['location']).toBe('/');
+  }
+});
+
 test('the checked-in story snapshot renders from the tracked presentation source alone', async ({
   page,
 }) => {

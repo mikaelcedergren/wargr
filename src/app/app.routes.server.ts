@@ -1,4 +1,7 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
 
-/** Prerender every route to static HTML at build time (SSG). */
-export const serverRoutes: ServerRoute[] = [{ path: '**', renderMode: RenderMode.Prerender }];
+/** The web server redirects the former index; content pages remain prerendered. */
+export const serverRoutes: ServerRoute[] = [
+  { path: 'blog', renderMode: RenderMode.Client },
+  { path: '**', renderMode: RenderMode.Prerender },
+];
