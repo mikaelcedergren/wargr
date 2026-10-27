@@ -31,11 +31,9 @@
     <script>
       try {
         var savedTheme = localStorage.getItem('wg-theme');
-        if (savedTheme === 'night' || savedTheme === 'dark') {
+        if (savedTheme === 'night') {
           document.documentElement.classList.remove('theme-light');
-          document.documentElement.classList.remove('theme-dark');
           document.documentElement.classList.add('theme-night');
-          if (savedTheme === 'dark') localStorage.setItem('wg-theme', 'night');
         }
       } catch (e) {}
     </script>

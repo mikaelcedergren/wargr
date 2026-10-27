@@ -1,9 +1,9 @@
-import { DOCUMENT, isPlatformBrowser } from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  PLATFORM_ID,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -11,12 +11,15 @@ import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 import {
+  CX_THEMES,
   CxIconButtonComponent,
   CxNavigationRecoveryComponent,
   CxMastheadComponent,
   CxInlineComponent,
   type CxMastheadItem,
 } from '@mikaelcedergren/cx-framework';
+
+import { Appearance } from './shared/appearance';
 
 @Component({
   selector: 'wg-root',
@@ -33,7 +36,7 @@ import {
 })
 export class AppComponent {
   private readonly doc = inject(DOCUMENT);
-  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly appearance = inject(Appearance);
   private readonly router = inject(Router);
   protected readonly year = new Date().getFullYear();
   private readonly page = signal(this.pageData());
@@ -46,12 +49,16 @@ export class AppComponent {
   /** Private routes own their viewport without public navigation. */
   protected readonly bare = computed(() => this.page()['chrome'] === 'bare');
 
-  /** Light is the default; the pre-paint script in index.html may have switched to night already. */
-  protected readonly night = signal(
-    this.isBrowser && this.doc.documentElement.classList.contains('theme-night'),
-  );
+  protected readonly night = computed(() => this.appearance.reader() === 'night');
 
   public constructor() {
+    effect(() => {
+      const mode = this.bare() ? this.appearance.admin() : this.appearance.reader();
+      for (const theme of CX_THEMES) {
+        this.doc.documentElement.classList.toggle(`theme-${theme.id}`, theme.id === mode);
+      }
+    });
+
     this.router.events
       .pipe(
         filter((event) => event instanceof NavigationEnd),
@@ -61,17 +68,7 @@ export class AppComponent {
   }
 
   protected toggleTheme(): void {
-    const next = !this.night();
-    this.night.set(next);
-    const root = this.doc.documentElement;
-    root.classList.remove('theme-dark');
-    root.classList.toggle('theme-night', next);
-    root.classList.toggle('theme-light', !next);
-    try {
-      localStorage.setItem('wg-theme', next ? 'night' : 'light');
-    } catch {
-      /* storage blocked (private mode) — the toggle still works for this session */
-    }
+    this.appearance.toggleReader();
   }
 
   private pageData() {

@@ -3,8 +3,8 @@
 @use '@mikaelcedergren/cx-framework/styles/page';
 
 // The global stylesheet already carries the framework fonts, base reset and tokens for the public
-// reading skin. This layer adds only Admin's page composition — the application shell and column
-// placement. Every visual decision below reads a token; no component internals are reached into.
+// reading skin. Framework patterns own navigation and the editor sidebar; these rules place
+// product content without reaching into component internals.
 
 wg-admin {
   display: block;
@@ -18,8 +18,7 @@ wg-admin {
   min-height: 100dvh;
   place-items: center;
   padding: var(--space-lg);
-  background:
-    radial-gradient(circle at 50% 0%, var(--primary-opacity), transparent 34rem), var(--surface);
+  background: var(--surface);
 }
 
 .wg-admin-login__panel {
@@ -33,64 +32,12 @@ wg-admin {
 /* Application shell */
 
 .wg-admin-workspace {
-  display: grid;
-  width: 100%;
-  height: 100dvh;
-  grid-template-columns: 232px minmax(0, 1fr);
-  overflow: hidden;
+  min-height: 100dvh;
   background: var(--surface);
-}
-
-.wg-admin-workspace__nav {
-  position: relative;
-  z-index: var(--z-index-nav-overlay);
-  width: 232px;
-  height: 100dvh;
-  min-height: 0;
-}
-
-.wg-admin-workspace__nav cx-side-nav {
-  height: 100%;
-}
-
-.wg-admin-brand {
-  display: flex;
-  width: 100%;
-  min-width: 0;
-  align-items: center;
-  gap: var(--space-sm);
-  padding-inline: var(--space-xs);
-  color: var(--ink);
-  font-size: var(--font-size-title-3);
-  font-weight: var(--font-weight-bold);
-}
-
-.wg-admin-brand__close {
-  margin-left: auto;
-}
-
-.wg-admin-workspace__main {
-  height: 100dvh;
-  min-height: 0;
-  overflow: auto;
-  background: var(--surface);
-  overscroll-behavior: contain;
 }
 
 .wg-admin-content {
   max-width: var(--measure-xl);
-}
-
-.wg-admin-workspace__scrim {
-  display: none;
-}
-
-/* The top bar's trailing control cluster. One wrapper keeps conditional actions projectable. */
-
-.wg-admin-top-bar-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
 }
 
 /* Text roles */
@@ -137,30 +84,6 @@ wg-admin {
   gap: var(--space-2xs);
 }
 
-/* Editor: the essay column plus the sticky ghostwriter rail on the right. The rail follows the
-   author down the piece; when it outgrows the viewport it scrolls inside its own sticky box. */
-
-.wg-admin-editor {
-  display: grid;
-  align-items: start;
-  gap: var(--space-lg);
-  grid-template-columns: minmax(0, 1fr) 320px;
-}
-
-.wg-admin-editor__main {
-  min-width: 0;
-}
-
-.wg-admin-editor__side {
-  position: sticky;
-  top: var(--space-lg);
-  display: grid;
-  gap: var(--space-md);
-  max-height: calc(100dvh - var(--space-lg) * 2);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
 .wg-admin-run {
   width: 100%;
 }
@@ -191,52 +114,8 @@ wg-admin {
 }
 
 @media (max-width: #{bp.$mobile - 1px}) {
-  .wg-admin-workspace {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .wg-admin-workspace__nav {
-    position: fixed;
-    inset: 0 auto 0 0;
-    transform: translateX(-100%);
-    transition: transform var(--motion-slow) var(--ease-out-strong);
-  }
-
-  .wg-admin-workspace__nav--visible {
-    transform: translateX(0);
-  }
-
-  .wg-admin-workspace__scrim {
-    position: fixed;
-    z-index: var(--z-index-nav-overlay-backdrop);
-    inset: 0;
-    display: block;
-    padding: 0;
-    border: 0;
-    background: var(--overlay-backdrop);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity var(--motion-base) ease;
-  }
-
-  .wg-admin-workspace__scrim--visible {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
   .wg-admin-login {
     align-items: start;
     padding: var(--space-md);
-  }
-
-  .wg-admin-editor {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .wg-admin-editor__side {
-    position: static;
-    order: -1;
-    max-height: none;
-    overflow: visible;
   }
 }

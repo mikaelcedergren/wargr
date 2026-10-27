@@ -21,11 +21,11 @@ import {
   CxDropdownComponent,
   CxExpansionPanelComponent,
   CxIconButtonComponent,
-  CxIconComponent,
   CxInlineComponent,
   CxMarkdownEditorComponent,
   CxPasswordFieldComponent,
-  CxSideNavComponent,
+  CxMastheadComponent,
+  CxSidebarLayoutComponent,
   CxStackComponent,
   CxStateMessageComponent,
   CxTableComponent,
@@ -36,19 +36,20 @@ import {
   type CxDropdownOption,
   type CxFieldValidation,
   type CxMenuItem,
-  type CxSideNavGroup,
+  type CxMastheadItem,
   type CxStateMessageAction,
   type CxTableColumn,
   type CxTableRow,
   type CxTableRowActivateEvent,
   type CxTableRowMenuSelectEvent,
-  type CxThemeMode,
   CX_THEMES,
   CX_THEME_ICONS,
   CX_THEME_LABELS,
   cxThemeStartsGroup,
   isCxThemeMode,
 } from '@mikaelcedergren/cx-framework';
+
+import { Appearance } from '../shared/appearance';
 
 type AuthResponse = { authenticated?: boolean; ok?: boolean };
 
@@ -117,9 +118,6 @@ type ApiError = {
     details?: { currentRevision?: number; problems?: string[] };
   };
 };
-
-const DEFAULT_THEME: CxThemeMode = 'night';
-const THEME_STORAGE_KEY = 'wg-admin-theme';
 
 const POLISH_MODE_OPTIONS: CxDropdownOption[] = [
   {
@@ -205,11 +203,11 @@ function emptyDocument(): ArticleDocument {
     CxDropdownComponent,
     CxExpansionPanelComponent,
     CxIconButtonComponent,
-    CxIconComponent,
     CxInlineComponent,
     CxMarkdownEditorComponent,
     CxPasswordFieldComponent,
-    CxSideNavComponent,
+    CxMastheadComponent,
+    CxSidebarLayoutComponent,
     CxStackComponent,
     CxStateMessageComponent,
     CxTableComponent,
@@ -270,7 +268,6 @@ export class AdminComponent implements OnInit, OnDestroy {
   protected readonly newTitleValidation = signal<CxFieldValidation | undefined>(undefined);
   protected readonly creating = signal(false);
   protected readonly pendingDelete = signal<ArticleSummary | undefined>(undefined);
-  protected readonly mobileNavOpen = signal(false);
 
   protected readonly polishModeOptions = POLISH_MODE_OPTIONS;
   protected readonly articleColumns = ARTICLE_COLUMNS;
@@ -351,7 +348,8 @@ export class AdminComponent implements OnInit, OnDestroy {
     return 'Write rough, polish in the voice, publish when it is true.';
   });
 
-  protected readonly theme = signal<CxThemeMode>(DEFAULT_THEME);
+  private readonly appearance = inject(Appearance);
+  protected readonly theme = this.appearance.admin;
 
   protected readonly accountMenu = computed<CxMenuItem[]>(() => {
     const current = this.theme();
@@ -374,28 +372,18 @@ export class AdminComponent implements OnInit, OnDestroy {
     ];
   });
 
-  protected readonly navGroups: CxSideNavGroup[] = [
-    {
-      id: 'admin',
-      label: 'Admin',
-      items: [{ id: 'essays', label: 'Essays', icon: 'edit', routerLink: ['/admin'] }],
-    },
+  protected readonly navigation: CxMastheadItem[] = [
+    { id: 'essays', label: 'Essays', routerLink: ['/admin'] },
   ];
-
-  public constructor() {
-    this.applyTheme(this.theme());
-  }
 
   public ngOnInit(): void {
     if (this.browser) {
-      this.restoreTheme();
       void this.restoreSession();
     }
   }
 
   public ngOnDestroy(): void {
     this.pollSequence += 1;
-    this.document.documentElement.classList.remove(`theme-${this.theme()}`);
   }
 
   /* Sign in */
@@ -1084,38 +1072,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     if (itemId === 'logout') return;
     const mode = itemId.startsWith('theme:') ? itemId.slice('theme:'.length) : '';
     if (!isCxThemeMode(mode)) return;
-    this.applyTheme(mode);
-    try {
-      this.document.defaultView?.localStorage.setItem(THEME_STORAGE_KEY, mode);
-    } catch {
-      // A blocked storage quota must not stop the theme from applying for this session.
-    }
-  }
-
-  protected closeMobileNav(): void {
-    this.mobileNavOpen.set(false);
-  }
-
-  protected toggleMobileNav(): void {
-    this.mobileNavOpen.update((open) => !open);
-  }
-
-  private applyTheme(mode: CxThemeMode): void {
-    const root = this.document.documentElement;
-    for (const definition of CX_THEMES) {
-      root.classList.toggle(`theme-${definition.id}`, definition.id === mode);
-    }
-    this.theme.set(mode);
-  }
-
-  private restoreTheme(): void {
-    let stored: string | null = null;
-    try {
-      stored = this.document.defaultView?.localStorage.getItem(THEME_STORAGE_KEY) ?? null;
-    } catch {
-      stored = null;
-    }
-    this.applyTheme(isCxThemeMode(stored) ? stored : DEFAULT_THEME);
+    this.appearance.selectAdmin(mode);
   }
 
   private async restoreSession(): Promise<void> {
@@ -1196,7 +1153,6 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.newTitle.set('');
     this.creating.set(false);
     this.pendingDelete.set(undefined);
-    this.mobileNavOpen.set(false);
   }
 
   private request(

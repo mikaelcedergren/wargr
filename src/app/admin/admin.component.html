@@ -1,40 +1,18 @@
 @if (authenticated()) {
   <section class="wg-admin-workspace" aria-label="Wargr admin">
-    <button
-      class="wg-admin-workspace__scrim"
-      [class.wg-admin-workspace__scrim--visible]="mobileNavOpen()"
-      type="button"
-      aria-label="Dismiss admin menu"
-      (click)="closeMobileNav()"
-    ></button>
+    <cx-masthead heading="Wargr admin" logo="edit" [items]="navigation" (itemSelect)="showList()">
+      <cx-account-control
+        actions
+        username="Michael Wargr"
+        [collapsed]="true"
+        [disabled]="submitting()"
+        [menuItems]="accountMenu()"
+        (itemSelect)="onAccountMenu($event)"
+        (logout)="signOut()"
+      />
+    </cx-masthead>
 
-    <div class="wg-admin-workspace__nav" [class.wg-admin-workspace__nav--visible]="mobileNavOpen()">
-      <cx-side-nav [groups]="navGroups" (itemSelect)="closeMobileNav()">
-        <div header class="wg-admin-brand">
-          <cx-icon icon="edit" size="24" mood="primary" shape="square-subtle" />
-          <span>Wargr admin</span>
-          <span class="wg-admin-brand__close cx-hide-desktop">
-            <cx-icon-button
-              icon="sidebar-left"
-              variant="transparent"
-              ariaLabel="Close admin menu"
-              (pressed)="closeMobileNav()"
-            />
-          </span>
-        </div>
-
-        <cx-account-control
-          footer
-          username="Michael Wargr"
-          [disabled]="submitting()"
-          [menuItems]="accountMenu()"
-          (itemSelect)="onAccountMenu($event)"
-          (logout)="signOut()"
-        />
-      </cx-side-nav>
-    </div>
-
-    <section class="wg-admin-workspace__main cx-page">
+    <section class="cx-page">
       <cx-top-bar
         [pageTitle]="{
           kind: 'heading',
@@ -45,17 +23,7 @@
         menuAriaLabel="Essay actions"
         (menuItemSelect)="onEditorMenu($event)"
       >
-        <div actions class="wg-admin-top-bar-actions">
-          <span class="cx-hide-desktop">
-            <cx-icon-button
-              icon="sidebar-left"
-              ariaLabel="Open admin menu"
-              [selected]="mobileNavOpen()"
-              [ariaPressed]="mobileNavOpen()"
-              (pressed)="toggleMobileNav()"
-            />
-          </span>
-
+        <cx-inline actions gap="sm" align="center">
           @switch (view()) {
             @case ('list') {
               @if (articles().length > 0) {
@@ -79,7 +47,7 @@
               />
             }
           }
-        </div>
+        </cx-inline>
       </cx-top-bar>
 
       <div class="cx-page__content wg-admin-content">
@@ -112,205 +80,203 @@
 
           @case ('editor') {
             @if (article(); as current) {
-              <div class="wg-admin-editor">
-                <div class="wg-admin-editor__main">
-                  <cx-stack gap="xl" gapMobile="lg">
-                    @if (editorError()) {
-                      <cx-alert mood="danger" [heading]="editorError()">
-                        @if (publishProblems().length > 0) {
-                          <ul class="wg-admin-problems">
-                            @for (problem of publishProblems(); track $index) {
-                              <li>{{ problem }}</li>
-                            }
-                          </ul>
-                        }
-                      </cx-alert>
-                    }
-                    @if (editorNotice()) {
-                      <cx-alert mood="success" [heading]="editorNotice()" />
-                    }
+              <cx-sidebar-layout placement="end" mobilePlacement="before">
+                <cx-stack gap="xl" gapMobile="lg">
+                  @if (editorError()) {
+                    <cx-alert mood="danger" [heading]="editorError()">
+                      @if (publishProblems().length > 0) {
+                        <ul class="wg-admin-problems">
+                          @for (problem of publishProblems(); track $index) {
+                            <li>{{ problem }}</li>
+                          }
+                        </ul>
+                      }
+                    </cx-alert>
+                  }
+                  @if (editorNotice()) {
+                    <cx-alert mood="success" [heading]="editorNotice()" />
+                  }
 
-                    <section class="wg-admin-section" aria-label="Essay">
-                      <cx-stack gap="lg">
-                        <cx-text-field
-                          label="Title"
-                          hint="Creates curiosity and remains findable through search."
-                          [value]="draft().title"
-                          [disabled]="polishing()"
-                          (valueChange)="updateDraftField('title', $event)"
-                        />
-                        <cx-text-field
-                          label="Topic"
-                          hint="One sentence on what the essay is really about. Internal only, never shown to readers."
-                          [value]="draft().topic"
-                          [disabled]="polishing()"
-                          (valueChange)="updateDraftField('topic', $event)"
-                        />
-                        <cx-text-area
-                          label="Ingress"
-                          [hint]="ingressHint()"
-                          sizing="fixed"
-                          [minLines]="2"
-                          [value]="draft().ingress"
-                          [disabled]="polishing()"
-                          (valueChange)="updateDraftField('ingress', $event)"
-                        />
-                        <div class="wg-admin-body-field">
-                          <span class="wg-admin-field-label">Body</span>
-                          <div class="wg-admin-body-editor">
-                            <cx-markdown-editor
-                              ariaLabel="Essay body"
-                              presentation="document"
-                              placeholder="Write whatever you have, however raw."
-                              [value]="draft().body"
+                  <section class="wg-admin-section" aria-label="Essay">
+                    <cx-stack gap="lg">
+                      <cx-text-field
+                        label="Title"
+                        hint="Creates curiosity and remains findable through search."
+                        [value]="draft().title"
+                        [disabled]="polishing()"
+                        (valueChange)="updateDraftField('title', $event)"
+                      />
+                      <cx-text-field
+                        label="Topic"
+                        hint="One sentence on what the essay is really about. Internal only, never shown to readers."
+                        [value]="draft().topic"
+                        [disabled]="polishing()"
+                        (valueChange)="updateDraftField('topic', $event)"
+                      />
+                      <cx-text-area
+                        label="Ingress"
+                        [hint]="ingressHint()"
+                        sizing="fixed"
+                        [minLines]="2"
+                        [value]="draft().ingress"
+                        [disabled]="polishing()"
+                        (valueChange)="updateDraftField('ingress', $event)"
+                      />
+                      <div class="wg-admin-body-field">
+                        <span class="wg-admin-field-label">Body</span>
+                        <div class="wg-admin-body-editor">
+                          <cx-markdown-editor
+                            ariaLabel="Essay body"
+                            presentation="document"
+                            placeholder="Write whatever you have, however raw."
+                            [value]="draft().body"
+                            [disabled]="polishing()"
+                            (valueChange)="updateDraftField('body', $event)"
+                          />
+                        </div>
+                      </div>
+                      <cx-text-field
+                        label="Address"
+                        [hint]="
+                          current.state === 'published'
+                            ? 'A published essay keeps its address.'
+                            : 'Lowercase words separated by hyphens: wargr.com/<address>/'
+                        "
+                        [value]="slugDraft()"
+                        [disabled]="polishing() || current.state === 'published'"
+                        (valueChange)="updateSlug($event)"
+                      />
+                    </cx-stack>
+                  </section>
+
+                  <section class="wg-admin-section" aria-label="Publishing furniture">
+                    <h2>Publishing furniture</h2>
+                    <p class="wg-admin-prose">
+                      The ghostwriter writes all of this alongside the essay. Publishing requires
+                      10–20 tags, three social posts, two or three pull quotes and three image
+                      prompts.
+                    </p>
+                    <cx-stack gap="lg">
+                      <cx-tag-field
+                        label="Tags"
+                        hint="10–20 lowercase tags, no # prefix."
+                        [tags]="availableTags()"
+                        [values]="tagValues()"
+                        [creatable]="true"
+                        [disabled]="polishing()"
+                        (valuesChange)="updateTags($event)"
+                      />
+
+                      <div class="wg-admin-list-block">
+                        <cx-inline gap="sm" justify="between">
+                          <span class="wg-admin-field-label">Social posts</span>
+                          <cx-icon-button
+                            icon="plus"
+                            variant="transparent"
+                            ariaLabel="Add a social post"
+                            [disabled]="polishing() || draft().socialPosts.length >= 10"
+                            (pressed)="addListEntry('socialPosts')"
+                          />
+                        </cx-inline>
+                        @for (post of draft().socialPosts; track $index) {
+                          <div class="wg-admin-list-row">
+                            <cx-text-area
+                              [label]="'Post ' + ($index + 1)"
+                              hint="Within 280 characters. No numbering, no title."
+                              sizing="fixed"
+                              [minLines]="2"
+                              [value]="post"
                               [disabled]="polishing()"
-                              (valueChange)="updateDraftField('body', $event)"
+                              (valueChange)="updateListEntry('socialPosts', $index, $event)"
+                            />
+                            <cx-icon-button
+                              icon="delete"
+                              variant="transparent"
+                              [ariaLabel]="'Remove post ' + ($index + 1)"
+                              [disabled]="polishing()"
+                              (pressed)="removeListEntry('socialPosts', $index)"
                             />
                           </div>
-                        </div>
-                        <cx-text-field
-                          label="Address"
-                          [hint]="
-                            current.state === 'published'
-                              ? 'A published essay keeps its address.'
-                              : 'Lowercase words separated by hyphens: wargr.com/<address>/'
-                          "
-                          [value]="slugDraft()"
-                          [disabled]="polishing() || current.state === 'published'"
-                          (valueChange)="updateSlug($event)"
-                        />
-                      </cx-stack>
-                    </section>
+                        }
+                      </div>
 
-                    <section class="wg-admin-section" aria-label="Publishing furniture">
-                      <h2>Publishing furniture</h2>
-                      <p class="wg-admin-prose">
-                        The ghostwriter writes all of this alongside the essay. Publishing requires
-                        10–20 tags, three social posts, two or three pull quotes and three image
-                        prompts.
-                      </p>
-                      <cx-stack gap="lg">
-                        <cx-tag-field
-                          label="Tags"
-                          hint="10–20 lowercase tags, no # prefix."
-                          [tags]="availableTags()"
-                          [values]="tagValues()"
-                          [creatable]="true"
-                          [disabled]="polishing()"
-                          (valuesChange)="updateTags($event)"
-                        />
-
-                        <div class="wg-admin-list-block">
-                          <cx-inline gap="sm" justify="between">
-                            <span class="wg-admin-field-label">Social posts</span>
-                            <cx-icon-button
-                              icon="plus"
-                              variant="transparent"
-                              ariaLabel="Add a social post"
-                              [disabled]="polishing() || draft().socialPosts.length >= 10"
-                              (pressed)="addListEntry('socialPosts')"
-                            />
-                          </cx-inline>
-                          @for (post of draft().socialPosts; track $index) {
-                            <div class="wg-admin-list-row">
+                      <div class="wg-admin-list-block">
+                        <cx-inline gap="sm" justify="between">
+                          <span class="wg-admin-field-label">Pull quotes</span>
+                          <cx-icon-button
+                            icon="plus"
+                            variant="transparent"
+                            ariaLabel="Add a pull quote"
+                            [disabled]="polishing() || draft().pullQuotes.length >= 10"
+                            (pressed)="addPullQuote()"
+                          />
+                        </cx-inline>
+                        @for (quote of draft().pullQuotes; track $index) {
+                          <div class="wg-admin-list-row">
+                            <cx-stack gap="sm">
+                              <cx-text-field
+                                [label]="'Hook ' + ($index + 1)"
+                                [value]="quote.hook"
+                                [disabled]="polishing()"
+                                (valueChange)="updatePullQuote($index, 'hook', $event)"
+                              />
                               <cx-text-area
-                                [label]="'Post ' + ($index + 1)"
-                                hint="Within 280 characters. No numbering, no title."
+                                label="Expansion"
                                 sizing="fixed"
                                 [minLines]="2"
-                                [value]="post"
+                                [value]="quote.expansion"
                                 [disabled]="polishing()"
-                                (valueChange)="updateListEntry('socialPosts', $index, $event)"
+                                (valueChange)="updatePullQuote($index, 'expansion', $event)"
                               />
-                              <cx-icon-button
-                                icon="delete"
-                                variant="transparent"
-                                [ariaLabel]="'Remove post ' + ($index + 1)"
-                                [disabled]="polishing()"
-                                (pressed)="removeListEntry('socialPosts', $index)"
-                              />
-                            </div>
-                          }
-                        </div>
-
-                        <div class="wg-admin-list-block">
-                          <cx-inline gap="sm" justify="between">
-                            <span class="wg-admin-field-label">Pull quotes</span>
+                            </cx-stack>
                             <cx-icon-button
-                              icon="plus"
+                              icon="delete"
                               variant="transparent"
-                              ariaLabel="Add a pull quote"
-                              [disabled]="polishing() || draft().pullQuotes.length >= 10"
-                              (pressed)="addPullQuote()"
+                              [ariaLabel]="'Remove pull quote ' + ($index + 1)"
+                              [disabled]="polishing()"
+                              (pressed)="removePullQuote($index)"
                             />
-                          </cx-inline>
-                          @for (quote of draft().pullQuotes; track $index) {
-                            <div class="wg-admin-list-row">
-                              <cx-stack gap="sm">
-                                <cx-text-field
-                                  [label]="'Hook ' + ($index + 1)"
-                                  [value]="quote.hook"
-                                  [disabled]="polishing()"
-                                  (valueChange)="updatePullQuote($index, 'hook', $event)"
-                                />
-                                <cx-text-area
-                                  label="Expansion"
-                                  sizing="fixed"
-                                  [minLines]="2"
-                                  [value]="quote.expansion"
-                                  [disabled]="polishing()"
-                                  (valueChange)="updatePullQuote($index, 'expansion', $event)"
-                                />
-                              </cx-stack>
-                              <cx-icon-button
-                                icon="delete"
-                                variant="transparent"
-                                [ariaLabel]="'Remove pull quote ' + ($index + 1)"
-                                [disabled]="polishing()"
-                                (pressed)="removePullQuote($index)"
-                              />
-                            </div>
-                          }
-                        </div>
+                          </div>
+                        }
+                      </div>
 
-                        <div class="wg-admin-list-block">
-                          <cx-inline gap="sm" justify="between">
-                            <span class="wg-admin-field-label">Image prompts</span>
+                      <div class="wg-admin-list-block">
+                        <cx-inline gap="sm" justify="between">
+                          <span class="wg-admin-field-label">Image prompts</span>
+                          <cx-icon-button
+                            icon="plus"
+                            variant="transparent"
+                            ariaLabel="Add an image prompt"
+                            [disabled]="polishing() || draft().imagePrompts.length >= 10"
+                            (pressed)="addListEntry('imagePrompts')"
+                          />
+                        </cx-inline>
+                        @for (prompt of draft().imagePrompts; track $index) {
+                          <div class="wg-admin-list-row">
+                            <cx-text-area
+                              [label]="'Prompt ' + ($index + 1)"
+                              hint="Begins with “Create a”. Colour photography, no text in the image."
+                              sizing="fixed"
+                              [minLines]="2"
+                              [value]="prompt"
+                              [disabled]="polishing()"
+                              (valueChange)="updateListEntry('imagePrompts', $index, $event)"
+                            />
                             <cx-icon-button
-                              icon="plus"
+                              icon="delete"
                               variant="transparent"
-                              ariaLabel="Add an image prompt"
-                              [disabled]="polishing() || draft().imagePrompts.length >= 10"
-                              (pressed)="addListEntry('imagePrompts')"
+                              [ariaLabel]="'Remove prompt ' + ($index + 1)"
+                              [disabled]="polishing()"
+                              (pressed)="removeListEntry('imagePrompts', $index)"
                             />
-                          </cx-inline>
-                          @for (prompt of draft().imagePrompts; track $index) {
-                            <div class="wg-admin-list-row">
-                              <cx-text-area
-                                [label]="'Prompt ' + ($index + 1)"
-                                hint="Begins with “Create a”. Colour photography, no text in the image."
-                                sizing="fixed"
-                                [minLines]="2"
-                                [value]="prompt"
-                                [disabled]="polishing()"
-                                (valueChange)="updateListEntry('imagePrompts', $index, $event)"
-                              />
-                              <cx-icon-button
-                                icon="delete"
-                                variant="transparent"
-                                [ariaLabel]="'Remove prompt ' + ($index + 1)"
-                                [disabled]="polishing()"
-                                (pressed)="removeListEntry('imagePrompts', $index)"
-                              />
-                            </div>
-                          }
-                        </div>
-                      </cx-stack>
-                    </section>
-                  </cx-stack>
-                </div>
+                          </div>
+                        }
+                      </div>
+                    </cx-stack>
+                  </section>
+                </cx-stack>
 
-                <aside class="wg-admin-editor__side" aria-label="The ghostwriter">
+                <cx-stack sidebar gap="md">
                   <cx-card heading="The ghostwriter" icon="ai">
                     <cx-stack gap="md">
                       @if (polishError()) {
@@ -380,8 +346,8 @@
                       </cx-stack>
                     </cx-expansion-panel>
                   }
-                </aside>
-              </div>
+                </cx-stack>
+              </cx-sidebar-layout>
             }
           }
         }
@@ -435,49 +401,43 @@
   />
 } @else {
   <section class="wg-admin-login" aria-label="Wargr admin">
-    <cx-card class="wg-admin-login__panel" heading="Wargr admin" icon="lock">
-      <cx-stack gap="lg">
-        <p class="wg-admin-prose">Sign in to write.</p>
+    <cx-card class="wg-admin-login__panel">
+      <form aria-label="Sign in" (submit)="onSubmit($event)">
+        <cx-stack gap="md">
+          @if (requestError()) {
+            <cx-alert mood="danger" [heading]="requestError()" />
+          }
 
-        <form aria-label="Sign in" (submit)="onSubmit($event)">
-          <cx-stack gap="md">
-            @if (requestError()) {
-              <cx-alert mood="danger" [heading]="requestError()" />
-            }
+          <cx-text-field
+            #usernameField
+            label="Username"
+            name="username"
+            autocomplete="username"
+            [value]="username()"
+            [validation]="usernameValidation()"
+            [disabled]="submitting()"
+            (valueChange)="updateUsername($event)"
+          />
 
-            <cx-text-field
-              #usernameField
-              label="Username"
-              name="username"
-              autocomplete="username"
-              prependIcon="user"
-              [value]="username()"
-              [validation]="usernameValidation()"
-              [disabled]="submitting()"
-              (valueChange)="updateUsername($event)"
-            />
+          <cx-password-field
+            label="Password"
+            name="password"
+            autocomplete="current-password"
+            [value]="password()"
+            [validation]="passwordValidation()"
+            [disabled]="submitting()"
+            (valueChange)="updatePassword($event)"
+          />
 
-            <cx-password-field
-              label="Password"
-              name="password"
-              autocomplete="current-password"
-              [value]="password()"
-              [validation]="passwordValidation()"
-              [disabled]="submitting()"
-              (valueChange)="updatePassword($event)"
-            />
-
-            <cx-button
-              class="wg-admin-login__submit"
-              text="Sign in"
-              mood="primary"
-              icon="lock-open"
-              type="submit"
-              [loading]="submitting()"
-            />
-          </cx-stack>
-        </form>
-      </cx-stack>
+          <cx-button
+            class="wg-admin-login__submit"
+            text="Sign in"
+            mood="primary"
+            type="submit"
+            [loading]="submitting()"
+          />
+        </cx-stack>
+      </form>
     </cx-card>
   </section>
 }

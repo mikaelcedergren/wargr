@@ -10,6 +10,11 @@ test('admin sign-in rejects a wrong password and survives reload until logout', 
   await expect(page).toHaveTitle('Admin — Wargr');
   await page.getByRole('textbox', { name: 'Username', exact: true }).fill('admin');
   await page.getByLabel('Password', { exact: true }).fill('incorrect-password');
+  await expect(page.getByLabel('Password', { exact: true })).toHaveAttribute('type', 'password');
+  await page.getByRole('button', { name: 'Show password', exact: true }).click();
+  await expect(page.getByLabel('Password', { exact: true })).toHaveAttribute('type', 'text');
+  await page.getByRole('button', { name: 'Hide password', exact: true }).click();
+  await expect(page.getByLabel('Password', { exact: true })).toHaveAttribute('type', 'password');
   const refused = page.waitForResponse((response) => response.url().endsWith('/api/admin/login'));
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   expect((await refused).status()).toBe(401);
@@ -26,6 +31,59 @@ test('admin sign-in rejects a wrong password and survives reload until logout', 
   await logout(page);
   await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toBeVisible();
   expect((await page.request.get('/api/admin/articles')).status()).toBe(401);
+});
+
+test('framework navigation returns to essays and closes its compact menu', async ({ page }) => {
+  const [article] = await openWorkspace(page);
+  await openEssay(page, article.title);
+  await page.setViewportSize({ width: 390, height: 844 });
+  const toggle = page.getByRole('button', { name: 'Open menu', exact: true });
+  await toggle.click();
+  await expect(page.getByRole('button', { name: 'Close menu', exact: true })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(toggle).toBeFocused();
+  await toggle.click();
+  await page.getByRole('link', { name: 'Essays', exact: true }).filter({ visible: true }).click();
+  await expect(page.getByRole('textbox', { name: 'Title', exact: true })).toHaveCount(0);
+  await expect(toggle).toBeVisible();
+  await expect(page.getByRole('button', { name: 'New essay', exact: true })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+    true,
+  );
+});
+
+test('reader and Admin themes remain independent across navigation and reload', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.evaluate(() => {
+    localStorage.setItem('wg-theme', 'night');
+    localStorage.setItem('wg-admin-theme', 'aqua');
+  });
+  await openWorkspace(page);
+  await expect(page.locator('html')).toHaveClass(/theme-aqua/);
+  await page
+    .getByRole('button', { name: 'Account actions for Michael Wargr', exact: true })
+    .click();
+  await page.getByRole('menuitem', { name: 'Theme', exact: true }).click();
+  await page.getByRole('menuitemradio', { name: 'Dark', exact: true }).click();
+  await expect(page.locator('html')).toHaveClass(/theme-dark/);
+  expect(await page.evaluate(() => localStorage.getItem('wg-admin-theme'))).toBe('dark');
+  await page.reload();
+  await expect(page.locator('html')).toHaveClass(/theme-dark/);
+  // Browser same-document history navigation exercises route teardown without a page reload.
+  await page.evaluate(() => {
+    history.pushState(null, '', '/');
+    dispatchEvent(new PopStateEvent('popstate'));
+  });
+  await expect(page.getByRole('button', { name: 'Switch to light theme' })).toBeVisible();
+  await expect(page.locator('html')).toHaveClass(/theme-night/);
+  await page.getByRole('button', { name: 'Switch to light theme' }).click();
+  await expect(page.locator('html')).toHaveClass(/theme-light/);
+  await page.goBack();
+  await expect(page.locator('html')).toHaveClass(/theme-dark/);
+  const classes = await page.locator('html').getAttribute('class');
+  expect(classes?.split(' ').filter((name) => name.startsWith('theme-'))).toEqual(['theme-dark']);
 });
 
 test('the retired CMS routes no longer serve a login or API', async ({ page, request }) => {
