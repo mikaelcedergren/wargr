@@ -30,7 +30,8 @@ Admin database lives under `data/owner-development/`; private files and AI polis
 ## Public site
 
 The start page (`/`) features the latest published story in a cover hero, followed by the remaining
-stories in the existing card grid. Each story opens with its image and title in a framework cover
+stories in a text-only card grid. Images belong in the cover heroes, not in story-list cards.
+Each story opens with its image and title in a framework cover
 hero, followed by the article content. `/videos/` features video episodes
 linking to YouTube, and `/blog/` redirects to the start page; individual stories retain their existing root URLs. `/about/` introduces Michael
 Wargr. The original logo sits in the framework masthead with Home, Videos, and About navigation.
@@ -56,12 +57,21 @@ URL, indexability, and image response.
 ## Admin
 
 `/admin` is the owner's writing room: story drafts, the ghostwriter polish loop (four rewrite
-intensities carrying the ported voice contract), a bounded round history per story, and the
+intensities carrying the current voice contract), a bounded round history per story, and the
 publish/unpublish switch. It authenticates one owner (scrypt-hashed password in the web role's
 `.env.web`), runs over the typed `/api/admin` contract with compare-and-swap revisions, and is
 never indexed. AI rounds run as durable jobs in the worker process, which alone holds
 `OPENAI_API_KEY` (in `.env.worker`); paid provider work is fenced by idempotent effect receipts so
 a crash never buys the same round twice.
+
+[WRITING.md](WRITING.md) owns the writing workflow, calibration, and evaluation. The runtime
+contract in `server/src/voice-contract.ts` defines the original Wargr voice and its explicit author
+preferences. `server/src/voice-reference.ts` owns the complete Babylon exemplar approved by the
+author on 27 October 2026 and supplies it to every polish request. Requests also receive the
+current document and current instruction; stored round history is not model memory.
+Body-first composition and subsequent supporting copy are instructed
+within one request, not separate automated editorial passes. Format validation does not certify
+voice, truth, or audience response.
 
 Sign in as `admin` using the password configured in `.env.web`. Set
 `WARGR_STUDIO_USERNAME=admin` and generate `WARGR_STUDIO_PASSWORD_HASH` with
@@ -114,5 +124,5 @@ definition write to the shared `server-ops` installer. Neither installer loads, 
 restarts a service. The bounded `publisher-contract.json` is Wargr's sole declaration of the
 generator sources, database/image inputs, and log paths in that closure.
 
-The article database is the sole authoring source. The voice contract lives in
-`server/src/voice-contract.ts`.
+The article database is the sole authoring source. [WRITING.md](WRITING.md) routes writing work to
+the canonical voice contract, approved reference, and editorial workflow.

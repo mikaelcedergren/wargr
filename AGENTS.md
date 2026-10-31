@@ -89,7 +89,8 @@ server/src/
   article-service.ts / polish-service.ts  HTTP-facing services (CAS revisions, publish gate, polish admission)
   polish-jobs.ts / polish-handlers.ts / polish-worker.ts  durable polish job contract, handler, worker loop
   openai-provider.ts         bounded OpenAI Responses provider with idempotent paid-effect receipts
-  voice-contract.ts          the Michael Wargr voice contract (ported from the retired ghostwriter repo) + the four rewrite modes
+  voice-contract.ts          canonical Wargr prose instructions, explicit author decisions, and four distinct editing scopes
+  voice-reference.ts         exact author-approved Babylon exemplar, included in every polish request
   polish-content.ts          the structured generation spec: schema, instructions, validation
   database.ts                migrations, capacity/revision guards, and the exact schema proof
 data/wargr.db                sole authoring authority (articles, rounds, runs, sessions, jobs); registered backup
@@ -115,15 +116,20 @@ launchd/com.wargr.publisher.plist WatchPaths/hourly definition selecting the sea
 
 ## The Admin
 
-The private Admin at `/admin` (noindexed, owner-only) is where stories are written. The workflow
-is the ghostwriting loop the retired ghostwriter repository documented, now built in:
+The private Admin at `/admin` (noindexed, owner-only) is where stories are written. Read
+[WRITING.md](WRITING.md) before writing, editing, evaluating, or changing the writing system.
+It routes to the canonical runtime voice contract and owns the editorial workflow and evaluation.
+The approved exemplar is identified there explicitly. Publication or an old sentence's presence
+does not make other prose an approved voice reference.
 
 1. Create a story with a working title; write rough notes in the editor.
 2. Pick a rewrite intensity — rough material, treat as reference, developed draft, or final
    polish — optionally add a round instruction, and run the ghostwriter. The durable worker sends
-   the whole document plus the voice contract to OpenAI and replaces the story with the result.
-3. Edit. Your edits are meaning, not wording. Run the next round. Every round is kept as a bounded
-   version history you can reload.
+   the whole document, voice contract, and author-approved full exemplar to OpenAI and replaces
+   the story with the result.
+3. Edit. Explicit choices of wording matter as well as meaning. Put constraints for the next
+   round in its instruction. Every round is kept as a bounded version history you can reload;
+   that history is not automatically supplied to the model.
 4. Publish. The mechanical format gate (ingress 80–200 characters, 10–20 tags, three social posts,
    two or three pull quotes, three image prompts, hero master present) must pass; voice, truth,
    and the decision that a story is finished remain the author's.
@@ -142,7 +148,10 @@ Four rules are non-negotiable:
   history is a designed bounded ring; everything else never silently evicts.
 
 The voice contract in `server/src/voice-contract.ts` is the authoritative instruction set for
-polish rounds. Editing the voice is editing the product; treat it with the same care as prose.
+polish rounds; `server/src/voice-reference.ts` owns the exact accepted example. General author
+decisions and references become persistent only when explicitly recorded and included in the
+worker running the round; no implicit learning is promised. Editing the voice is editing
+the product. Follow the private evaluation workflow in [WRITING.md](WRITING.md).
 
 ## Publishing
 

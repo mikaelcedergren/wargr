@@ -6,6 +6,7 @@ import {
   type PolishMode,
 } from './article-schema.js';
 import { POLISH_MODE_INSTRUCTIONS, VOICE_CONTRACT } from './voice-contract.js';
+import { VOICE_REFERENCE_INSTRUCTIONS } from './voice-reference.js';
 
 export type JsonSchemaFormat = Readonly<{
   type: 'json_schema';
@@ -98,15 +99,15 @@ export const ARTICLE_DOCUMENT_FORMAT: JsonSchemaFormat = Object.freeze({
 
 const DOCUMENT_FIELD_CONTRACT = `## Output contract
 
-Return the complete rewritten story as one JSON document with these fields. Every field is part of the work; none is filler.
+Return the complete story document as JSON. Work on the body first, within this round's editing scope. Derive its supporting fields only after the prose is settled. Do not shape the body to produce promotional hooks. This is one generation request, not a claim that separate drafting and review calls have occurred. Preserve effective existing fields when the round does not require changing them.
 
-- \`title\`: a clear title that creates curiosity and remains findable through search.
+- \`title\`: a specific, accurate, sentence-case title. Name the actual subject or tension; do not promise a revelation the piece does not deliver.
 - \`topic\`: one sentence describing what the article is really about. Internal alignment metadata, never shown to readers, not promotional copy.
-- \`ingress\`: one paragraph between 80 and 200 characters. Plain text, no markdown. It creates tension and curiosity without revealing the conclusion. The body must work perfectly if the ingress is removed.
-- \`body\`: the chapter itself, as markdown. There is no maximum length. It must be long enough to carry a genuine movement rather than announcing a conclusion and decorating it. Use LF line endings and blank lines between paragraphs. Do not repeat the title, topic or ingress inside the body.
+- \`ingress\`: one plain-text paragraph between 80 and 200 characters. Follow the voice contract's introduction guidance: its sole purpose is curiosity that draws the reader into the whole article. It may leave the thought unresolved or end with "..."; it does not need a summary or conclusion. The body must work without the ingress.
+- \`body\`: the piece as markdown, at the length the available material warrants. No required chapter shape, personal opening, conversion or moral. Use LF line endings and blank lines between paragraphs. Do not paste the title, internal topic or ingress into the body as an extra preface.
 - \`tags\`: ten to twenty lowercase tags, no # prefix, no repeats.
-- \`socialPosts\`: three separate social posts, each within 280 characters. Do not number them or include the article title. Use three distinct angles. Keep them plain, direct and curious.
-- \`pullQuotes\`: two or three blocks, each with a \`hook\` line and an \`expansion\` paragraph that develops it. The final pull quote is rendered as the article's coda figure. Never begin a hook with \`Create\`.
+- \`socialPosts\`: three separate posts, each within 280 characters. Derive each from a specific part of the finished piece. Do not number them, repeat the title, invent a stronger claim, or manufacture a takeaway.
+- \`pullQuotes\`: two or three blocks with a \`hook\` and \`expansion\`. Select accurate excerpts or faithful descriptions of existing points. Do not insert maxims into the body to supply these fields, add another ending, or claim an unverified rendering behavior. Never begin a hook with \`Create\`.
 - \`imagePrompts\`: three image prompts, each beginning with \`Create a\`. Colour photography only, no text in the image. The Wargr visual tone is gritty, intimate, atmospheric and emotionally serious, often with shallow depth of field, physical texture and close focus on one detail. Prefer suggestion over literal illustration. Avoid the obvious symbol. The three prompts must use substantially different motifs.`;
 
 export function articlePolishSpec(
@@ -117,6 +118,7 @@ export function articlePolishSpec(
 ): StructuredGenerationSpec<ArticleDocument> {
   const instructions = [
     VOICE_CONTRACT,
+    VOICE_REFERENCE_INSTRUCTIONS,
     POLISH_MODE_INSTRUCTIONS[mode],
     DOCUMENT_FIELD_CONTRACT,
     ...(correction === undefined
@@ -126,7 +128,7 @@ export function articlePolishSpec(
         ]),
   ].join('\n\n');
   const input = [
-    'Here is the current state of the story, as a JSON document. Everything the author has written or kept is in it.',
+    'Here is the current story document. It may contain notes, author wording, or earlier generated prose. Its presence does not certify its style or verify its factual claims. Use only the supplied material and current instruction; no previous rounds or feedback history are included.',
     JSON.stringify(
       {
         title: document.title,
@@ -144,7 +146,7 @@ export function articlePolishSpec(
     ...(instruction === null
       ? []
       : [`The author added this instruction for the current round:\n\n${instruction}`]),
-    'Rewrite the story now. The rewritten document is the response.',
+    'Apply the requested editing scope. Return the complete document, including unchanged passages and fields where appropriate.',
   ].join('\n\n');
 
   return Object.freeze({

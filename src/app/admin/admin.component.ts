@@ -123,22 +123,22 @@ const POLISH_MODE_OPTIONS: CxDropdownOption[] = [
   {
     id: 'rough',
     label: 'Rough material',
-    description: 'Raw ingredients. The ghostwriter rebuilds everything except the truth.',
+    description: 'Build a story from your ideas, facts and key phrases.',
   },
   {
     id: 'reference',
     label: 'Treat as reference',
-    description: 'Extract what it means, then write it again from the ground up.',
+    description: 'Rewrite freely while keeping your meaning, facts and settled phrases.',
   },
   {
     id: 'developed',
     label: 'Developed draft',
-    description: 'The structure works. Narrow changes: phrasing, joins, thin scenes.',
+    description: 'Keep what works; repair unclear passages, repetition and weak connections.',
   },
   {
     id: 'polish',
     label: 'Final polish',
-    description: 'Grammar, rhythm and weak words only. Nothing is restructured.',
+    description: 'Small corrections only. Keep the structure, ideas and chosen wording.',
   },
 ];
 
@@ -289,7 +289,7 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   protected readonly ingressHint = computed(() => {
     const used = [...this.draft().ingress].length;
-    return `Bold opening paragraph, 80–200 characters. Creates tension without revealing the conclusion. · ${String(used)}/200`;
+    return `Make the reader curious enough to read on. 80–200 characters. · ${String(used)}/200`;
   });
 
   protected readonly tagValues = computed(() => this.draft().tags);
@@ -345,7 +345,7 @@ export class AdminComponent implements OnInit, OnDestroy {
       if (!current) return '';
       return current.state === 'published' ? `Published · wargr.com/${current.slug}/` : 'Draft';
     }
-    return 'Write rough, polish in the voice, publish when it is true.';
+    return 'Bring your ideas, develop the story, and publish when it is ready.';
   });
 
   private readonly appearance = inject(Appearance);

@@ -101,7 +101,7 @@
                     <cx-stack gap="lg">
                       <cx-text-field
                         label="Title"
-                        hint="Creates curiosity and remains findable through search."
+                        hint="Name the story’s specific subject or tension."
                         [value]="draft().title"
                         [disabled]="polishing()"
                         (valueChange)="updateDraftField('title', $event)"
@@ -152,9 +152,9 @@
                   <section class="wg-admin-section" aria-label="Publishing furniture">
                     <h2>Publishing furniture</h2>
                     <p class="wg-admin-prose">
-                      The ghostwriter writes all of this alongside the story. Publishing requires
-                      10–20 tags, three social posts, two or three pull quotes and three image
-                      prompts.
+                      The ghostwriter prepares this supporting material from the story. Publishing
+                      requires 10–20 tags, three social posts, two or three pull quotes and three
+                      image prompts.
                     </p>
                     <cx-stack gap="lg">
                       <cx-tag-field
@@ -290,9 +290,8 @@
                         />
                       } @else {
                         <p class="wg-admin-prose">
-                          Pick how settled the current text is, then run a round. Your edits are
-                          read as meaning, not wording; run round after round until the story is
-                          true.
+                          Choose how much to change. Add any wording to keep or problems to fix in
+                          this round’s instruction. Review the result before publishing.
                         </p>
                         <cx-dropdown
                           label="This round"
