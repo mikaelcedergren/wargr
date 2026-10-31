@@ -22,7 +22,7 @@ wg-admin {
 }
 
 .wg-admin-login__panel {
-  width: min(100%, var(--measure-sm));
+  width: min(100%, var(--content-width-sm));
 }
 
 .wg-admin-login__submit {
@@ -37,16 +37,16 @@ wg-admin {
 }
 
 .wg-admin-content {
-  max-width: var(--measure-xl);
+  max-width: var(--content-width-xl);
 }
 
 /* Text roles */
 
 .wg-admin-prose {
   margin: 0;
-  max-width: var(--measure-md);
+  max-width: var(--content-width-md);
   color: var(--opacity-high);
-  line-height: var(--line-height-body-relaxed);
+  line-height: var(--line-height-relaxed);
 }
 
 .wg-admin-meta {
