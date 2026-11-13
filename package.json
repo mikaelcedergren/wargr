@@ -27,7 +27,6 @@
     "generate:content": "bin/generate-content",
     "dev": "pnpm favicon:check && node scripts/dev.mjs",
     "dev:owner": "pnpm favicon:check && node scripts/dev.mjs --owner",
-    "admin:password-hash": "node scripts/admin-password-hash.mjs",
     "build": "pnpm run build:browser && pnpm run build:server",
     "build:browser": "ng build --configuration prod",
     "build:server": "pnpm --dir server build",

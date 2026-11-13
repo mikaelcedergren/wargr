@@ -1,9 +1,8 @@
 import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 
 /**
- * Owner password verification for Admin. The web role stores only the complete `scrypt$…` string
- * produced by `pnpm admin:password-hash`; the plaintext never rests in configuration. The format
- * pins every cost parameter into the stored value so a hash remains verifiable after defaults move.
+ * Owner password verification for Admin. Environment loading hashes the configured password
+ * once at startup; authentication receives only the resulting scrypt value.
  */
 
 const SCRYPT_PREFIX = 'scrypt';

@@ -22,7 +22,7 @@ import {
   WARGR_PUBLIC_ORIGIN,
   WARGR_WWW_ORIGIN,
 } from './constants.js';
-import { hashAdminPassword, parseAdminPasswordHash } from './password-hash.js';
+import { hashAdminPassword } from './password-hash.js';
 
 export const WARGR_MANIFEST_FILE = fileURLToPath(new URL('../../cx-product.json', import.meta.url));
 export const WARGR_ARTIFACT_ROOT = path.dirname(WARGR_MANIFEST_FILE);
@@ -64,8 +64,6 @@ export type WargrEnvironmentRole = 'web' | 'worker';
 const DEVELOPMENT_ADMIN_USERNAME = 'admin';
 const DEVELOPMENT_ADMIN_PASSWORD = 'dev';
 const DEVELOPMENT_SESSION_SECRET = 'wargr-local-development-session-secret';
-
-let developmentPasswordHash: string | undefined;
 
 export function resolveWargrOperationalRoot(environment: Environment): string {
   const validation = releaseValidationEnvironmentValue(environment);
@@ -184,14 +182,15 @@ export function loadWargrEnvironment(
   if (adminUsername.length > 256) {
     throw new Error('WARGR_STUDIO_USERNAME must contain at most 256 characters.');
   }
-  const adminPasswordHash = releaseValidation
-    ? hashAdminPassword(randomBase64UrlIdentifier(32))
-    : exactSecret(
-        environment,
-        'WARGR_STUDIO_PASSWORD_HASH',
-        execution.dataMode === 'shared' ? undefined : developmentAdminPasswordHash(),
-      );
-  parseAdminPasswordHash(adminPasswordHash);
+  const adminPasswordHash = hashAdminPassword(
+    releaseValidation
+      ? randomBase64UrlIdentifier(32)
+      : exactSecret(
+          environment,
+          'WARGR_STUDIO_PASSWORD',
+          execution.dataMode === 'shared' ? undefined : DEVELOPMENT_ADMIN_PASSWORD,
+        ),
+  );
   const sessionSecret = releaseValidation
     ? randomBase64UrlIdentifier(32)
     : exactSecret(
@@ -253,11 +252,6 @@ function developmentLoopbackOrigins(appOrigin: string): readonly string[] {
   const sibling = new URL(appOrigin);
   sibling.hostname = siblingHost;
   return [appOrigin, normalizeHttpOrigin(sibling.origin)];
-}
-
-function developmentAdminPasswordHash(): string {
-  developmentPasswordHash ??= hashAdminPassword(DEVELOPMENT_ADMIN_PASSWORD);
-  return developmentPasswordHash;
 }
 
 function exactSecret(environment: Environment, name: string, fallback: string | undefined): string {

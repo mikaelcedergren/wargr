@@ -24,7 +24,7 @@ test('owner development is isolated from shared data and private configuration',
     {
       OPENAI_API_KEY: 'must-not-cross',
       SOURCE: 'test',
-      WARGR_STUDIO_PASSWORD_HASH: 'must-not-cross',
+      WARGR_STUDIO_PASSWORD: 'must-not-cross',
       WARGR_STUDIO_SESSION_SECRET: 'must-not-cross',
       WARGR_STUDIO_USERNAME: 'must-not-cross',
     },
@@ -38,7 +38,7 @@ test('owner development is isolated from shared data and private configuration',
   assert.equal(environments.server.ARTICLE_POLISH_ENABLED, '0');
   for (const key of [
     'OPENAI_API_KEY',
-    'WARGR_STUDIO_PASSWORD_HASH',
+    'WARGR_STUDIO_PASSWORD',
     'WARGR_STUDIO_SESSION_SECRET',
     'WARGR_STUDIO_USERNAME',
   ]) {

@@ -81,8 +81,7 @@ export function createOwnerAuthService({
   sessionTtlSeconds,
 }: OwnerAuthServiceOptions): OwnerAuthService {
   validateCredential(expectedUsername, 'Expected owner username');
-  // The stored credential is the complete scrypt hash produced by `pnpm admin:password-hash`; the
-  // plaintext never reaches configuration or this service's construction.
+  // Environment loading hashes the configured password before constructing this service.
   parseAdminPasswordHash(expectedPasswordHash);
   if (typeof cookieSecure !== 'boolean') {
     throw new Error('Owner session cookieSecure must be a boolean.');

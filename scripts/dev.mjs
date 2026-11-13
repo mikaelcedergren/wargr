@@ -24,7 +24,7 @@ export function createDevelopmentEnvironments(
   if (owner) {
     for (const key of [
       'OPENAI_API_KEY',
-      'WARGR_STUDIO_PASSWORD_HASH',
+      'WARGR_STUDIO_PASSWORD',
       'WARGR_STUDIO_SESSION_SECRET',
       'WARGR_STUDIO_USERNAME',
     ]) {

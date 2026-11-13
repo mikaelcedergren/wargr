@@ -47,7 +47,6 @@ pnpm start:web        # compiled web process at http://127.0.0.1:3060 (health: /
 pnpm start:worker     # compiled listener-free polish worker
 pnpm generate:content # regenerate the tracked snapshot from the article database (locked transaction)
 pnpm images           # alias for the complete generate:content transaction
-pnpm admin:password-hash # interactive scrypt hash generator for .env.web
 pnpm typecheck        # strict application and NodeNext server TypeScript verification
 pnpm test             # isolated Node tests for build, publisher, and server contracts
 pnpm e2e              # Chromium smoke tests on a runner-owned loopback port
@@ -83,7 +82,7 @@ server/src/
   runtime.ts / worker-runtime.ts  web and worker lifecycle composition
   app.ts                     Express composition; /api/admin owns the typed HTTP contract
   auth-service.ts            owner session auth (scrypt password hash, signed session cookies, login throttling)
-  password-hash.ts           scrypt$N$r$p$salt$hash storage format shared with admin:password-hash
+  password-hash.ts           in-memory scrypt hashing and password verification
   article-schema.ts          the structured story record + the mechanical publish-format contract
   article-repository.ts      SQLite persistence: articles, bounded version rounds, polish runs, provider effects, owner sessions
   article-service.ts / polish-service.ts  HTTP-facing services (CAS revisions, publish gate, polish admission)
@@ -182,8 +181,7 @@ one half of an uncertain or full-stack change.
 The web process loads only owned mode-`0600` `.env.web` values:
 
 - `WARGR_STUDIO_USERNAME`
-- `WARGR_STUDIO_PASSWORD_HASH` (the complete `scrypt$…` output of `pnpm admin:password-hash`;
-  the plaintext never rests in configuration)
+- `WARGR_STUDIO_PASSWORD` (the password stored directly; hashed in memory at web startup)
 - `WARGR_STUDIO_SESSION_SECRET`
 
 The worker loads only the owned mode-`0600` `.env.worker` value `OPENAI_API_KEY`. Neither role

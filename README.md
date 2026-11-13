@@ -74,9 +74,11 @@ within one request, not separate automated editorial passes. Format validation d
 voice, truth, or audience response.
 
 Sign in as `admin` using the password configured in `.env.web`. Set
-`WARGR_STUDIO_USERNAME=admin` and generate `WARGR_STUDIO_PASSWORD_HASH` with
-`pnpm admin:password-hash`. These credential key names remain stable because development and
-installed production roles share the file. The generic `.env` file is not loaded.
+`WARGR_STUDIO_USERNAME=admin` and `WARGR_STUDIO_PASSWORD` to the password you want.
+The password is stored directly in this private, Git-ignored, mode-`0600` file; the server hashes
+it in memory at startup. The generic `.env` file is not loaded.
+Development and production share this file, so production needs the password-based server
+release before its next restart.
 After changing credentials, restart the registered development service to load them;
 production adopts them on its next explicitly authorized restart or release.
 

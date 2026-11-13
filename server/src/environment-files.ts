@@ -14,7 +14,7 @@ export type WargrProcessRole = 'web' | 'worker';
 const ROLE_FILES = Object.freeze({
   web: Object.freeze({
     allowedKeys: new Set([
-      'WARGR_STUDIO_PASSWORD_HASH',
+      'WARGR_STUDIO_PASSWORD',
       'WARGR_STUDIO_SESSION_SECRET',
       'WARGR_STUDIO_USERNAME',
     ]),
@@ -24,7 +24,7 @@ const ROLE_FILES = Object.freeze({
   worker: Object.freeze({
     allowedKeys: new Set(['OPENAI_API_KEY']),
     foreignPrivateKeys: [
-      'WARGR_STUDIO_PASSWORD_HASH',
+      'WARGR_STUDIO_PASSWORD',
       'WARGR_STUDIO_SESSION_SECRET',
       'WARGR_STUDIO_USERNAME',
     ] as const,

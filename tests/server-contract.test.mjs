@@ -74,6 +74,8 @@ test(
         PORT: String(port),
         SITE_BROWSER_DIR: browserDir,
         WARGR_LOAD_ENV_FILE: 'false',
+        WARGR_STUDIO_USERNAME: 'admin',
+        WARGR_STUDIO_PASSWORD: 'synthetic-configured-password',
       },
       stdio: ['ignore', 'pipe', 'pipe'],
     });
@@ -185,7 +187,7 @@ test(
     assert.equal(wrongLogin.status, 401);
 
     const login = await localFetch(`${origin}/api/admin/login`, {
-      body: JSON.stringify({ password: 'dev', username: 'admin' }),
+      body: JSON.stringify({ password: 'synthetic-configured-password', username: 'admin' }),
       headers: { 'Content-Type': 'application/json', Origin: origin },
       method: 'POST',
     });
