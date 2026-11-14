@@ -152,6 +152,33 @@ the introduction can develop curiosity rather than repeat it. Then check that th
 the invitation. Evaluate that relationship and the prose, without requiring a miniature essay,
 adding an ellipsis to every item, or mistaking an internal review pass for the author's approval.
 
+## Whole-story context in a line edit
+
+The author explicitly clarified that the ghostwriter must read and assess an article as a whole
+story even when the requested work is grammar correction. The canonical contract's **Read the
+whole story before editing** section owns this instruction for all modes. The following invented
+example illustrates the distinction; it is not an approved voice reference or biographical material:
+
+> I thought he had forgotten me.
+>
+> Every Thursday, a letter arrived. I left them unopened.
+>
+> It took me months to admit that I was the one refusing to answer.
+
+The opening belief and the letters appear to contradict each other when read as isolated factual
+statements. The ending makes that tension intelligible: the narrator is describing an earlier
+belief and later recognising their own refusal. Rewriting the opening to say the narrator knew
+they had not been forgotten would remove the movement of the story. A grammar pass elsewhere
+does not authorise resolving that tension or explaining the ending sooner.
+
+The same care applies to a small connective edit. **Because** gives a reason; **but** introduces a
+contrast. Either may produce a fluent sentence while changing the author's explanation. The
+surrounding scene and the rest of the article must support the choice. If they do not settle it,
+fluency alone is insufficient evidence to make that change.
+
+This is a reading and judgement requirement within the existing full-document request. It does
+not introduce another provider call or claim that a mechanical check can establish understanding.
+
 ## What not to copy
 
 Do not reuse the religious imagery, study, school example, merchant ending, or personal statements

@@ -53,9 +53,11 @@ refinement and the author-supplied opening without turning them into another tem
 
 ## Produce a story
 
-1. **Establish the intended meaning.** Identify the author's central thought, position, important
-   phrases and actual material. Distinguish remembered events, external evidence, interpretation
-   and proposed illustrations. Do not demand a finished outline.
+1. **Read the whole story and establish its meaning.** Read through the ending before choosing
+   changes, including for a grammar-only request. Apply the canonical contract's whole-story
+   assessment to the author's central thought, progression and actual material. Distinguish
+   remembered events, external evidence, interpretation and proposed illustrations. The reading
+   scope stays whole even when the editing scope is narrow. Do not demand a finished outline.
 2. **Find the reader's reason to stay.** Identify the question, consequence, conflict, relationship
    or observation that warrants attention. In serious material, understand what somebody stands
    to lose or what has already happened to them. Do not manufacture stakes or demand tragedy.
@@ -71,8 +73,11 @@ refinement and the author-supplied opening without turning them into another tem
    automatic verdicts. While a thought is developing, take natural opportunities to connect related
    clauses into longer sentences rather than stopping after each statement. Keep a break when the
    join would be forced, and let short sentences and paragraph breaks mark a meaningful pause.
-   Read each passage into the next to judge the effect. Keep language that gives particular
-   pleasure or force. Do not replace one mannerism with blanket minimalism.
+   Read each passage into the next to judge the effect, then reread the complete result against
+   the supplied version and the requested scope. Keep language that gives particular pleasure or
+   force. Do not replace one mannerism with blanket minimalism. The
+   [context example](docs/writing/examples.md#whole-story-context-in-a-line-edit) illustrates why a
+   fluent local correction can still be wrong for the story.
 6. **Prepare supporting copy.** Derive the title, ingress, social posts and pull quotes from what the
    finished piece actually does. Do not reshape its body to make those fields easier to fill.
    Review the title and ingress together before checking the article's payoff. Apply the canonical
